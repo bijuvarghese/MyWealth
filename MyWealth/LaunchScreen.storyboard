@@ -16,16 +16,16 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="32" translatesAutoresizingMaskIntoConstraints="NO" id="D0k-oU-Eds">
-                                <rect key="frame" x="26" y="217.99999999999997" width="341.33333333333331" height="416.33333333333326"/>
+                                <rect key="frame" x="26" y="206.66666666666663" width="341.33333333333331" height="439"/>
                                 <subviews>
-                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="MyWealth" textAlignment="center" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" minimumFontSize="18" translatesAutoresizingMaskIntoConstraints="NO" id="GJd-Yh-RWb">
-                                        <rect key="frame" x="0.0" y="0.0" width="341.33333333333331" height="43"/>
-                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="36"/>
-                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Wealthy" textAlignment="center" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" minimumFontSize="18" translatesAutoresizingMaskIntoConstraints="NO" id="GJd-Yh-RWb">
+                                        <rect key="frame" x="0.0" y="0.0" width="341.33333333333331" height="65.666666666666671"/>
+                                        <fontDescription key="fontDescription" type="italicSystem" pointSize="55"/>
+                                        <color key="textColor" red="0.9404296875" green="0.7504882812" blue="0.3635253906" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="launch" translatesAutoresizingMaskIntoConstraints="NO" id="rk6-gh-uFN">
-                                        <rect key="frame" x="0.0" y="75" width="341.33333333333331" height="341.33333333333331"/>
+                                        <rect key="frame" x="0.0" y="97.666666666666657" width="341.33333333333331" height="341.33333333333337"/>
                                     </imageView>
                                 </subviews>
                             </stackView>
