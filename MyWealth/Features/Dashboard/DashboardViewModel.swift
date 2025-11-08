@@ -38,14 +38,28 @@ final class DashboardViewModel {
     }
     
     func totalInUSD(_ assets: [Asset]) -> Double {
-        assets.reduce(0) { total, a in
-            total + (a.currency == .usd ? a.amount : a.amount / exchangeRate)
+        assets.reduce(0.0) { total, a in
+            let amount = a.amount ?? 0
+            let valueInUSD: Double
+            if a.currency == .usd {
+                valueInUSD = amount
+            } else {
+                valueInUSD = amount / exchangeRate
+            }
+            return total + valueInUSD
         }
     }
     
     func totalInINR(_ assets: [Asset]) -> Double {
-        assets.reduce(0) { total, a in
-            total + (a.currency == .inr ? a.amount : a.amount * exchangeRate)
+        assets.reduce(0.0) { total, a in
+            let amount = a.amount ?? 0
+            let valueInINR: Double
+            if a.currency == .inr {
+                valueInINR = amount
+            } else {
+                valueInINR = amount * exchangeRate
+            }
+            return total + valueInINR
         }
     }
     
@@ -53,7 +67,7 @@ final class DashboardViewModel {
         let dict = Dictionary(grouping: assets) { $0.category }
         return dict.map { (key, group) in
             let total = totalInUSD(group)
-            return (key, total)
+            return (key ?? .others, total)
         }.sorted { $0.1 > $1.1 }
     }
 }

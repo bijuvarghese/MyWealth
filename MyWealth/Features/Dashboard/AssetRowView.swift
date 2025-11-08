@@ -11,15 +11,15 @@ struct AssetRowView: View {
     
     var body: some View {
         HStack {
-            Image(systemName: asset.category.icon)
+            Image(systemName: asset.category?.icon ?? "")
                 .foregroundStyle(.blue)
                 .frame(width: 25)
             VStack(alignment: .leading) {
-                Text(asset.name)
+                Text(asset.name ?? "")
                     .font(.headline)
-                Text("\(asset.amount, specifier: "%.2f") \(asset.currency.rawValue)")
+                Text("\(asset.amount ?? 0, specifier: "%.2f") \(asset.currency?.rawValue ?? "")")
                     .foregroundStyle(.secondary)
-                Text(asset.category.rawValue)
+                Text(asset.category?.rawValue ?? "")
                     .font(.caption)
                     .foregroundStyle(.gray)
             }

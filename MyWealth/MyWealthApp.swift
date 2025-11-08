@@ -14,7 +14,7 @@ struct MyWealthApp: App {
         let schema = Schema([
             Asset.self,
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false, groupContainer: ModelConfiguration.GroupContainer.automatic)
 
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])

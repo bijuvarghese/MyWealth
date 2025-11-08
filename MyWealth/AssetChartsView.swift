@@ -32,8 +32,8 @@ struct AssetChartsView: View {
                 .chartLegend(.visible)
                 
                 // Pie chart - overall USD vs INR
-                let usdValue = assets.filter { $0.currency == .usd }.reduce(0) { $0 + $1.amount }
-                let inrValue = assets.filter { $0.currency == .inr }.reduce(0) { $0 + $1.amount / viewModel.exchangeRate }
+                let usdValue = assets.filter { $0.currency == .usd }.reduce(0) { $0 + ($1.amount ?? 0) }
+                let inrValue = assets.filter { $0.currency == .inr }.reduce(0) { $0 + ($1.amount ?? 0)  / viewModel.exchangeRate }
                 
                 Chart {
                     SectorMark(

@@ -12,10 +12,10 @@ import Charts
 
 @Model
 final class Asset {
-    var name: String
-    var amount: Double
-    var currency: CurrencyType
-    var category: CategoryType
+    var name: String?
+    var amount: Double?
+    var currency: CurrencyType?
+    var category: CategoryType?
     
     init(name: String, amount: Double, currency: CurrencyType, category: CategoryType) {
         self.name = name
