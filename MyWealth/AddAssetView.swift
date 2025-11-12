@@ -44,7 +44,7 @@ struct AddAssetView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         guard let value = Double(amount), !name.isEmpty else { return }
-                        let newAsset = Asset(name: name, amount: value, currency: currency, category: category)
+                        let newAsset = Asset(name: name, amount: value, currency: currency, category: category, lastUpdated: Date())
                         modelContext.insert(newAsset)
                         dismiss()
                     }

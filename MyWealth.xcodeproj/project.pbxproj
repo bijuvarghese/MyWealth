@@ -6,7 +6,18 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		C64A90802EC048CB001E1F52 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C6FF485E2EBE5C0A00A528A7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C6FF48652EBE5C0A00A528A7;
+			remoteInfo = MyWealth;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		C64A907C2EC048CB001E1F52 /* MyWealthTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyWealthTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6FF48662EBE5C0A00A528A7 /* MyWealth.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyWealth.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -21,6 +32,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		C64A907D2EC048CB001E1F52 /* MyWealthTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MyWealthTests;
+			sourceTree = "<group>";
+		};
 		C6FF48682EBE5C0A00A528A7 /* MyWealth */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -32,6 +48,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		C64A90792EC048CB001E1F52 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C6FF48632EBE5C0A00A528A7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -46,6 +69,7 @@
 			isa = PBXGroup;
 			children = (
 				C6FF48682EBE5C0A00A528A7 /* MyWealth */,
+				C64A907D2EC048CB001E1F52 /* MyWealthTests */,
 				C6FF48672EBE5C0A00A528A7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				C6FF48662EBE5C0A00A528A7 /* MyWealth.app */,
+				C64A907C2EC048CB001E1F52 /* MyWealthTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -61,6 +86,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		C64A907B2EC048CB001E1F52 /* MyWealthTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C64A90842EC048CB001E1F52 /* Build configuration list for PBXNativeTarget "MyWealthTests" */;
+			buildPhases = (
+				C64A90782EC048CB001E1F52 /* Sources */,
+				C64A90792EC048CB001E1F52 /* Frameworks */,
+				C64A907A2EC048CB001E1F52 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C64A90812EC048CB001E1F52 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C64A907D2EC048CB001E1F52 /* MyWealthTests */,
+			);
+			name = MyWealthTests;
+			packageProductDependencies = (
+			);
+			productName = MyWealthTests;
+			productReference = C64A907C2EC048CB001E1F52 /* MyWealthTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		C6FF48652EBE5C0A00A528A7 /* MyWealth */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C6FF48742EBE5C0B00A528A7 /* Build configuration list for PBXNativeTarget "MyWealth" */;
@@ -93,6 +141,10 @@
 				LastSwiftUpdateCheck = 2610;
 				LastUpgradeCheck = 2610;
 				TargetAttributes = {
+					C64A907B2EC048CB001E1F52 = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = C6FF48652EBE5C0A00A528A7;
+					};
 					C6FF48652EBE5C0A00A528A7 = {
 						CreatedOnToolsVersion = 26.1;
 					};
@@ -113,11 +165,19 @@
 			projectRoot = "";
 			targets = (
 				C6FF48652EBE5C0A00A528A7 /* MyWealth */,
+				C64A907B2EC048CB001E1F52 /* MyWealthTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		C64A907A2EC048CB001E1F52 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C6FF48642EBE5C0A00A528A7 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -128,6 +188,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		C64A90782EC048CB001E1F52 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C6FF48622EBE5C0A00A528A7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -137,7 +204,57 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		C64A90812EC048CB001E1F52 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C6FF48652EBE5C0A00A528A7 /* MyWealth */;
+			targetProxy = C64A90802EC048CB001E1F52 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		C64A90822EC048CB001E1F52 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3B2GBCUUPP;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bv.MyWealthTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MyWealth.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MyWealth";
+			};
+			name = Debug;
+		};
+		C64A90832EC048CB001E1F52 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3B2GBCUUPP;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bv.MyWealthTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MyWealth.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MyWealth";
+			};
+			name = Release;
+		};
 		C6FF48752EBE5C0B00A528A7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -342,6 +459,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		C64A90842EC048CB001E1F52 /* Build configuration list for PBXNativeTarget "MyWealthTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C64A90822EC048CB001E1F52 /* Debug */,
+				C64A90832EC048CB001E1F52 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		C6FF48612EBE5C0A00A528A7 /* Build configuration list for PBXProject "MyWealth" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

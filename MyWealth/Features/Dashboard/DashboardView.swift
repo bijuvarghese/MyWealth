@@ -35,14 +35,12 @@ struct DashboardView: View {
                             for index in indexSet {
                                 modelContext.delete(assets[index])
                             }
-                            // No need to call save explicitly; SwiftData will persist on context changes,
-                            // but you can handle errors if you’re doing manual saves elsewhere.
                         }
                     }
-                    FooterView(usdValue: viewModel.totalInUSD(assets), inrValue: viewModel.totalInINR(assets), lastUpdated: viewModel.lastUpdated)
+                    FooterView(model: viewModel.getFooterData(assets))
                 }
             }
-            .navigationTitle("My Assets")
+            .navigationTitle("My Assets")        
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -51,24 +49,25 @@ struct DashboardView: View {
                         Label("Add Asset", systemImage: "plus.circle.fill")
                     }
                 }
-                ToolbarItem(placement: .bottomBar) {
-                    Button {
-                        Task { await viewModel.fetchExchangeRate() }
-                    } label: {
-                        if viewModel.isLoadingRate {
-                            ProgressView()
-                        } else {
-                            Label("Refresh Rate", systemImage: "arrow.clockwise")
-                        }
-                    }
-                }
             }
+//                ToolbarItem(placement: .bottomBar) {
+//                    Button {
+//                        Task { await viewModel.refreshExchangeRateIfNeeded() }
+//                    } label: {
+//                        if viewModel.isLoadingRate {
+//                            ProgressView()
+//                        } else {
+//                            Label("Refresh Rate", systemImage: "arrow.clockwise")
+//                        }
+//                    }
+//                }
+//            }
             .sheet(isPresented: $showAddSheet) {
                 AddAssetView()
             }
         }
         .task {
-            await viewModel.fetchExchangeRate()
+            await viewModel.refreshExchangeRateIfNeeded()
         }
     }
 }

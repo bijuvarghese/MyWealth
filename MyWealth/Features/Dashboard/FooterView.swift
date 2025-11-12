@@ -9,18 +9,29 @@ import SwiftUI
 
 struct FooterView: View {
     
-    let usdValue: Double
-    let inrValue: Double
-    let lastUpdated: Date?
+    let viewModel: FooterViewModel
+    
+    init(model: FooterModel) {
+        self.viewModel = FooterViewModel(model: model)
+    }
     
     var body: some View {
         VStack(spacing: 6) {
-            Text("💵 Total in USD: \(usdValue, format: .currency(code: "USD"))")
-                .font(.headline)
-            Text("🇮🇳 Total in INR: \(inrValue, format: .currency(code: "INR"))")
-                .foregroundStyle(.secondary)
-            
-            if let updated = lastUpdated {
+            HStack {
+                Text("💵 Total in USD:")
+                    .font(.headline)
+                Spacer()
+                Text("\(viewModel.usdValue, format: .currency(code: "USD"))")
+                    .font(.title2)
+            }
+            HStack {
+                Text("🇮🇳 Total in INR:")
+                    .font(.headline)
+                Spacer()
+                Text("\(viewModel.inrValue, format: .currency(code: "INR"))")
+                    .font(.title2)
+            }
+            if let updated = viewModel.lastUpdated {
                 Text("Last updated: \(updated.formatted(date: .abbreviated, time: .shortened))")
                     .font(.caption2)
                     .foregroundStyle(.gray)
@@ -28,8 +39,32 @@ struct FooterView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 10)
-        .background(.ultraThinMaterial)
+        .padding(.horizontal, 24)
+        .background(.launch)
     }
     
+}
+
+class FooterViewModel {
+    let model: FooterModel
     
+    init(model: FooterModel) {
+        self.model = model
+    }
+    
+    var usdValue: Double { model.usdValue }
+    var inrValue: Double { model.inrValue }
+    var lastUpdated: Date? { model.lastUpdated }
+}
+
+struct FooterModel {
+    let usdValue: Double
+    let inrValue: Double
+    let lastUpdated: Date?
+    
+    init(usdValue: Double, inrValue: Double, lastUpdated: Date?) {
+        self.usdValue = usdValue
+        self.inrValue = inrValue
+        self.lastUpdated = lastUpdated
+    }
 }

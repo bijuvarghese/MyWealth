@@ -16,12 +16,14 @@ final class Asset {
     var amount: Double?
     var currency: CurrencyType?
     var category: CategoryType?
+    var lastUpdated: Date?
     
-    init(name: String, amount: Double, currency: CurrencyType, category: CategoryType) {
+    init(name: String, amount: Double, currency: CurrencyType, category: CategoryType, lastUpdated: Date? = Date()) {
         self.name = name
         self.amount = amount
         self.currency = currency
         self.category = category
+        self.lastUpdated = lastUpdated
     }
     
     enum CurrencyType: String, Codable, CaseIterable, Identifiable {
