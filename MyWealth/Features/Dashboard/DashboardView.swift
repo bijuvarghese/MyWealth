@@ -17,6 +17,7 @@ struct DashboardView: View {
     @State private var showAddSheet = false
     @State private var viewModel = DashboardViewModel()
     
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -40,7 +41,7 @@ struct DashboardView: View {
                     FooterView(model: viewModel.getFooterData(assets))
                 }
             }
-            .navigationTitle("My Assets")        
+            .navigationTitle("My Assets")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -50,18 +51,6 @@ struct DashboardView: View {
                     }
                 }
             }
-//                ToolbarItem(placement: .bottomBar) {
-//                    Button {
-//                        Task { await viewModel.refreshExchangeRateIfNeeded() }
-//                    } label: {
-//                        if viewModel.isLoadingRate {
-//                            ProgressView()
-//                        } else {
-//                            Label("Refresh Rate", systemImage: "arrow.clockwise")
-//                        }
-//                    }
-//                }
-//            }
             .sheet(isPresented: $showAddSheet) {
                 AddAssetView()
             }

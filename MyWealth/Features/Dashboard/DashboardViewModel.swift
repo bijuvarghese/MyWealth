@@ -50,7 +50,7 @@ final class DashboardViewModel: AssetOperations {
         isLoadingRate = true
         defer { isLoadingRate = false }
         do {
-            let decoded: RateResponse = try await NetworkManager.shared.getJSON(
+            let decoded: RateResponse = try await NetworkManager.shared.getResponse(
                 from: url,
                 headers: ["apikey": "cualLc86jPPqWwxNk6H1KRwHPqI9doH6"]
             )
@@ -82,7 +82,8 @@ final class DashboardViewModel: AssetOperations {
         return FooterModel(
             usdValue: totalInUSD(assets, exchangeRate: exchangeRate),
             inrValue: totalInINR(assets, exchangeRate: exchangeRate),
-            lastUpdated: lastUpdated
+            lastUpdated: lastUpdated,
+            exchangeRate: exchangeRate
         )
     }
 }

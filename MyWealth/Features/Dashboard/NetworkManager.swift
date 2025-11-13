@@ -66,7 +66,7 @@ final class NetworkManager {
 }
 
 extension NetworkManager {
-    func getJSON<T: Decodable>(
+    func getResponse<T: Decodable>(
         from url: URL,
         headers: [String: String]? = nil,
         decoder: JSONDecoder = JSONDecoder()

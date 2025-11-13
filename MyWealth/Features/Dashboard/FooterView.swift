@@ -31,6 +31,8 @@ struct FooterView: View {
                 Text("\(viewModel.inrValue, format: .currency(code: "INR"))")
                     .font(.title2)
             }
+            Text("1 USD = \(viewModel.exchangeRate ?? 0, format: .currency(code: "INR")) INR")
+                .font(.headline)
             if let updated = viewModel.lastUpdated {
                 Text("Last updated: \(updated.formatted(date: .abbreviated, time: .shortened))")
                     .font(.caption2)
@@ -55,16 +57,13 @@ class FooterViewModel {
     var usdValue: Double { model.usdValue }
     var inrValue: Double { model.inrValue }
     var lastUpdated: Date? { model.lastUpdated }
+    var exchangeRate: Double? { model.exchangeRate }
 }
 
 struct FooterModel {
     let usdValue: Double
     let inrValue: Double
     let lastUpdated: Date?
+    let exchangeRate: Double?
     
-    init(usdValue: Double, inrValue: Double, lastUpdated: Date?) {
-        self.usdValue = usdValue
-        self.inrValue = inrValue
-        self.lastUpdated = lastUpdated
-    }
 }
