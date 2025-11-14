@@ -6,20 +6,7 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		C63A09AE2EC5824F005CDAAE /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C63A09AD2EC5824F005CDAAE /* WidgetKit.framework */; };
-		C63A09B02EC5824F005CDAAE /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C63A09AF2EC5824F005CDAAE /* SwiftUI.framework */; };
-		C63A09BF2EC5824F005CDAAE /* WealthyExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C63A09AB2EC5824F005CDAAE /* WealthyExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
-		C63A09BD2EC5824F005CDAAE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = C6FF485E2EBE5C0A00A528A7 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C63A09AA2EC5824F005CDAAE;
-			remoteInfo = WealthyExtension;
-		};
 		C64A90802EC048CB001E1F52 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C6FF485E2EBE5C0A00A528A7 /* Project object */;
@@ -36,7 +23,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				C63A09BF2EC5824F005CDAAE /* WealthyExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -44,21 +30,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		C63A09AB2EC5824F005CDAAE /* WealthyExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WealthyExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		C63A09AD2EC5824F005CDAAE /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		C63A09AF2EC5824F005CDAAE /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		C64A907C2EC048CB001E1F52 /* MyWealthTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyWealthTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6FF48662EBE5C0A00A528A7 /* MyWealth.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyWealth.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		C63A09C42EC5824F005CDAAE /* Exceptions for "Wealthy" folder in "WealthyExtension" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = C63A09AA2EC5824F005CDAAE /* WealthyExtension */;
-		};
 		C6FF48732EBE5C0B00A528A7 /* Exceptions for "MyWealth" folder in "MyWealth" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -69,14 +46,6 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		C63A09B12EC5824F005CDAAE /* Wealthy */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				C63A09C42EC5824F005CDAAE /* Exceptions for "Wealthy" folder in "WealthyExtension" target */,
-			);
-			path = Wealthy;
-			sourceTree = "<group>";
-		};
 		C64A907D2EC048CB001E1F52 /* MyWealthTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = MyWealthTests;
@@ -93,15 +62,6 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		C63A09A82EC5824F005CDAAE /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C63A09B02EC5824F005CDAAE /* SwiftUI.framework in Frameworks */,
-				C63A09AE2EC5824F005CDAAE /* WidgetKit.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		C64A90792EC048CB001E1F52 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -122,7 +82,6 @@
 		C63A09AC2EC5824F005CDAAE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C63A09AD2EC5824F005CDAAE /* WidgetKit.framework */,
 				C63A09AF2EC5824F005CDAAE /* SwiftUI.framework */,
 			);
 			name = Frameworks;
@@ -133,7 +92,6 @@
 			children = (
 				C6FF48682EBE5C0A00A528A7 /* MyWealth */,
 				C64A907D2EC048CB001E1F52 /* MyWealthTests */,
-				C63A09B12EC5824F005CDAAE /* Wealthy */,
 				C63A09AC2EC5824F005CDAAE /* Frameworks */,
 				C6FF48672EBE5C0A00A528A7 /* Products */,
 			);
@@ -144,7 +102,6 @@
 			children = (
 				C6FF48662EBE5C0A00A528A7 /* MyWealth.app */,
 				C64A907C2EC048CB001E1F52 /* MyWealthTests.xctest */,
-				C63A09AB2EC5824F005CDAAE /* WealthyExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -152,28 +109,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C63A09AA2EC5824F005CDAAE /* WealthyExtension */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = C63A09C32EC5824F005CDAAE /* Build configuration list for PBXNativeTarget "WealthyExtension" */;
-			buildPhases = (
-				C63A09A72EC5824F005CDAAE /* Sources */,
-				C63A09A82EC5824F005CDAAE /* Frameworks */,
-				C63A09A92EC5824F005CDAAE /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				C63A09B12EC5824F005CDAAE /* Wealthy */,
-			);
-			name = WealthyExtension;
-			packageProductDependencies = (
-			);
-			productName = WealthyExtension;
-			productReference = C63A09AB2EC5824F005CDAAE /* WealthyExtension.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
 		C64A907B2EC048CB001E1F52 /* MyWealthTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C64A90842EC048CB001E1F52 /* Build configuration list for PBXNativeTarget "MyWealthTests" */;
@@ -209,7 +144,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				C63A09BE2EC5824F005CDAAE /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				C6FF48682EBE5C0A00A528A7 /* MyWealth */,
@@ -231,9 +165,6 @@
 				LastSwiftUpdateCheck = 2610;
 				LastUpgradeCheck = 2610;
 				TargetAttributes = {
-					C63A09AA2EC5824F005CDAAE = {
-						CreatedOnToolsVersion = 26.1;
-					};
 					C64A907B2EC048CB001E1F52 = {
 						CreatedOnToolsVersion = 26.1;
 						TestTargetID = C6FF48652EBE5C0A00A528A7;
@@ -259,19 +190,11 @@
 			targets = (
 				C6FF48652EBE5C0A00A528A7 /* MyWealth */,
 				C64A907B2EC048CB001E1F52 /* MyWealthTests */,
-				C63A09AA2EC5824F005CDAAE /* WealthyExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		C63A09A92EC5824F005CDAAE /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		C64A907A2EC048CB001E1F52 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -289,13 +212,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		C63A09A72EC5824F005CDAAE /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		C64A90782EC048CB001E1F52 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -313,11 +229,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		C63A09BE2EC5824F005CDAAE /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C63A09AA2EC5824F005CDAAE /* WealthyExtension */;
-			targetProxy = C63A09BD2EC5824F005CDAAE /* PBXContainerItemProxy */;
-		};
 		C64A90812EC048CB001E1F52 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = C6FF48652EBE5C0A00A528A7 /* MyWealth */;
@@ -326,66 +237,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		C63A09C12EC5824F005CDAAE /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3B2GBCUUPP;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Wealthy/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Wealthy;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.bv.MyWealth.Wealthy;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		C63A09C22EC5824F005CDAAE /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3B2GBCUUPP;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Wealthy/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Wealthy;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.bv.MyWealth.Wealthy;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 		C64A90822EC048CB001E1F52 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -436,7 +287,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = MyWealth/MyWealth.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 18;
 				DEVELOPMENT_TEAM = 3B2GBCUUPP;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -474,7 +325,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = MyWealth/MyWealth.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 18;
 				DEVELOPMENT_TEAM = 3B2GBCUUPP;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -632,15 +483,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C63A09C32EC5824F005CDAAE /* Build configuration list for PBXNativeTarget "WealthyExtension" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				C63A09C12EC5824F005CDAAE /* Debug */,
-				C63A09C22EC5824F005CDAAE /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		C64A90842EC048CB001E1F52 /* Build configuration list for PBXNativeTarget "MyWealthTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
