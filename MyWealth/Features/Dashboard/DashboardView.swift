@@ -9,12 +9,20 @@
 import SwiftUI
 import SwiftData
 import Charts
+enum SheetType {
+    case addAsset
+    case settings
+}
 
+struct SheetTypeModel: Identifiable {
+    let id = UUID()
+    let type: SheetType
+}
 struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var assets: [Asset]
     
-    @State private var showAddSheet = false
+    @State private var showSheet: SheetTypeModel? = nil
     @State private var viewModel = DashboardViewModel()
     
     
@@ -45,14 +53,28 @@ struct DashboardView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        showAddSheet = true
+                        showSheet = SheetTypeModel(type: .addAsset)
                     } label: {
                         Label("Add Asset", systemImage: "plus.circle.fill")
                     }
                 }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showSheet = SheetTypeModel(type: .settings)
+                    } label: {
+                        Label("Add Asset", systemImage: "gear.circle.fill")
+                    }
+                }
+                
             }
-            .sheet(isPresented: $showAddSheet) {
-                AddAssetView()
+            .sheet(item: $showSheet) { sheet in
+                switch sheet.type {
+                case .addAsset:
+                    AddAssetView()
+                case .settings:
+                    SettingsView()
+                }
             }
         }
         .task {
@@ -60,3 +82,4 @@ struct DashboardView: View {
         }
     }
 }
+

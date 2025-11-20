@@ -12,11 +12,6 @@ import Charts
 @Observable
 final class DashboardViewModel: AssetOperations {
 
-    private enum DefaultsKeys {
-        static let lastUpdated = "exchangeRate.lastUpdated"
-        static let rate = "exchangeRate.value"
-    }
-
     var exchangeRate: Double = 0
     var isLoadingRate = false
     var lastUpdated: Date? = nil

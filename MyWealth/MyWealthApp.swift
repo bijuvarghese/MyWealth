@@ -29,7 +29,7 @@ struct MyWealthApp: App {
 
     var body: some Scene {
         WindowGroup {
-            DashboardView()
+            HomeView()
         }
         .modelContainer(sharedModelContainer)
     }
