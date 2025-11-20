@@ -29,6 +29,7 @@ final class Asset {
     enum CurrencyType: String, Codable, CaseIterable, Identifiable {
         case usd = "USD"
         case inr = "INR"
+        case none = ""
         var id: String { rawValue }
     }
     

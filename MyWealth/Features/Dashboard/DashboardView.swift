@@ -16,7 +16,7 @@ struct DashboardView: View {
     
     @State private var showAddSheet = false
     @State private var viewModel = DashboardViewModel()
-    
+    @State private var selectedAsset: Asset?
     
     var body: some View {
         NavigationStack {
@@ -31,6 +31,11 @@ struct DashboardView: View {
                     List {
                         ForEach(assets) { asset in
                             AssetRowView(asset: asset)
+                                .onTapGesture {
+                                    selectedAsset = asset
+                                    showAddSheet = true
+                                }
+
                         }
                         .onDelete { indexSet in
                             for index in indexSet {
@@ -52,7 +57,7 @@ struct DashboardView: View {
                 }
             }
             .sheet(isPresented: $showAddSheet) {
-                AddAssetView()
+                AddorEditAssetView(asset: selectedAsset)
             }
         }
         .task {
