@@ -6,11 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SettingsView: View {
     
     @Environment(\.dismiss) private var dismiss
-    
+    @Environment(\.modelContext) private var modelContext
+    @Query private var currencies: Currencies
+
+    let viewModel = SettingsViewModel()
     private var appVersion: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
     }
@@ -57,16 +61,23 @@ struct SettingsView: View {
                 }
             }
             .task {
-                viewModel.exchangeRateSymbols.sink(receiveValue: { _ in })
+                await viewModel.refreshDataIfNeeded()
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        
+
     }
 }
 
 @Observable
 final class SettingsViewModel {
     var isLoadingRate: Bool = false
+    
+    func refreshDataIfNeeded() async {
+        guard let symbols = await getAllSymbols() else { return }
+        
+        
+    }
     
     func getAllSymbols() async -> [String: String]? {
         guard let url = URL(string: "https://api.apilayer.com/exchangerates_data/symbols") else {
@@ -88,8 +99,4 @@ final class SettingsViewModel {
         }
         return nil
     }
-}
-struct SymbolsResponse: Codable {
-    let success: Bool?
-    let symbols: [String: String]?
 }

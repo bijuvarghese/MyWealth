@@ -29,6 +29,7 @@ final class Asset {
     enum CurrencyType: String, Codable, CaseIterable, Identifiable {
         case usd = "USD"
         case inr = "INR"
+        case none = ""
         var id: String { rawValue }
     }
     
@@ -52,5 +53,29 @@ final class Asset {
             case .others: "tray.full"
             }
         }
+    }
+}
+
+@Model
+final class Currencies {
+    var symbols: [String: String]?
+    var updatedDate: Date?
+
+    init(symbols: [String: String]? = nil, updatedDate: Date? = Date()) {
+        self.symbols = symbols
+        self.updatedDate = updatedDate
+    }
+}
+
+
+struct SymbolsResponse: Codable {
+    var success: Bool?
+    var symbols: [String: String]?
+    var updatedDate: Date?
+
+    init(success: Bool? = nil, symbols: [String: String]? = nil, updatedDate: Date? = Date()) {
+        self.success = success
+        self.symbols = symbols
+        self.updatedDate = updatedDate
     }
 }

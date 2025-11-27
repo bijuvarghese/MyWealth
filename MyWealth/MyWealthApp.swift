@@ -13,6 +13,7 @@ struct MyWealthApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Asset.self,
+            Currencies.self            
         ])
         let modelConfiguration = ModelConfiguration(
             schema: schema,
@@ -30,6 +31,7 @@ struct MyWealthApp: App {
     var body: some Scene {
         WindowGroup {
             HomeView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .modelContainer(sharedModelContainer)
     }

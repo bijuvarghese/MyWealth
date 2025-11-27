@@ -11,6 +11,7 @@ import SwiftData
 import Charts
 enum SheetType {
     case addAsset
+    case editAsset(Asset)
     case settings
 }
 
@@ -25,7 +26,6 @@ struct DashboardView: View {
     @State private var showSheet: SheetTypeModel? = nil
     @State private var viewModel = DashboardViewModel()
     
-    
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -39,6 +39,9 @@ struct DashboardView: View {
                     List {
                         ForEach(assets) { asset in
                             AssetRowView(asset: asset)
+                                .onTapGesture {
+                                    showSheet = SheetTypeModel(type: .editAsset(asset))
+                                }
                         }
                         .onDelete { indexSet in
                             for index in indexSet {
@@ -71,7 +74,9 @@ struct DashboardView: View {
             .sheet(item: $showSheet) { sheet in
                 switch sheet.type {
                 case .addAsset:
-                    AddAssetView()
+                    AddorEditAssetView()
+                case .editAsset(let asset):
+                    AddorEditAssetView(asset: asset)
                 case .settings:
                     SettingsView()
                 }

@@ -23,9 +23,9 @@ final class DashboardViewModel: AssetOperations {
         if let savedDateInterval = UserDefaults.standard.object(forKey: DefaultsKeys.lastUpdated) as? TimeInterval {
             self.lastUpdated = Date(timeIntervalSince1970: savedDateInterval)
         }
-        Task { [weak self] in
-            await self?.refreshExchangeRateIfNeeded()
-        }
+//        Task { [weak self] in
+//            await self?.refreshExchangeRateIfNeeded()
+//        }
     }
     
     @MainActor

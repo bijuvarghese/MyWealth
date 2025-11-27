@@ -31,13 +31,12 @@ struct HomeView: View {
         
     }
 }
-
-private enum DefaultsKeys {
+enum DefaultsKeys {
     static let lastUpdated = "exchangeRate.lastUpdated"
     static let rate = "exchangeRate.value"
     static let baseCurrency = "baseCurrency"
     static let apikey = "cualLc86jPPqWwxNk6H1KRwHPqI9doH6"
-
+    static let hasCompletedPreferencesKey = "hasCompletedPreferences"
 }
 
 @Observable
@@ -49,12 +48,12 @@ final class HomeViewModel {
     /// Returns true if the user has completed initial preferences setup.
     /// Replace this with your actual persistence mechanism if needed.
     func hasUserSetPreferences() -> Bool {
-        UserDefaults.standard.bool(forKey: hasCompletedPreferencesKey)
+        UserDefaults.standard.bool(forKey: DefaultsKeys.hasCompletedPreferencesKey)
     }
 
     /// Call this when the user completes preferences so future launches skip setup.
     func markUserPreferencesCompleted() {
-        UserDefaults.standard.set(true, forKey: hasCompletedPreferencesKey)
+        UserDefaults.standard.set(true, forKey: DefaultsKeys.hasCompletedPreferencesKey)
     }
     
     var state: HomeViewState = .initial
