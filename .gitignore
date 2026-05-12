@@ -1,1 +1,7 @@
 *xcuser*
+functions/node_modules/
+functions/.env
+functions/.env.*
+functions/.secret.local
+firebase-debug.log
+firebase-debug.*.log

@@ -45,15 +45,10 @@ final class DashboardViewModel: AssetOperations {
     }
     
     func fetchExchangeRate() async {
-        
-        guard let url = URL(string: "https://api.apilayer.com/exchangerates_data/latest?symbols=INR&base=USD") else { return }
         isLoadingRate = true
         defer { isLoadingRate = false }
         do {
-            let decoded: RateResponse = try await NetworkManager.shared.getResponse(
-                from: url,
-                headers: ["apikey": "cualLc86jPPqWwxNk6H1KRwHPqI9doH6"]
-            )
+            let decoded = try await FirebaseExchangeRateService.shared.fetchLatestUSDToINRRate()
             if let rate = decoded.rates?["INR"] {
                 let now = Date()
                 exchangeRate = rate
@@ -61,7 +56,7 @@ final class DashboardViewModel: AssetOperations {
                 persistRate(rate, at: now)
             }
         } catch {
-            print("⚠️ Error fetching rate:", error)
+            print("Warning: Error fetching rate:", error.localizedDescription)
         }
     }
     
