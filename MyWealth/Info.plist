@@ -4,6 +4,8 @@
 <dict>
 	<key>ExchangeRateProxyURL</key>
 	<string>https://us-central1-mywealth-api-router.cloudfunctions.net/latestExchangeRate</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

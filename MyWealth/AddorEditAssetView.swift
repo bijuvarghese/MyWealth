@@ -34,10 +34,17 @@ struct AddorEditAssetView: View {
                 TextField("Amount", text: $amount)
                     .keyboardType(.decimalPad)
                 
-                Picker("Currency", selection: $currency) {
-                    ForEach(Asset.CurrencyType.allCases) { type in
-                        Text(type.rawValue)
-                            .tag(type)
+                NavigationLink {
+                    CurrencySelectionView(selection: $currency)
+                } label: {
+                    LabeledContent("Currency") {
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text(currency.rawValue)
+                                .foregroundStyle(.primary)
+                            Text(currency.name)
+                                .font(.caption)
+                                .foregroundStyle(.gray)
+                        }
                     }
                 }
                 Picker("Category", selection: $category) {
@@ -91,7 +98,7 @@ struct AddorEditAssetView: View {
             if let asset {
                 name = asset.name ?? ""
                 amount = String(asset.amount ?? 0)
-                currency = asset.currency ?? .none
+                currency = asset.currency ?? .usd
                 category = asset.category ?? .others
             }
         }
