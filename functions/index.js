@@ -18,7 +18,6 @@ exports.latestExchangeRate = onRequest(
 
     const apiKey = exchangeRatesApiKey.value();
     const url = new URL("https://api.apilayer.com/exchangerates_data/latest");
-    url.searchParams.set("symbols", "INR");
     url.searchParams.set("base", "USD");
 
     try {

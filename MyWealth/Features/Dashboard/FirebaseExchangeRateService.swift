@@ -16,7 +16,7 @@ final class FirebaseExchangeRateService {
 
     private init() {}
 
-    func fetchLatestUSDToINRRate() async throws -> RateResponse {
+    func fetchLatestExchangeRates() async throws -> RateResponse {
         guard let url = Self.proxyURL else {
             throw ExchangeRateServiceError.missingProxyURL
         }

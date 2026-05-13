@@ -15,7 +15,9 @@ struct DashboardView: View {
     @Query private var assets: [Asset]
     
     @State private var showAddSheet = false
+    @State private var showSettings = false
     @State private var viewModel = DashboardViewModel()
+    @State private var settings = AppSettings()
     @State private var selectedAsset: Asset?
     
     var body: some View {
@@ -29,6 +31,10 @@ struct DashboardView: View {
                     )
                 } else {
                     List {
+                        Section("Asset Currency Totals") {
+                            CurrencyTotalsView(totals: viewModel.totalsByCurrency(assets))
+                        }
+
                         ForEach(assets) { asset in
                             AssetRowView(asset: asset)
                                 .onTapGesture {
@@ -43,11 +49,24 @@ struct DashboardView: View {
                             }
                         }
                     }
-                    FooterView(model: viewModel.getFooterData(assets))
+//                    FooterView(
+//                        model: viewModel.getFooterData(
+//                            assets,
+//                            baseCurrency: settings.baseCurrency,
+//                            displayCurrencies: settings.totalCurrencies
+//                        )
+//                    )
                 }
             }
             .navigationTitle("My Assets")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        showSettings = true
+                    } label: {
+                        Label("Settings", systemImage: "gearshape")
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showAddSheet = true
@@ -58,6 +77,9 @@ struct DashboardView: View {
             }
             .sheet(isPresented: $showAddSheet) {
                 AddorEditAssetView(asset: selectedAsset)
+            }
+            .sheet(isPresented: $showSettings) {
+                SettingsView(settings: settings)
             }
         }
         .task {

@@ -17,22 +17,23 @@ struct FooterView: View {
     
     var body: some View {
         VStack(spacing: 6) {
-            HStack {
-                Text("💵 Total in USD:")
-                    .font(.headline)
-                Spacer()
-                Text("\(viewModel.usdValue, format: .currency(code: "USD"))")
-                    .font(.title2)
+            ForEach(viewModel.totals) { total in
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Total in \(total.currency.rawValue)")
+                            .font(.headline)
+                        Text(total.currency.name)
+                            .font(.caption)
+                            .foregroundStyle(.gray)
+                    }
+                    Spacer()
+                    Text(total.amount, format: .currency(code: total.currency.rawValue))
+                        .font(.title2)
+                }
             }
-            HStack {
-                Text("🇮🇳 Total in INR:")
-                    .font(.headline)
-                Spacer()
-                Text("\(viewModel.inrValue, format: .currency(code: "INR"))")
-                    .font(.title2)
-            }
-            Text("1 USD = \(viewModel.exchangeRate ?? 0, format: .currency(code: "INR")) INR")
-                .font(.headline)
+            Text("Base: \(viewModel.baseCurrency.rawValue) - \(viewModel.baseCurrency.name)")
+                .font(.caption2)
+                .foregroundStyle(.gray)
             if let updated = viewModel.lastUpdated {
                 Text("Last updated: \(updated.formatted(date: .abbreviated, time: .shortened))")
                     .font(.caption2)
@@ -54,16 +55,16 @@ class FooterViewModel {
         self.model = model
     }
     
-    var usdValue: Double { model.usdValue }
-    var inrValue: Double { model.inrValue }
+    var totals: [ConvertedCurrencyTotal] { model.totals }
+    var baseCurrency: Asset.CurrencyType { model.baseCurrency }
     var lastUpdated: Date? { model.lastUpdated }
-    var exchangeRate: Double? { model.exchangeRate }
+    var rates: [String: Double] { model.rates }
 }
 
 struct FooterModel {
-    let usdValue: Double
-    let inrValue: Double
+    let totals: [ConvertedCurrencyTotal]
+    let baseCurrency: Asset.CurrencyType
     let lastUpdated: Date?
-    let exchangeRate: Double?
+    let rates: [String: Double]
     
 }

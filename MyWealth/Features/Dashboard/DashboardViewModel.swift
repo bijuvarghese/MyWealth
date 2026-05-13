@@ -15,18 +15,26 @@ final class DashboardViewModel: AssetOperations {
     private enum DefaultsKeys {
         static let lastUpdated = "exchangeRate.lastUpdated"
         static let rate = "exchangeRate.value"
+        static let rates = "exchangeRate.rates"
     }
 
     var exchangeRate: Double = 0
+    var exchangeRates: [String: Double] = ["USD": 1]
     var isLoadingRate = false
     var lastUpdated: Date? = nil
     
-    init() {
+    init(autoRefreshRate: Bool = true) {
         if let savedRate = UserDefaults.standard.object(forKey: DefaultsKeys.rate) as? Double {
             self.exchangeRate = savedRate
         }
+        if let savedRates = UserDefaults.standard.object(forKey: DefaultsKeys.rates) as? [String: Double] {
+            self.exchangeRates = savedRates.merging(["USD": 1]) { current, _ in current }
+        }
         if let savedDateInterval = UserDefaults.standard.object(forKey: DefaultsKeys.lastUpdated) as? TimeInterval {
             self.lastUpdated = Date(timeIntervalSince1970: savedDateInterval)
+        }
+        guard autoRefreshRate else {
+            return
         }
         Task { [weak self] in
             await self?.refreshExchangeRateIfNeeded()
@@ -48,20 +56,23 @@ final class DashboardViewModel: AssetOperations {
         isLoadingRate = true
         defer { isLoadingRate = false }
         do {
-            let decoded = try await FirebaseExchangeRateService.shared.fetchLatestUSDToINRRate()
-            if let rate = decoded.rates?["INR"] {
-                let now = Date()
-                exchangeRate = rate
-                lastUpdated = now
-                persistRate(rate, at: now)
-            }
+            let decoded = try await FirebaseExchangeRateService.shared.fetchLatestExchangeRates()
+            let rates = (decoded.rates ?? [:]).merging(["USD": 1]) { current, _ in current }
+            guard let rate = rates["INR"] else { return }
+
+            let now = Date()
+            exchangeRates = rates
+            exchangeRate = rate
+            lastUpdated = now
+            persistRates(rates, inrRate: rate, at: now)
         } catch {
             print("Warning: Error fetching rate:", error.localizedDescription)
         }
     }
     
-    private func persistRate(_ rate: Double, at date: Date) {
-        UserDefaults.standard.set(rate, forKey: DefaultsKeys.rate)
+    private func persistRates(_ rates: [String: Double], inrRate: Double, at date: Date) {
+        UserDefaults.standard.set(inrRate, forKey: DefaultsKeys.rate)
+        UserDefaults.standard.set(rates, forKey: DefaultsKeys.rates)
         UserDefaults.standard.set(date.timeIntervalSince1970, forKey: DefaultsKeys.lastUpdated)
     }
     
@@ -73,14 +84,63 @@ final class DashboardViewModel: AssetOperations {
         }.sorted { $0.1 > $1.1 }
     }
     
-    func getFooterData(_ assets: [Asset]) -> FooterModel {
+    func totalsByCurrency(_ assets: [Asset]) -> [CurrencyTotal] {
+        let assetCurrencies = assets.reduce(into: [Asset.CurrencyType]()) { result, asset in
+            guard let currency = asset.currency, !result.contains(currency) else {
+                return
+            }
+            result.append(currency)
+        }
+
+        return assetCurrencies.compactMap { currency in
+            guard let total = convertedTotal(assets, to: currency, exchangeRates: exchangeRates) else {
+                return nil
+            }
+            return CurrencyTotal(currency: currency, amount: total)
+        }
+        .filter { $0.amount > 0 }
+        .sorted { $0.currency.rawValue < $1.currency.rawValue }
+    }
+
+    func getFooterData(
+        _ assets: [Asset],
+        baseCurrency: Asset.CurrencyType,
+        displayCurrencies: [Asset.CurrencyType]
+    ) -> FooterModel {
+        let orderedCurrencies = ([baseCurrency] + displayCurrencies).reduce(into: [Asset.CurrencyType]()) { result, currency in
+            if !result.contains(currency) {
+                result.append(currency)
+            }
+        }
+
+        let totals = orderedCurrencies.compactMap { currency -> ConvertedCurrencyTotal? in
+            guard let amount = convertedTotal(assets, to: currency, exchangeRates: exchangeRates) else {
+                return nil
+            }
+            return ConvertedCurrencyTotal(currency: currency, amount: amount)
+        }
+
         return FooterModel(
-            usdValue: totalInUSD(assets, exchangeRate: exchangeRate),
-            inrValue: totalInINR(assets, exchangeRate: exchangeRate),
+            totals: totals,
+            baseCurrency: baseCurrency,
             lastUpdated: lastUpdated,
-            exchangeRate: exchangeRate
+            rates: exchangeRates
         )
     }
+}
+
+struct CurrencyTotal: Identifiable {
+    let currency: Asset.CurrencyType
+    let amount: Double
+
+    var id: String { currency.rawValue }
+}
+
+struct ConvertedCurrencyTotal: Identifiable {
+    let currency: Asset.CurrencyType
+    let amount: Double
+
+    var id: String { currency.rawValue }
 }
 
 struct RateResponse: Codable {

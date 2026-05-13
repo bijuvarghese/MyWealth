@@ -29,8 +29,20 @@ struct MyWealthApp: App {
 
     var body: some Scene {
         WindowGroup {
-            DashboardView()
+            AppRootView()
         }
         .modelContainer(sharedModelContainer)
+    }
+}
+
+private struct AppRootView: View {
+    @State private var settings = AppSettings()
+
+    var body: some View {
+        if settings.hasCompletedOnboarding {
+            DashboardView()
+        } else {
+            OnboardingView(settings: settings)
+        }
     }
 }
