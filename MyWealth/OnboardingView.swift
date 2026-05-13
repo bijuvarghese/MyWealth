@@ -31,7 +31,7 @@ struct OnboardingView: View {
                     }
                 }
             }
-            .navigationTitle("Set Up Wealthy")
+            .navigationTitle("Set Up Wealth Map")
             .safeAreaInset(edge: .bottom) {
                 Button {
                     settings.completeOnboarding(
