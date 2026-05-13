@@ -1,4 +1,15 @@
 {
+  "hosting": {
+    "site": "mywealth-api-router",
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false
+  },
   "functions": [
     {
       "source": "functions",
