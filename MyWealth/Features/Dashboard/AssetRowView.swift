@@ -12,7 +12,7 @@ struct AssetRowView: View {
     var body: some View {
         HStack {
             Image(systemName: asset.category?.icon ?? "")
-                .foregroundStyle(.launch)
+                .foregroundStyle(.accent)
                 .frame(width: 25)
             VStack(alignment: .leading) {
                 Text(asset.name ?? "")
