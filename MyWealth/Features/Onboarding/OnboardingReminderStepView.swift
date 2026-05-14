@@ -57,9 +57,9 @@ struct OnboardingReminderStepView: View {
                 }
             }
         }
-        .onChange(of: reminderManager.isNotificationPermissionGranted) { _, isGranted in
-            if isGranted {
-                remindersEnabled = true
+        .onChange(of: remindersEnabled) { _, isEnabled in
+            if isEnabled && !reminderManager.isNotificationPermissionGranted {
+                reminderManager.requestNotificationPermission()
             }
         }
     }

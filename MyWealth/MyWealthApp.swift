@@ -40,7 +40,7 @@ private struct AppRootView: View {
     @State private var settings = AppSettings()
 
     var body: some View {
-        if settings.hasCompletedOnboarding {
+        if settings.onboardingStatus().isComplete {
             DashboardView()
         } else {
             OnboardingView(settings: settings)

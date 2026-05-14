@@ -75,6 +75,7 @@ enum ReminderType: String, Codable, CaseIterable {
 
 struct ReminderPreference: Codable {
     var isEnabled: Bool
+    var hasMadeChoice: Bool
     var frequency: ReminderFrequency
     var reminderTime: Date
     var reminderType: ReminderType
@@ -82,16 +83,37 @@ struct ReminderPreference: Codable {
     
     init(
         isEnabled: Bool = false,
+        hasMadeChoice: Bool = false,
         frequency: ReminderFrequency = .weekly,
         reminderTime: Date = Self.defaultReminderTime(),
         reminderType: ReminderType = .reviewPortfolio,
         lastReminderDate: Date? = nil
     ) {
         self.isEnabled = isEnabled
+        self.hasMadeChoice = hasMadeChoice
         self.frequency = frequency
         self.reminderTime = reminderTime
         self.reminderType = reminderType
         self.lastReminderDate = lastReminderDate
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case isEnabled
+        case hasMadeChoice
+        case frequency
+        case reminderTime
+        case reminderType
+        case lastReminderDate
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.isEnabled = try container.decode(Bool.self, forKey: .isEnabled)
+        self.hasMadeChoice = try container.decodeIfPresent(Bool.self, forKey: .hasMadeChoice) ?? true
+        self.frequency = try container.decode(ReminderFrequency.self, forKey: .frequency)
+        self.reminderTime = try container.decode(Date.self, forKey: .reminderTime)
+        self.reminderType = try container.decode(ReminderType.self, forKey: .reminderType)
+        self.lastReminderDate = try container.decodeIfPresent(Date.self, forKey: .lastReminderDate)
     }
     
     static func defaultReminderTime() -> Date {
