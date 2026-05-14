@@ -35,19 +35,67 @@ struct MyWealthTests {
     @MainActor
     @Test func onboardingCompletionPersistsSelectedCurrencies() async throws {
         let defaults = try makeIsolatedDefaults()
-        let settings = AppSettings(userDefaults: defaults)
+        let settings = AppSettings(
+            userDefaults: defaults,
+            hasMadeReminderChoice: { true }
+        )
 
-        #expect(settings.hasCompletedOnboarding == false)
+        #expect(settings.hasCompletedOnboarding.isComplete == false)
+        #expect(settings.hasCompletedOnboarding.missingSteps == [.baseCurrency, .displayCurrencies])
 
         settings.completeOnboarding(
             baseCurrency: .eur,
             displayCurrencies: [.usd, .inr]
         )
 
-        let restoredSettings = AppSettings(userDefaults: defaults)
-        #expect(restoredSettings.hasCompletedOnboarding == true)
+        let restoredSettings = AppSettings(
+            userDefaults: defaults,
+            hasMadeReminderChoice: { true }
+        )
+        #expect(restoredSettings.hasCompletedOnboarding.isComplete == true)
+        #expect(restoredSettings.hasCompletedOnboarding.missingSteps.isEmpty)
         #expect(restoredSettings.baseCurrency == .eur)
         #expect(restoredSettings.totalCurrencies == [.eur, .usd, .inr])
+    }
+
+    @MainActor
+    @Test func onboardingCompletionRequiresReminderChoice() async throws {
+        let defaults = try makeIsolatedDefaults()
+        let settings = AppSettings(
+            userDefaults: defaults,
+            hasMadeReminderChoice: { false }
+        )
+
+        settings.completeOnboarding(
+            baseCurrency: .eur,
+            displayCurrencies: [.usd, .inr]
+        )
+
+        #expect(settings.hasCompletedOnboarding.isComplete == false)
+        #expect(settings.hasCompletedOnboarding.missingSteps == [.reminders])
+        #expect(settings.firstMissingOnboardingStep() == .reminders)
+    }
+
+    @Test func defaultReminderPreferenceHasNoRecordedChoice() async throws {
+        let preference = ReminderPreference()
+
+        #expect(preference.isEnabled == false)
+        #expect(preference.hasMadeChoice == false)
+    }
+
+    @Test func legacyReminderPreferenceDecodesAsRecordedChoice() async throws {
+        let legacyPreference = LegacyReminderPreference(
+            isEnabled: false,
+            frequency: .weekly,
+            reminderTime: ReminderPreference.defaultReminderTime(),
+            reminderType: .reviewPortfolio,
+            lastReminderDate: nil
+        )
+
+        let data = try JSONEncoder().encode(legacyPreference)
+        let preference = try JSONDecoder().decode(ReminderPreference.self, from: data)
+
+        #expect(preference.hasMadeChoice == true)
     }
 
     private func makeIsolatedDefaults() throws -> UserDefaults {
@@ -55,6 +103,14 @@ struct MyWealthTests {
         let defaults = try #require(UserDefaults(suiteName: suiteName))
         defaults.removePersistentDomain(forName: suiteName)
         return defaults
+    }
+
+    private struct LegacyReminderPreference: Codable {
+        var isEnabled: Bool
+        var frequency: ReminderFrequency
+        var reminderTime: Date
+        var reminderType: ReminderType
+        var lastReminderDate: Date?
     }
 
 }

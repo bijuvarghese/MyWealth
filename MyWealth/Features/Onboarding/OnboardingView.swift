@@ -41,6 +41,7 @@ struct OnboardingView: View {
 
             baseCurrency = settings.baseCurrency
             displayCurrencies = settings.totalCurrencies
+            currentStep = settings.firstMissingOnboardingStep()
 
             if !displayCurrencies.contains(baseCurrency) {
                 displayCurrencies.insert(baseCurrency, at: 0)
@@ -51,11 +52,6 @@ struct OnboardingView: View {
         .onChange(of: baseCurrency) { _, newValue in
             if !displayCurrencies.contains(newValue) {
                 displayCurrencies.insert(newValue, at: 0)
-            }
-        }
-        .onChange(of: currentStep) { _, newStep in
-            if newStep == .reminders {
-                ReminderManager.shared.requestNotificationPermission()
             }
         }
     }
@@ -99,8 +95,11 @@ struct OnboardingView: View {
         case .reminders:
             if remindersEnabled {
                 ReminderManager.shared.enableReminders(
-                    frequency: reminderFrequency
+                    frequency: reminderFrequency,
+                    type: reminderType
                 )
+            } else {
+                ReminderManager.shared.disableReminders()
             }
             
             settings.completeOnboarding(

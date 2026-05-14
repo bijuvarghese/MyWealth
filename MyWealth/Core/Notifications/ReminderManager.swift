@@ -32,16 +32,20 @@ class ReminderManager: ObservableObject {
     
     func enableReminders(
         frequency: ReminderFrequency = .weekly,
-        time: Date = ReminderPreference.defaultReminderTime()
+        time: Date = ReminderPreference.defaultReminderTime(),
+        type: ReminderType = .reviewPortfolio
     ) {
         preference.isEnabled = true
+        preference.hasMadeChoice = true
         preference.frequency = frequency
         preference.reminderTime = time
+        preference.reminderType = type
         preferenceStore.preference = preference
     }
     
     func disableReminders() {
         preference.isEnabled = false
+        preference.hasMadeChoice = true
         preferenceStore.preference = preference
         scheduler.cancelAllReminders()
     }
@@ -113,4 +117,3 @@ class ReminderManager: ObservableObject {
         scheduler.scheduleReminder(preference: preference)
     }
 }
-
