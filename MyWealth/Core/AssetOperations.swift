@@ -7,7 +7,6 @@
 
 protocol AssetOperations {
     func totalInUSD(_ assets: [Asset], exchangeRate: Double) -> Double
-    func totalInINR(_ assets: [Asset], exchangeRate: Double) -> Double
     func convertedTotal(_ assets: [Asset], to targetCurrency: Asset.CurrencyType, exchangeRates: [String: Double]) -> Double?
 }
 
@@ -29,23 +28,6 @@ extension AssetOperations {
         }
     }
     
-    func totalInINR(_ assets: [Asset], exchangeRate: Double) -> Double {
-        assets.reduce(0.0) { total, a in
-            let amount = a.amount ?? 0
-            guard let currency = a.currency, currency.isSupportedForTotals else {
-                return total
-            }
-
-            let valueInINR: Double
-            if currency == .inr {
-                valueInINR = amount
-            } else {
-                valueInINR = amount * exchangeRate
-            }
-            return total + valueInINR
-        }
-    }
-
     func convertedTotal(_ assets: [Asset], to targetCurrency: Asset.CurrencyType, exchangeRates: [String: Double]) -> Double? {
         guard let targetRate = rate(for: targetCurrency, exchangeRates: exchangeRates) else {
             return nil
