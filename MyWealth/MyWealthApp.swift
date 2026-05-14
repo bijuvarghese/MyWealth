@@ -30,6 +30,7 @@ struct MyWealthApp: App {
     var body: some Scene {
         WindowGroup {
             AppRootView()
+                .setupReminderModule()
         }
         .modelContainer(sharedModelContainer)
     }

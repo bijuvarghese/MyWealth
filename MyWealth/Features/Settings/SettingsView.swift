@@ -7,6 +7,16 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Section("Features") {
+                    NavigationLink(destination: ReminderSettingsView()) {
+                        HStack {
+                            Image(systemName: "bell.badge.fill")
+                                .foregroundColor(.blue)
+                            Text("Reminders")
+                        }
+                    }
+                }
+
                 Section("Totals") {
                     NavigationLink {
                         BaseCurrencySelectionView(settings: settings)

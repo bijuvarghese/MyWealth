@@ -1,0 +1,95 @@
+import Foundation
+import UserNotifications
+
+class NotificationScheduler {
+    static let shared = NotificationScheduler()
+    
+    private init() {}
+    
+    // MARK: - Permission Handling
+    
+    func requestNotificationPermission(completion: @escaping (Bool) -> Void) {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if let error = error {
+                print("Error requesting notification permission: \(error)")
+            }
+            DispatchQueue.main.async {
+                completion(granted)
+            }
+        }
+    }
+    
+    // MARK: - Scheduling
+    
+    func scheduleReminder(preference: ReminderPreference) {
+        // Cancel existing reminders first
+        cancelAllReminders()
+        
+        guard preference.isEnabled else {
+            return
+        }
+        
+        let content = UNMutableNotificationContent()
+        content.title = "Wealth Map"
+        content.body = preference.reminderType.randomMessage
+        content.sound = .default
+        content.badge = NSNumber(value: 1)
+        
+        // Add custom data to identify reminder type
+        content.userInfo = [
+            "reminderType": preference.reminderType.rawValue,
+            "scheduledAt": Date().timeIntervalSince1970
+        ]
+        
+        // Calculate trigger time
+        let trigger = createTrigger(from: preference)
+        let request = UNNotificationRequest(
+            identifier: UUID().uuidString,
+            content: content,
+            trigger: trigger
+        )
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error scheduling reminder: \(error)")
+            } else {
+                print("Reminder scheduled: \(preference.reminderType.displayName) at \(preference.reminderTime)")
+            }
+        }
+    }
+    
+    func cancelAllReminders() {
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+    }
+    
+    // MARK: - Private Helpers
+    
+    private func createTrigger(from preference: ReminderPreference) -> UNNotificationTrigger {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute], from: preference.reminderTime)
+        
+        let frequency = preference.frequency
+        
+        switch frequency {
+        case .daily:
+            var dailyComponents = DateComponents()
+            dailyComponents.hour = components.hour
+            dailyComponents.minute = components.minute
+            return UNCalendarNotificationTrigger(dateMatching: dailyComponents, repeats: true)
+            
+        case .weekly:
+            var weeklyComponents = DateComponents()
+            weeklyComponents.weekday = calendar.component(.weekday, from: Date())
+            weeklyComponents.hour = components.hour
+            weeklyComponents.minute = components.minute
+            return UNCalendarNotificationTrigger(dateMatching: weeklyComponents, repeats: true)
+            
+        case .monthly:
+            var monthlyComponents = DateComponents()
+            monthlyComponents.day = calendar.component(.day, from: Date())
+            monthlyComponents.hour = components.hour
+            monthlyComponents.minute = components.minute
+            return UNCalendarNotificationTrigger(dateMatching: monthlyComponents, repeats: true)
+        }
+    }
+}

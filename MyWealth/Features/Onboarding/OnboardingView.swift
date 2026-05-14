@@ -6,6 +6,9 @@ struct OnboardingView: View {
     @State private var currentStep: OnboardingStep = .baseCurrency
     @State private var baseCurrency: Asset.CurrencyType = .usd
     @State private var displayCurrencies: [Asset.CurrencyType] = [.usd, .inr]
+    @State private var remindersEnabled = false
+    @State private var reminderType: ReminderType = .reviewPortfolio
+    @State private var reminderFrequency: ReminderFrequency = .weekly
     @State private var didLoadInitialValues = false
 
     var body: some View {
@@ -19,6 +22,12 @@ struct OnboardingView: View {
                     OnboardingDisplayCurrencyStepView(
                         displayCurrencies: $displayCurrencies,
                         baseCurrency: baseCurrency
+                    )
+                case .reminders:
+                    OnboardingReminderStepView(
+                        remindersEnabled: $remindersEnabled,
+                        reminderType: $reminderType,
+                        reminderFrequency: $reminderFrequency
                     )
                 }
             }
@@ -44,6 +53,11 @@ struct OnboardingView: View {
                 displayCurrencies.insert(newValue, at: 0)
             }
         }
+        .onChange(of: currentStep) { _, newStep in
+            if newStep == .reminders {
+                ReminderManager.shared.requestNotificationPermission()
+            }
+        }
     }
 
     private var progressHeader: some View {
@@ -62,7 +76,7 @@ struct OnboardingView: View {
         Button {
             handlePrimaryAction()
         } label: {
-            Text(currentStep == .displayCurrencies ? "Finish Setup" : "Continue")
+            Text(currentStep == .reminders ? "Finish Setup" : "Continue")
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
@@ -80,6 +94,15 @@ struct OnboardingView: View {
             currentStep = .displayCurrencies
 
         case .displayCurrencies:
+            currentStep = .reminders
+            
+        case .reminders:
+            if remindersEnabled {
+                ReminderManager.shared.enableReminders(
+                    frequency: reminderFrequency
+                )
+            }
+            
             settings.completeOnboarding(
                 baseCurrency: baseCurrency,
                 displayCurrencies: displayCurrencies
