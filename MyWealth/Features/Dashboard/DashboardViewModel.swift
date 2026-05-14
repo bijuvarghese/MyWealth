@@ -22,7 +22,8 @@ final class DashboardViewModel: AssetOperations {
     var exchangeRates: [String: Double] = ["USD": 1]
     var isLoadingRate = false
     var lastUpdated: Date? = nil
-    
+    var selectedAsset: Asset?
+
     init(autoRefreshRate: Bool = true) {
         if let savedRate = UserDefaults.standard.object(forKey: DefaultsKeys.rate) as? Double {
             self.exchangeRate = savedRate

@@ -16,24 +16,7 @@ struct FooterView: View {
     }
     
     var body: some View {
-        VStack(spacing: 6) {
-            ForEach(viewModel.totals) { total in
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Total in \(total.currency.rawValue)")
-                            .font(.headline)
-                        Text(total.currency.name)
-                            .font(.caption)
-                            .foregroundStyle(.gray)
-                    }
-                    Spacer()
-                    Text(total.amount, format: .currency(code: total.currency.rawValue))
-                        .font(.title2)
-                }
-            }
-            Text("Base: \(viewModel.baseCurrency.rawValue) - \(viewModel.baseCurrency.name)")
-                .font(.caption2)
-                .foregroundStyle(.gray)
+        VStack {
             if let updated = viewModel.lastUpdated {
                 Text("Last updated: \(updated.formatted(date: .abbreviated, time: .shortened))")
                     .font(.caption2)
@@ -41,9 +24,6 @@ struct FooterView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 10)
-        .padding(.horizontal, 24)
-        .background(.launch)
     }
     
 }

@@ -128,7 +128,7 @@ private struct BaseCurrencySelectionView: View {
                 if settings.baseCurrency == currency {
                     Image(systemName: "checkmark")
                         .font(.body.weight(.semibold))
-                        .foregroundStyle(.launch)
+                        .foregroundStyle(.accent)
                 }
             }
         }
@@ -216,7 +216,7 @@ private struct TotalCurrencySelectionView: View {
                 if settings.totalCurrencies.contains(currency) {
                     Image(systemName: "checkmark")
                         .font(.body.weight(.semibold))
-                        .foregroundStyle(.launch)
+                        .foregroundStyle(.accent)
                 }
             }
         }

@@ -261,7 +261,7 @@ private struct CurrencyRowView: View {
             if isSelected {
                 Image(systemName: "checkmark")
                     .font(.body.weight(.semibold))
-                    .foregroundStyle(.launch)
+                    .foregroundStyle(.accent)
             }
         }
     }

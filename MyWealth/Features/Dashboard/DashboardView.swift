@@ -18,7 +18,6 @@ struct DashboardView: View {
     @State private var showSettings = false
     @State private var viewModel = DashboardViewModel()
     @State private var settings = AppSettings()
-    @State private var selectedAsset: Asset?
     
     var body: some View {
         NavigationStack {
@@ -31,31 +30,32 @@ struct DashboardView: View {
                     )
                 } else {
                     List {
-                        Section("Asset Currency Totals") {
+                        Section("Net Worth") {
                             CurrencyTotalsView(totals: viewModel.totalsByCurrency(assets))
                         }
-
-                        ForEach(assets) { asset in
-                            AssetRowView(asset: asset)
-                                .onTapGesture {
-                                    selectedAsset = asset
-                                    showAddSheet = true
+                        Section(header: Text("Assets"), footer: FooterView(
+                            model: viewModel.getFooterData(
+                                assets,
+                                baseCurrency: settings.baseCurrency,
+                                displayCurrencies: settings.totalCurrencies
+                            )
+                        )
+                        ) {
+                            ForEach(assets) { asset in
+                                AssetRowView(asset: asset)
+                                    .onTapGesture {
+                                        viewModel.selectedAsset = asset
+                                        showAddSheet = true
+                                    }
+                                
+                            }
+                            .onDelete { indexSet in
+                                for index in indexSet {
+                                    modelContext.delete(assets[index])
                                 }
-
-                        }
-                        .onDelete { indexSet in
-                            for index in indexSet {
-                                modelContext.delete(assets[index])
                             }
                         }
                     }
-//                    FooterView(
-//                        model: viewModel.getFooterData(
-//                            assets,
-//                            baseCurrency: settings.baseCurrency,
-//                            displayCurrencies: settings.totalCurrencies
-//                        )
-//                    )
                 }
             }
             .navigationTitle("My Assets")
@@ -75,9 +75,15 @@ struct DashboardView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showAddSheet) {
-                AddorEditAssetView(asset: selectedAsset)
-            }
+            .sheet(
+                isPresented: $showAddSheet,
+                onDismiss: {
+                    viewModel.selectedAsset = nil
+                },
+                content: {
+                    AddorEditAssetView(asset: viewModel.selectedAsset)
+                }
+            )
             .sheet(isPresented: $showSettings) {
                 SettingsView(settings: settings)
             }
