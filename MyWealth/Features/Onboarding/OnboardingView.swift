@@ -1,221 +1,5 @@
 import SwiftUI
 
-private struct CurrencySummaryView: View {
-    let currency: Asset.CurrencyType
-
-    var body: some View {
-        VStack(alignment: .trailing, spacing: 2) {
-            Text(currency.rawValue)
-                .foregroundStyle(.primary)
-            Text(currency.name)
-                .font(.caption)
-                .foregroundStyle(.gray)
-        }
-    }
-}
-
-private struct OnboardingCurrencyPickerView: View {
-    @Environment(\.dismiss) private var dismiss
-    @Binding var selection: Asset.CurrencyType
-    @State private var searchText = ""
-
-    private let commonCurrencies: [Asset.CurrencyType] = [
-        .usd,
-        .inr,
-        .eur,
-        .gbp,
-        .cad,
-        .aud
-    ]
-
-    private var filteredCurrencies: [Asset.CurrencyType] {
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty else {
-            return Asset.CurrencyType.selectableCases
-        }
-
-        return Asset.CurrencyType.selectableCases.filter { currency in
-            currency.rawValue.localizedCaseInsensitiveContains(query) ||
-            currency.name.localizedCaseInsensitiveContains(query)
-        }
-    }
-
-    private var groupedCurrencies: [(String, [Asset.CurrencyType])] {
-        let currencies = searchText.isEmpty
-            ? filteredCurrencies.filter { !commonCurrencies.contains($0) }
-            : filteredCurrencies
-
-        let grouped = Dictionary(grouping: currencies) { currency in
-            String(currency.rawValue.prefix(1))
-        }
-
-        return grouped
-            .map { ($0.key, $0.value.sorted { $0.rawValue < $1.rawValue }) }
-            .sorted { $0.0 < $1.0 }
-    }
-
-    var body: some View {
-        List {
-            if searchText.isEmpty {
-                Section("Common") {
-                    ForEach(commonCurrencies) { currency in
-                        currencyButton(for: currency)
-                    }
-                }
-            }
-
-            ForEach(groupedCurrencies, id: \.0) { letter, currencies in
-                Section(letter) {
-                    ForEach(currencies) { currency in
-                        currencyButton(for: currency)
-                    }
-                }
-            }
-        }
-        .navigationTitle("Default Currency")
-        .navigationBarTitleDisplayMode(.inline)
-        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
-    }
-
-    private func currencyButton(for currency: Asset.CurrencyType) -> some View {
-        Button {
-            selection = currency
-            dismiss()
-        } label: {
-            CurrencyRowView(currency: currency, isSelected: selection == currency)
-        }
-    }
-}
-
-private struct OnboardingDisplayCurrencyPickerView: View {
-    @Binding var selections: [Asset.CurrencyType]
-    let requiredCurrency: Asset.CurrencyType
-    @State private var searchText = ""
-
-    private let commonCurrencies: [Asset.CurrencyType] = [
-        .usd,
-        .inr,
-        .eur,
-        .gbp,
-        .cad,
-        .aud
-    ]
-
-    private var filteredCurrencies: [Asset.CurrencyType] {
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty else {
-            return Asset.CurrencyType.selectableCases
-        }
-
-        return Asset.CurrencyType.selectableCases.filter { currency in
-            currency.rawValue.localizedCaseInsensitiveContains(query) ||
-            currency.name.localizedCaseInsensitiveContains(query)
-        }
-    }
-
-    private var groupedCurrencies: [(String, [Asset.CurrencyType])] {
-        let currencies = searchText.isEmpty
-            ? filteredCurrencies.filter { !commonCurrencies.contains($0) }
-            : filteredCurrencies
-
-        let grouped = Dictionary(grouping: currencies) { currency in
-            String(currency.rawValue.prefix(1))
-        }
-
-        return grouped
-            .map { ($0.key, $0.value.sorted { $0.rawValue < $1.rawValue }) }
-            .sorted { $0.0 < $1.0 }
-    }
-
-    var body: some View {
-        List {
-            if searchText.isEmpty {
-                Section("Common") {
-                    ForEach(commonCurrencies) { currency in
-                        currencyButton(for: currency)
-                    }
-                }
-            }
-
-            ForEach(groupedCurrencies, id: \.0) { letter, currencies in
-                Section(letter) {
-                    ForEach(currencies) { currency in
-                        currencyButton(for: currency)
-                    }
-                }
-            }
-        }
-        .navigationTitle("Display Currencies")
-        .navigationBarTitleDisplayMode(.inline)
-        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
-        .onAppear {
-            if !selections.contains(requiredCurrency) {
-                selections.insert(requiredCurrency, at: 0)
-            }
-        }
-    }
-
-    private func currencyButton(for currency: Asset.CurrencyType) -> some View {
-        Button {
-            toggle(currency)
-        } label: {
-            CurrencyRowView(currency: currency, isSelected: selections.contains(currency))
-        }
-        .disabled(currency == requiredCurrency)
-    }
-
-    private func toggle(_ currency: Asset.CurrencyType) {
-        if selections.contains(currency) {
-            if selections.count > 1 && currency != requiredCurrency {
-                selections.removeAll { $0 == currency }
-            }
-        } else {
-            selections.append(currency)
-            selections.sort { $0.rawValue < $1.rawValue }
-        }
-    }
-}
-
-private struct CurrencyRowView: View {
-    let currency: Asset.CurrencyType
-    let isSelected: Bool
-
-    var body: some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 3) {
-                Text(currency.rawValue)
-                    .font(.headline)
-                    .foregroundStyle(.primary)
-                Text(currency.name)
-                    .font(.caption)
-                    .foregroundStyle(.gray)
-            }
-
-            Spacer()
-
-            if isSelected {
-                Image(systemName: "checkmark")
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(.accent)
-            }
-        }
-    }
-}
-
-enum OnboardingStep: Int, CaseIterable {
-    case baseCurrency
-    case displayCurrencies
-
-    var title: String {
-        switch self {
-        case .baseCurrency:
-            "Choose Base Currency"
-        case .displayCurrencies:
-            "Choose Display Currencies"
-        }
-    }
-}
-
 struct OnboardingView: View {
     @Bindable var settings: AppSettings
 
@@ -226,13 +10,11 @@ struct OnboardingView: View {
 
     var body: some View {
         NavigationStack {
-            VStack {
+            VStack(spacing: 16) {
                 progressHeader
-
                 switch currentStep {
                 case .baseCurrency:
                     OnboardingBaseCurrencyStepView(baseCurrency: $baseCurrency)
-
                 case .displayCurrencies:
                     OnboardingDisplayCurrencyStepView(
                         displayCurrencies: $displayCurrencies,
@@ -240,7 +22,7 @@ struct OnboardingView: View {
                     )
                 }
             }
-            .navigationTitle(currentStep.title)
+            .navigationTitle("Setup Wealth Map")
             .safeAreaInset(edge: .bottom) {
                 bottomButton
             }
@@ -312,20 +94,31 @@ private struct OnboardingBaseCurrencyStepView: View {
     var body: some View {
         Form {
             Section {
-                Text("Your base currency is used to calculate your total wealth and fetch exchange rates for all your assets.")
-                    .foregroundStyle(.primary)
-
                 NavigationLink {
                     OnboardingCurrencyPickerView(selection: $baseCurrency)
                 } label: {
-                    LabeledContent("Base Currency") {
+                    LabeledContent("Base Currency*") {
                         CurrencySummaryView(currency: baseCurrency)
                     }
                 }
             } header: {
-                Text("Required")
-            } footer: {
-                Text("You can change this later from Settings.")
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("Select your base currency", systemImage: "globe")
+                            .font(.title3.bold())
+                            .foregroundStyle(.primary)
+
+                        Text("Your base currency is the foundation of your Wealth Map.")
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+
+                        Text("It’s used to calculate your total wealth and convert assets using current exchange rates.")
+                            .font(.body)
+                            .foregroundStyle(.primary)
+
+                        Text("You can update this later in Settings.")
+                            .font(.footnote)
+                            .foregroundStyle(.primary)
+                }
             }
         }
     }
@@ -338,24 +131,29 @@ private struct OnboardingDisplayCurrencyStepView: View {
     var body: some View {
         Form {
             Section {
-                Text("Display currencies help you see your total wealth converted into different currencies around the world.")
-                    .foregroundStyle(.primary)
-
                 NavigationLink {
                     OnboardingDisplayCurrencyPickerView(
                         selections: $displayCurrencies,
                         requiredCurrency: baseCurrency
                     )
                 } label: {
-                    LabeledContent("Display Currencies") {
+                    LabeledContent("Select Currencies(Optional)") {
                         Text(displayCurrencies.map(\.rawValue).joined(separator: ", "))
                             .foregroundStyle(.primary)
                     }
                 }
             } header: {
-                Text("Optional but Recommended")
-            } footer: {
-                Text("Your base currency is always included.")
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("Track Wealth Across Global Currencies", systemImage: "globe")
+                        .font(.title3.bold())
+                        .foregroundStyle(.primary)
+                    Text("Display currencies let you see your total wealth converted into different currencies around the world.")
+                        .font(.body)
+                        .foregroundStyle(.primary)
+                    Text("Your base currency will always be included.")
+                        .font(.footnote)
+                        .foregroundStyle(.primary)
+                }
             }
         }
     }
