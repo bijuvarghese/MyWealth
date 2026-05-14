@@ -3,6 +3,7 @@ import Foundation
 enum OnboardingStep: Int, CaseIterable {
     case baseCurrency
     case displayCurrencies
+    case reminders
 
     var title: String {
         switch self {
@@ -10,6 +11,8 @@ enum OnboardingStep: Int, CaseIterable {
             "Choose Base Currency"
         case .displayCurrencies:
             "Choose Display Currencies"
+        case .reminders:
+            "Set Up Reminders"
         }
     }
 }
