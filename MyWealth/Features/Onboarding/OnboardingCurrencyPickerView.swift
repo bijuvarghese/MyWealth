@@ -61,6 +61,11 @@ struct OnboardingCurrencyPickerView: View {
         .navigationTitle("Default Currency")
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
+        .scrollContentBackground(.hidden)
+        .background {
+            RadialDotBackground(dotRadius: 1, spacing: 20)
+                .ignoresSafeArea(.all)
+        }
     }
 
     private func currencyButton(for currency: Asset.CurrencyType) -> some View {

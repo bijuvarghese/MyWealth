@@ -61,6 +61,11 @@ struct OnboardingDisplayCurrencyPickerView: View {
         .navigationTitle("Display Currencies")
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
+        .scrollContentBackground(.hidden)
+        .background {
+            RadialDotBackground(dotRadius: 1, spacing: 20)
+                .ignoresSafeArea(.all)
+        }
         .onAppear {
             if !selections.contains(requiredCurrency) {
                 selections.insert(requiredCurrency, at: 0)

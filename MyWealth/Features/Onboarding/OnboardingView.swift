@@ -13,22 +13,27 @@ struct OnboardingView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 16) {
-                progressHeader
-                switch currentStep {
-                case .baseCurrency:
-                    OnboardingBaseCurrencyStepView(baseCurrency: $baseCurrency)
-                case .displayCurrencies:
-                    OnboardingDisplayCurrencyStepView(
-                        displayCurrencies: $displayCurrencies,
-                        baseCurrency: baseCurrency
-                    )
-                case .reminders:
-                    OnboardingReminderStepView(
-                        remindersEnabled: $remindersEnabled,
-                        reminderType: $reminderType,
-                        reminderFrequency: $reminderFrequency
-                    )
+            ZStack {
+                RadialDotBackground(dotRadius: 1, spacing: 20)
+                    .ignoresSafeArea(.all)
+
+                VStack(spacing: 16) {
+                    progressHeader
+                    switch currentStep {
+                    case .baseCurrency:
+                        OnboardingBaseCurrencyStepView(baseCurrency: $baseCurrency)
+                    case .displayCurrencies:
+                        OnboardingDisplayCurrencyStepView(
+                            displayCurrencies: $displayCurrencies,
+                            baseCurrency: baseCurrency
+                        )
+                    case .reminders:
+                        OnboardingReminderStepView(
+                            remindersEnabled: $remindersEnabled,
+                            reminderType: $reminderType,
+                            reminderFrequency: $reminderFrequency
+                        )
+                    }
                 }
             }
             .navigationTitle("Setup Wealth Map")
@@ -81,7 +86,6 @@ struct OnboardingView: View {
         .buttonStyle(.borderedProminent)
         .disabled(currentStep == .displayCurrencies && displayCurrencies.isEmpty)
         .padding()
-        .background(.regularMaterial)
     }
 
     private func handlePrimaryAction() {
@@ -111,7 +115,16 @@ struct OnboardingView: View {
 }
 
 private struct OnboardingBaseCurrencyStepView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @Binding var baseCurrency: Asset.CurrencyType
+
+    private var primaryTextColor: Color {
+        colorScheme == .dark ? .white : .black
+    }
+
+    private var secondaryTextColor: Color {
+        primaryTextColor
+    }
 
     var body: some View {
         Form {
@@ -123,32 +136,57 @@ private struct OnboardingBaseCurrencyStepView: View {
                         CurrencySummaryView(currency: baseCurrency)
                     }
                 }
+                .padding(12)
+                .background {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                }
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             } header: {
                 VStack(alignment: .leading, spacing: 12) {
                     Label("Select your base currency", systemImage: "globe")
                             .font(.title3.bold())
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(primaryTextColor)
 
                         Text("Your base currency is the foundation of your Wealth Map.")
                             .font(.headline)
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(primaryTextColor)
 
                         Text("It’s used to calculate your total wealth and convert assets using current exchange rates.")
                             .font(.body)
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(primaryTextColor)
 
                         Text("You can update this later in Settings.")
                             .font(.footnote)
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(secondaryTextColor)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(16)
+                .background {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
                 }
             }
         }
+        .scrollContentBackground(.hidden)
     }
 }
 
 private struct OnboardingDisplayCurrencyStepView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @Binding var displayCurrencies: [Asset.CurrencyType]
     let baseCurrency: Asset.CurrencyType
+
+    private var primaryTextColor: Color {
+        colorScheme == .dark ? .white : .black
+    }
+
+    private var secondaryTextColor: Color {
+        primaryTextColor
+    }
 
     var body: some View {
         Form {
@@ -164,19 +202,35 @@ private struct OnboardingDisplayCurrencyStepView: View {
                             .foregroundStyle(.primary)
                     }
                 }
+                .padding(12)
+                .background {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                }
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             } header: {
                 VStack(alignment: .leading, spacing: 12) {
                     Label("Track Wealth Across Global Currencies", systemImage: "globe")
                         .font(.title3.bold())
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(primaryTextColor)
                     Text("Display currencies let you see your total wealth converted into different currencies around the world.")
                         .font(.body)
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(primaryTextColor)
                     Text("Your base currency will always be included.")
                         .font(.footnote)
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(secondaryTextColor)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(16)
+                .background {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
                 }
             }
         }
+        .scrollContentBackground(.hidden)
     }
 }
