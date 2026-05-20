@@ -11,7 +11,7 @@ struct SettingsView: View {
                     NavigationLink(destination: ReminderSettingsView()) {
                         HStack {
                             Image(systemName: "bell.badge.fill")
-                                .foregroundColor(.blue)
+                                .foregroundColor(.accent)
                             Text("Reminders")
                         }
                     }

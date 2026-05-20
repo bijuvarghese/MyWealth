@@ -28,18 +28,10 @@ struct TransferRateWidgetView: View {
         HStack(spacing: 8) {
             Image(systemName: "arrow.left.arrow.right.circle.fill")
                 .foregroundStyle(.accent)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Transfer Rates")
-                    .font(.headline)
-                    .foregroundStyle(.primary)
-                Text("From \(baseCurrency.rawValue) to display currencies")
-                    .font(.caption)
-                    .foregroundStyle(.gray)
-            }
-
-            Spacer()
-
+            Text("Transfer Rates")
+                .font(.headline)
+                .foregroundStyle(.primary)
+            Spacer()            
             if let lastUpdated {
                 Text(lastUpdated, format: .relative(presentation: .numeric))
                     .font(.caption2)
@@ -75,9 +67,14 @@ private struct TransferRateRowView: View {
     var body: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
-                Text("\(row.baseCurrency.rawValue) -> \(row.targetCurrency.rawValue)")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
+                HStack(spacing: 6) {
+                    Text(row.baseCurrency.rawValue)
+                    Image(systemName: "arrow.right")
+                        .font(.subheadline.weight(.semibold))
+                    Text(row.targetCurrency.rawValue)
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.primary)
                 Text(row.targetCurrency.name)
                     .font(.caption)
                     .foregroundStyle(.gray)
@@ -102,3 +99,4 @@ private struct TransferRateRowView: View {
         }
     }
 }
+

@@ -32,7 +32,13 @@ struct DashboardView: View {
                         Section("Net Worth") {
                             CurrencyTotalsView(totals: viewModel.totalsByCurrency(assets))
                         }
-                        Section {
+                        Section(footer: FooterView(
+                            model: viewModel.getFooterData(
+                                assets,
+                                baseCurrency: settings.baseCurrency,
+                                displayCurrencies: settings.totalCurrencies
+                            )
+                        )) {
                             TransferRateWidgetView(
                                 rows: viewModel.transferRateRows(
                                     baseCurrency: settings.baseCurrency,
@@ -42,14 +48,7 @@ struct DashboardView: View {
                                 lastUpdated: viewModel.lastUpdated
                             )
                         }
-                        Section(header: Text("Assets"), footer: FooterView(
-                            model: viewModel.getFooterData(
-                                assets,
-                                baseCurrency: settings.baseCurrency,
-                                displayCurrencies: settings.totalCurrencies
-                            )
-                        )
-                        ) {
+                        Section(header: Text("Assets")) {
                             ForEach(assets) { asset in
                                 AssetRowView(asset: asset)
                                     .onTapGesture {
