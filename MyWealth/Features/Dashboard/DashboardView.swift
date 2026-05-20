@@ -46,9 +46,12 @@ struct DashboardView: View {
                             HStack {
                                 Text("Net Worth")
                                 Spacer()
-                                Toggle("Compact ", isOn: $settings.usesCompactCurrencyTotals)
-                                    .font(.caption)
-                                    .labelsHidden()
+                                HStack(spacing: 6) {
+                                    Text("Compact")
+                                        .font(.caption)
+                                    Toggle("Compact", isOn: $settings.usesCompactCurrencyTotals)
+                                        .labelsHidden()
+                                }
                             }
                         }
 
