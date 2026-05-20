@@ -18,6 +18,8 @@ struct SettingsView: View {
                 }
 
                 Section("Totals") {
+                    Toggle("Compact Amounts", isOn: $settings.usesCompactCurrencyTotals)
+
                     NavigationLink {
                         BaseCurrencySelectionView(settings: settings)
                     } label: {

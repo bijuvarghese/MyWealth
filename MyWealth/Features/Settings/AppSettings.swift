@@ -8,6 +8,7 @@ final class AppSettings {
     private enum DefaultsKeys {
         static let totalCurrencies = "settings.totalCurrencies"
         static let baseCurrency = "settings.baseCurrency"
+        static let usesCompactCurrencyTotals = "settings.usesCompactCurrencyTotals"
         static let hasCompletedOnboarding = "settings.hasCompletedOnboarding"
     }
 
@@ -24,6 +25,12 @@ final class AppSettings {
     var totalCurrencies: [Asset.CurrencyType] {
         didSet {
             persistTotalCurrencies()
+        }
+    }
+
+    var usesCompactCurrencyTotals: Bool {
+        didSet {
+            persistUsesCompactCurrencyTotals()
         }
     }
 
@@ -50,6 +57,7 @@ final class AppSettings {
         let savedCodes = userDefaults.stringArray(forKey: DefaultsKeys.totalCurrencies) ?? []
         let savedCurrencies = savedCodes.compactMap(Asset.CurrencyType.init(rawValue:))
         self.totalCurrencies = savedCurrencies.isEmpty ? [.usd, .inr] : savedCurrencies
+        self.usesCompactCurrencyTotals = userDefaults.bool(forKey: DefaultsKeys.usesCompactCurrencyTotals)
 
         let hasSavedCurrencySettings = savedBaseCode != nil || !savedCodes.isEmpty
         self.hasCompletedCurrencyOnboarding = userDefaults.bool(forKey: DefaultsKeys.hasCompletedOnboarding) || hasSavedCurrencySettings
@@ -91,6 +99,10 @@ final class AppSettings {
 
     private func persistBaseCurrency() {
         userDefaults.set(baseCurrency.rawValue, forKey: DefaultsKeys.baseCurrency)
+    }
+
+    private func persistUsesCompactCurrencyTotals() {
+        userDefaults.set(usesCompactCurrencyTotals, forKey: DefaultsKeys.usesCompactCurrencyTotals)
     }
 
     private func persistOnboardingStatus() {

@@ -29,17 +29,29 @@ struct DashboardView: View {
                     )
                 } else {
                     List {
-                        Section("Net Worth") {
+                        Section {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                                     .fill(.ultraThinMaterial)
                                     .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
-                                CurrencyTotalsView(totals: viewModel.totalsByCurrency(assets))
+                                CurrencyTotalsView(
+                                    totals: viewModel.totalsByCurrency(assets),
+                                    useCompactFormatting: settings.usesCompactCurrencyTotals
+                                )
                                     .padding(12)
                             }
                             .listRowBackground(Color.clear)
                             .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                        } header: {
+                            HStack {
+                                Text("Net Worth")
+                                Spacer()
+                                Toggle("Compact ", isOn: $settings.usesCompactCurrencyTotals)
+                                    .font(.caption)
+                                    .labelsHidden()
+                            }
                         }
+
                         Section(footer: FooterView(
                             model: viewModel.getFooterData(
                                 assets,
@@ -138,4 +150,3 @@ struct DashboardView: View {
         }
     }
 }
-
