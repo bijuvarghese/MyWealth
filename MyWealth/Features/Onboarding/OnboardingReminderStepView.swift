@@ -1,28 +1,52 @@
 import SwiftUI
 
 struct OnboardingReminderStepView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @Binding var remindersEnabled: Bool
     @Binding var reminderType: ReminderType
     @Binding var reminderFrequency: ReminderFrequency
     @StateObject private var reminderManager = ReminderManager.shared
 
+    private var primaryTextColor: Color {
+        colorScheme == .dark ? .white : .black
+    }
+
+    private var secondaryTextColor: Color {
+        primaryTextColor
+    }
+
     var body: some View {
         Form {
             Section {
                 Toggle("Enable Portfolio Reminders", isOn: $remindersEnabled)
+                    .padding(12)
+                    .background {
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(.ultraThinMaterial)
+                            .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                    }
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             } header: {
                 VStack(alignment: .leading, spacing: 12) {
                     Label("Stay on Top of Your Wealth", systemImage: "bell.badge")
                         .font(.title3.bold())
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(primaryTextColor)
                     
                     Text("Get gentle reminders to keep your portfolio updated and review your wealth regularly.")
                         .font(.body)
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(primaryTextColor)
                     
                     Text("You can change this anytime in Settings.")
                         .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(secondaryTextColor)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(16)
+                .background {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
                 }
             }
 
@@ -33,6 +57,14 @@ struct OnboardingReminderStepView: View {
                             Text(type.displayName).tag(type)
                         }
                     }
+                    .padding(12)
+                    .background {
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(.ultraThinMaterial)
+                            .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                    }
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                 }
 
                 Section("Frequency") {
@@ -41,6 +73,14 @@ struct OnboardingReminderStepView: View {
                             Text(frequency.displayName).tag(frequency)
                         }
                     }
+                    .padding(12)
+                    .background {
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(.ultraThinMaterial)
+                            .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                    }
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                 }
 
                 Section {
@@ -54,9 +94,18 @@ struct OnboardingReminderStepView: View {
                             .foregroundStyle(.secondary)
                     }
                     .padding(.vertical, 4)
+                    .padding(12)
+                    .background {
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(.ultraThinMaterial)
+                            .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                    }
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                 }
             }
         }
+        .scrollContentBackground(.hidden)
         .onChange(of: remindersEnabled) { _, isEnabled in
             if isEnabled && !reminderManager.isNotificationPermissionGranted {
                 reminderManager.requestNotificationPermission()
