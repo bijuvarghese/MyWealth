@@ -32,7 +32,7 @@ final class AppSettings {
     }
 
     func onboardingStatus() -> OnboardingStatus {
-        let hasMadeReminderChoice = ReminderManager.shared.preference.hasMadeChoice
+        let hasMadeReminderChoice = hasMadeReminderChoice()
         let missingSteps = missingOnboardingSteps(hasMadeReminderChoice: hasMadeReminderChoice)
         return (missingSteps.isEmpty, missingSteps)
     }

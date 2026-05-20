@@ -8,7 +8,6 @@
 
 import SwiftUI
 import SwiftData
-import Charts
 
 struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
@@ -19,8 +18,8 @@ struct DashboardView: View {
     @State private var viewModel = DashboardViewModel()
     @State private var settings = AppSettings()
     
-    var body: some View {
-        NavigationStack {
+    fileprivate func contentView() -> AnyView {
+        return AnyView(
             VStack(spacing: 0) {
                 if assets.isEmpty {
                     ContentUnavailableView(
@@ -32,6 +31,16 @@ struct DashboardView: View {
                     List {
                         Section("Net Worth") {
                             CurrencyTotalsView(totals: viewModel.totalsByCurrency(assets))
+                        }
+                        Section {
+                            TransferRateWidgetView(
+                                rows: viewModel.transferRateRows(
+                                    baseCurrency: settings.baseCurrency,
+                                    displayCurrencies: settings.totalCurrencies
+                                ),
+                                baseCurrency: settings.baseCurrency,
+                                lastUpdated: viewModel.lastUpdated
+                            )
                         }
                         Section(header: Text("Assets"), footer: FooterView(
                             model: viewModel.getFooterData(
@@ -47,7 +56,6 @@ struct DashboardView: View {
                                         viewModel.selectedAsset = asset
                                         showAddSheet = true
                                     }
-                                
                             }
                             .onDelete { indexSet in
                                 for index in indexSet {
@@ -55,8 +63,21 @@ struct DashboardView: View {
                                 }
                             }
                         }
+                        
                     }
+                    .scrollContentBackground(.hidden)
+                    .scrollIndicators(.hidden)
                 }
+            }
+        )
+    }
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                RadialDotBackground(dotRadius: 1, spacing: 20)
+                    .ignoresSafeArea(.all)
+                contentView()
             }
             .navigationTitle("My Assets")
             .toolbar {
@@ -93,3 +114,4 @@ struct DashboardView: View {
         }
     }
 }
+

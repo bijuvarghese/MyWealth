@@ -59,6 +59,26 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func transferRateRowsConvertFromBaseCurrencyToDisplayCurrencies() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        viewModel.exchangeRates = [
+            "USD": 1,
+            "EUR": 0.5,
+            "INR": 80
+        ]
+
+        let rows = viewModel.transferRateRows(
+            baseCurrency: .eur,
+            displayCurrencies: [.eur, .usd, .inr]
+        )
+
+        #expect(rows.count == 2)
+        #expect(rows.map(\.targetCurrency) == [.usd, .inr])
+        #expect(rows.first { $0.targetCurrency == .usd }?.rate == 2)
+        #expect(rows.first { $0.targetCurrency == .inr }?.rate == 160)
+    }
+
+    @MainActor
     @Test func onboardingCompletionRequiresReminderChoice() async throws {
         let defaults = try makeIsolatedDefaults()
         let settings = AppSettings(

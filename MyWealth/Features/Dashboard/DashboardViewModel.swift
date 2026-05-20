@@ -103,6 +103,26 @@ final class DashboardViewModel: AssetOperations {
         .sorted { $0.currency.rawValue < $1.currency.rawValue }
     }
 
+    func transferRateRows(
+        baseCurrency: Asset.CurrencyType,
+        displayCurrencies: [Asset.CurrencyType]
+    ) -> [TransferRateRow] {
+        let targetCurrencies = displayCurrencies.reduce(into: [Asset.CurrencyType]()) { result, currency in
+            guard currency != .none, currency != baseCurrency, !result.contains(currency) else {
+                return
+            }
+            result.append(currency)
+        }
+
+        return targetCurrencies.map { targetCurrency in
+            TransferRateRow(
+                baseCurrency: baseCurrency,
+                targetCurrency: targetCurrency,
+                rate: transferRate(from: baseCurrency, to: targetCurrency)
+            )
+        }
+    }
+
     func getFooterData(
         _ assets: [Asset],
         baseCurrency: Asset.CurrencyType,
@@ -128,6 +148,29 @@ final class DashboardViewModel: AssetOperations {
             rates: exchangeRates
         )
     }
+
+    private func transferRate(
+        from baseCurrency: Asset.CurrencyType,
+        to targetCurrency: Asset.CurrencyType
+    ) -> Double? {
+        guard
+            let baseRate = rate(for: baseCurrency),
+            let targetRate = rate(for: targetCurrency),
+            baseRate > 0
+        else {
+            return nil
+        }
+
+        return targetRate / baseRate
+    }
+
+    private func rate(for currency: Asset.CurrencyType) -> Double? {
+        if currency == .usd {
+            return 1
+        }
+
+        return exchangeRates[currency.rawValue]
+    }
 }
 
 struct CurrencyTotal: Identifiable {
@@ -142,6 +185,14 @@ struct ConvertedCurrencyTotal: Identifiable {
     let amount: Double
 
     var id: String { currency.rawValue }
+}
+
+struct TransferRateRow: Identifiable {
+    let baseCurrency: Asset.CurrencyType
+    let targetCurrency: Asset.CurrencyType
+    let rate: Double?
+
+    var id: String { "\(baseCurrency.rawValue)-\(targetCurrency.rawValue)" }
 }
 
 struct RateResponse: Codable {
