@@ -11,13 +11,15 @@ struct SettingsView: View {
                     NavigationLink(destination: ReminderSettingsView()) {
                         HStack {
                             Image(systemName: "bell.badge.fill")
-                                .foregroundColor(.blue)
+                                .foregroundColor(.accent)
                             Text("Reminders")
                         }
                     }
                 }
 
                 Section("Totals") {
+                    Toggle("Compact Amounts", isOn: $settings.usesCompactCurrencyTotals)
+
                     NavigationLink {
                         BaseCurrencySelectionView(settings: settings)
                     } label: {

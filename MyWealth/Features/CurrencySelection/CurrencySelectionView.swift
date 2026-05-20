@@ -72,10 +72,8 @@ struct CurrencySelectionView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(currency.rawValue)
                         .font(.headline)
-                        .foregroundStyle(.secondary)
                     Text(currency.name)
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
                 }
                 Spacer()
                 if selection == currency {

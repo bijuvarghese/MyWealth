@@ -8,7 +8,6 @@
 
 import SwiftUI
 import SwiftData
-import Charts
 
 struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
@@ -19,8 +18,8 @@ struct DashboardView: View {
     @State private var viewModel = DashboardViewModel()
     @State private var settings = AppSettings()
     
-    var body: some View {
-        NavigationStack {
+    fileprivate func contentView() -> AnyView {
+        return AnyView(
             VStack(spacing: 0) {
                 if assets.isEmpty {
                     ContentUnavailableView(
@@ -30,24 +29,69 @@ struct DashboardView: View {
                     )
                 } else {
                     List {
-                        Section("Net Worth") {
-                            CurrencyTotalsView(totals: viewModel.totalsByCurrency(assets))
+                        Section {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .fill(.ultraThinMaterial)
+                                    .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                                CurrencyTotalsView(
+                                    totals: viewModel.totalsByCurrency(assets),
+                                    useCompactFormatting: settings.usesCompactCurrencyTotals
+                                )
+                                    .padding(12)
+                            }
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                        } header: {
+                            HStack {
+                                Text("Net Worth")
+                                Spacer()
+                                Toggle("Compact ", isOn: $settings.usesCompactCurrencyTotals)
+                                    .font(.caption)
+                                    .labelsHidden()
+                            }
                         }
-                        Section(header: Text("Assets"), footer: FooterView(
+
+                        Section(footer: FooterView(
                             model: viewModel.getFooterData(
                                 assets,
                                 baseCurrency: settings.baseCurrency,
                                 displayCurrencies: settings.totalCurrencies
                             )
-                        )
-                        ) {
+                        )) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .fill(.ultraThinMaterial)
+                                    .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                                TransferRateWidgetView(
+                                    rows: viewModel.transferRateRows(
+                                        baseCurrency: settings.baseCurrency,
+                                        displayCurrencies: settings.totalCurrencies
+                                    ),
+                                    baseCurrency: settings.baseCurrency,
+                                    lastUpdated: viewModel.lastUpdated
+                                )
+                                .padding(12)
+                            }
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                        }
+                        Section(header: Text("Assets")) {
                             ForEach(assets) { asset in
-                                AssetRowView(asset: asset)
-                                    .onTapGesture {
-                                        viewModel.selectedAsset = asset
-                                        showAddSheet = true
-                                    }
-                                
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .fill(.ultraThinMaterial)
+                                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                                    AssetRowView(asset: asset)
+                                        .padding(12)
+                                }
+                                .listRowBackground(Color.clear)
+                                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                                .listRowSeparator(.hidden)      // hide separators for these rows
+                                .onTapGesture {
+                                    viewModel.selectedAsset = asset
+                                    showAddSheet = true
+                                }
                             }
                             .onDelete { indexSet in
                                 for index in indexSet {
@@ -55,8 +99,21 @@ struct DashboardView: View {
                                 }
                             }
                         }
+                        
                     }
+                    .scrollContentBackground(.hidden)
+                    .scrollIndicators(.hidden)
                 }
+            }
+        )
+    }
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                RadialDotBackground(dotRadius: 1, spacing: 20)
+                    .ignoresSafeArea(.all)
+                contentView()
             }
             .navigationTitle("My Assets")
             .toolbar {
