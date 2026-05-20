@@ -30,7 +30,15 @@ struct DashboardView: View {
                 } else {
                     List {
                         Section("Net Worth") {
-                            CurrencyTotalsView(totals: viewModel.totalsByCurrency(assets))
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .fill(.ultraThinMaterial)
+                                    .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                                CurrencyTotalsView(totals: viewModel.totalsByCurrency(assets))
+                                    .padding(12)
+                            }
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                         }
                         Section(footer: FooterView(
                             model: viewModel.getFooterData(
@@ -39,22 +47,39 @@ struct DashboardView: View {
                                 displayCurrencies: settings.totalCurrencies
                             )
                         )) {
-                            TransferRateWidgetView(
-                                rows: viewModel.transferRateRows(
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .fill(.ultraThinMaterial)
+                                    .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                                TransferRateWidgetView(
+                                    rows: viewModel.transferRateRows(
+                                        baseCurrency: settings.baseCurrency,
+                                        displayCurrencies: settings.totalCurrencies
+                                    ),
                                     baseCurrency: settings.baseCurrency,
-                                    displayCurrencies: settings.totalCurrencies
-                                ),
-                                baseCurrency: settings.baseCurrency,
-                                lastUpdated: viewModel.lastUpdated
-                            )
+                                    lastUpdated: viewModel.lastUpdated
+                                )
+                                .padding(12)
+                            }
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                         }
                         Section(header: Text("Assets")) {
                             ForEach(assets) { asset in
-                                AssetRowView(asset: asset)
-                                    .onTapGesture {
-                                        viewModel.selectedAsset = asset
-                                        showAddSheet = true
-                                    }
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .fill(.ultraThinMaterial)
+                                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                                    AssetRowView(asset: asset)
+                                        .padding(12)
+                                }
+                                .listRowBackground(Color.clear)
+                                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                                .listRowSeparator(.hidden)      // hide separators for these rows
+                                .onTapGesture {
+                                    viewModel.selectedAsset = asset
+                                    showAddSheet = true
+                                }
                             }
                             .onDelete { indexSet in
                                 for index in indexSet {
