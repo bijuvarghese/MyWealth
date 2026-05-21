@@ -100,6 +100,22 @@ final class DashboardViewModel: AssetOperations {
             return (key, total)
         }.sorted { $0.1 > $1.1 }
     }
+
+    func categoryAllocationRows(_ assets: [Asset]) -> [CategoryAllocationRow] {
+        let totals = groupedByCategory(assets)
+        let portfolioTotal = totals.reduce(0) { $0 + $1.1 }
+        guard portfolioTotal > 0 else {
+            return []
+        }
+
+        return totals.map { category, amount in
+            CategoryAllocationRow(
+                category: category,
+                amount: amount,
+                percentage: amount / portfolioTotal
+            )
+        }
+    }
     
     func totalsByCurrency(_ assets: [Asset]) -> [CurrencyTotal] {
         totalsByCurrency(assets, currencies: uniqueCurrencies(assets.compactMap(\.currency)))
@@ -209,6 +225,79 @@ final class DashboardViewModel: AssetOperations {
         )
     }
 
+    func netWorthTrendRows(
+        _ snapshots: [NetWorthSnapshot],
+        baseCurrency: Asset.CurrencyType,
+        limit: Int = 30
+    ) -> [NetWorthTrendRow] {
+        snapshots
+            .filter { $0.displayCurrencyCode == baseCurrency.rawValue }
+            .sorted { $0.displayRecordedAt < $1.displayRecordedAt }
+            .suffix(limit)
+            .map { snapshot in
+                NetWorthTrendRow(
+                    recordedAt: snapshot.displayRecordedAt,
+                    amount: snapshot.displayAmount,
+                    currencyCode: snapshot.displayCurrencyCode
+                )
+            }
+    }
+
+    func recentAssetHistoryRows(
+        _ snapshots: [AssetValueSnapshot],
+        limit: Int = 5
+    ) -> [AssetHistoryRow] {
+        snapshots
+            .sorted { $0.displayRecordedAt > $1.displayRecordedAt }
+            .prefix(limit)
+            .map { snapshot in
+                AssetHistoryRow(
+                    assetName: snapshot.displayAssetName,
+                    amount: snapshot.displayAmount,
+                    currencyCode: snapshot.displayCurrencyCode,
+                    categoryName: snapshot.displayCategoryName,
+                    recordedAt: snapshot.displayRecordedAt
+                )
+            }
+    }
+
+    func recordPortfolioHistory(
+        assets: [Asset],
+        baseCurrency: Asset.CurrencyType,
+        netWorthSnapshots: [NetWorthSnapshot],
+        assetValueSnapshots: [AssetValueSnapshot],
+        modelContext: ModelContext
+    ) {
+        guard !assets.isEmpty else {
+            return
+        }
+
+        recordAssetValueSnapshots(
+            assets: assets,
+            existingSnapshots: assetValueSnapshots,
+            modelContext: modelContext
+        )
+
+        guard let netWorth = convertedTotal(assets, to: baseCurrency, exchangeRates: exchangeRates) else {
+            return
+        }
+
+        let latestSnapshot = netWorthSnapshots
+            .filter { $0.displayCurrencyCode == baseCurrency.rawValue }
+            .max { $0.displayRecordedAt < $1.displayRecordedAt }
+
+        guard shouldRecordNetWorthSnapshot(netWorth, after: latestSnapshot) else {
+            return
+        }
+
+        modelContext.insert(
+            NetWorthSnapshot(
+                amount: netWorth,
+                currencyCode: baseCurrency.rawValue
+            )
+        )
+    }
+
     private func transferRate(
         from baseCurrency: Asset.CurrencyType,
         to targetCurrency: Asset.CurrencyType
@@ -231,6 +320,60 @@ final class DashboardViewModel: AssetOperations {
 
         return exchangeRates[currency.rawValue]
     }
+
+    private func recordAssetValueSnapshots(
+        assets: [Asset],
+        existingSnapshots: [AssetValueSnapshot],
+        modelContext: ModelContext
+    ) {
+        let latestSnapshotsByAsset = Dictionary(
+            grouping: existingSnapshots,
+            by: \.displayAssetIdentifier
+        ).compactMapValues { snapshots in
+            snapshots.max { $0.displayRecordedAt < $1.displayRecordedAt }
+        }
+
+        for asset in assets {
+            let identifier = assetHistoryIdentifier(for: asset)
+            let latestSnapshot = latestSnapshotsByAsset[identifier]
+            guard shouldRecordAssetSnapshot(asset, after: latestSnapshot) else {
+                continue
+            }
+
+            modelContext.insert(
+                AssetValueSnapshot(
+                    assetIdentifier: identifier,
+                    assetName: asset.displayName,
+                    amount: asset.displayAmount,
+                    currencyCode: asset.displayCurrency.rawValue,
+                    categoryName: asset.displayCategory.rawValue
+                )
+            )
+        }
+    }
+
+    private func shouldRecordAssetSnapshot(_ asset: Asset, after snapshot: AssetValueSnapshot?) -> Bool {
+        guard let snapshot else {
+            return true
+        }
+
+        return snapshot.displayAssetName != asset.displayName
+            || snapshot.displayCurrencyCode != asset.displayCurrency.rawValue
+            || snapshot.displayCategoryName != asset.displayCategory.rawValue
+            || abs(snapshot.displayAmount - asset.displayAmount) >= 0.01
+    }
+
+    private func shouldRecordNetWorthSnapshot(_ amount: Double, after snapshot: NetWorthSnapshot?) -> Bool {
+        guard let snapshot else {
+            return true
+        }
+
+        return abs(snapshot.displayAmount - amount) >= 0.01
+    }
+
+    private func assetHistoryIdentifier(for asset: Asset) -> String {
+        String(describing: asset.persistentModelID)
+    }
 }
 
 struct CurrencyTotal: Identifiable {
@@ -238,6 +381,32 @@ struct CurrencyTotal: Identifiable {
     let amount: Double
 
     var id: String { currency.rawValue }
+}
+
+struct CategoryAllocationRow: Identifiable {
+    let category: Asset.CategoryType
+    let amount: Double
+    let percentage: Double
+
+    var id: String { category.rawValue }
+}
+
+struct NetWorthTrendRow: Identifiable {
+    let recordedAt: Date
+    let amount: Double
+    let currencyCode: String
+
+    var id: String { "\(currencyCode)-\(recordedAt.timeIntervalSince1970)" }
+}
+
+struct AssetHistoryRow: Identifiable {
+    let assetName: String
+    let amount: Double
+    let currencyCode: String
+    let categoryName: String
+    let recordedAt: Date
+
+    var id: String { "\(assetName)-\(currencyCode)-\(recordedAt.timeIntervalSince1970)" }
 }
 
 struct ConvertedCurrencyTotal: Identifiable {

@@ -8,15 +8,39 @@
 
 import SwiftUI
 import SwiftData
+import Charts
 
 struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var assets: [Asset]
+    @Query private var netWorthSnapshots: [NetWorthSnapshot]
+    @Query private var assetValueSnapshots: [AssetValueSnapshot]
+    @Bindable var settings: AppSettings
     
     @State private var showAddSheet = false
     @State private var showSettings = false
     @State private var viewModel = DashboardViewModel()
-    @State private var settings = AppSettings()
+
+    private var assetSnapshotSignature: String {
+        assets.map { asset in
+            [
+                String(describing: asset.persistentModelID),
+                asset.displayName,
+                "\(asset.displayAmount)",
+                asset.displayCurrency.rawValue,
+                asset.displayCategory.rawValue,
+                "\(asset.lastUpdated?.timeIntervalSince1970 ?? 0)"
+            ].joined(separator: ":")
+        }
+        .joined(separator: "|")
+    }
+
+    private var rateSnapshotSignature: String {
+        viewModel.exchangeRates
+            .sorted { $0.key < $1.key }
+            .map { "\($0.key):\($0.value)" }
+            .joined(separator: "|")
+    }
     
     @ViewBuilder
     private var contentView: some View {
@@ -29,6 +53,15 @@ struct DashboardView: View {
                 )
             } else {
                 List {
+                    Section(header: Text("Allocation")) {
+                        DashboardCard {
+                            PortfolioAllocationView(
+                                rows: viewModel.categoryAllocationRows(assets),
+                                currencyCode: Asset.CurrencyType.usd.rawValue
+                            )
+                        }
+                        .dashboardListRow()
+                    }
                     Section {
                         DashboardCard {
                             VStack(spacing: 10) {
@@ -81,22 +114,26 @@ struct DashboardView: View {
                         .dashboardListRow()
                     }
 
-                    Section(header: Text("Assets")) {
-                        ForEach(assets) { asset in
+                    Section(header: Text("Trend")) {
+                        DashboardCard {
+                            NetWorthTrendChartView(
+                                rows: viewModel.netWorthTrendRows(
+                                    netWorthSnapshots,
+                                    baseCurrency: settings.baseCurrency
+                                ),
+                                currencyCode: settings.baseCurrency.rawValue
+                            )
+                        }
+                        .dashboardListRow()
+                    }
+
+                    let historyRows = viewModel.recentAssetHistoryRows(assetValueSnapshots)
+                    if !historyRows.isEmpty {
+                        Section(header: Text("History")) {
                             DashboardCard {
-                                AssetRowView(asset: asset)
+                                AssetHistoryListView(rows: historyRows)
                             }
                             .dashboardListRow()
-                            .listRowSeparator(.hidden)
-                            .onTapGesture {
-                                viewModel.selectedAsset = asset
-                                showAddSheet = true
-                            }
-                        }
-                        .onDelete { indexSet in
-                            for index in indexSet {
-                                modelContext.delete(assets[index])
-                            }
                         }
                     }
                 }
@@ -136,7 +173,7 @@ struct DashboardView: View {
                     viewModel.selectedAsset = nil
                 },
                 content: {
-                    AddorEditAssetView(asset: viewModel.selectedAsset)
+                    AddorEditAssetView()
                 }
             )
             .sheet(isPresented: $showSettings) {
@@ -145,7 +182,27 @@ struct DashboardView: View {
         }
         .task {
             await viewModel.refreshExchangeRateIfNeeded()
+            recordPortfolioHistory()
         }
+        .onChange(of: assetSnapshotSignature) {
+            recordPortfolioHistory()
+        }
+        .onChange(of: settings.baseCurrency) {
+            recordPortfolioHistory()
+        }
+        .onChange(of: rateSnapshotSignature) {
+            recordPortfolioHistory()
+        }
+    }
+
+    private func recordPortfolioHistory() {
+        viewModel.recordPortfolioHistory(
+            assets: assets,
+            baseCurrency: settings.baseCurrency,
+            netWorthSnapshots: netWorthSnapshots,
+            assetValueSnapshots: assetValueSnapshots,
+            modelContext: modelContext
+        )
     }
 }
 
@@ -173,5 +230,134 @@ private extension View {
     func dashboardListRow() -> some View {
         listRowBackground(Color.clear)
             .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+    }
+}
+
+private struct NetWorthTrendChartView: View {
+    let rows: [NetWorthTrendRow]
+    let currencyCode: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("Net Worth")
+                    .font(.headline)
+                Spacer()
+                if let latest = rows.last {
+                    Text(latest.amount, format: .currency(code: currencyCode))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Chart(rows) { row in
+                if rows.count == 1 {
+                    PointMark(
+                        x: .value("Date", row.recordedAt),
+                        y: .value("Net Worth", row.amount)
+                    )
+                    .symbolSize(70)
+                    .foregroundStyle(.blue)
+                } else {
+                    LineMark(
+                        x: .value("Date", row.recordedAt),
+                        y: .value("Net Worth", row.amount)
+                    )
+                    .interpolationMethod(.catmullRom)
+                    .foregroundStyle(.blue)
+
+                    AreaMark(
+                        x: .value("Date", row.recordedAt),
+                        y: .value("Net Worth", row.amount)
+                    )
+                    .interpolationMethod(.catmullRom)
+                    .foregroundStyle(.blue.opacity(0.12))
+                }
+            }
+            .frame(height: 150)
+            .chartXAxis {
+                AxisMarks(values: .automatic(desiredCount: 4))
+            }
+            .chartYAxis {
+                AxisMarks(position: .leading)
+            }
+        }
+    }
+}
+
+private struct PortfolioAllocationView: View {
+    let rows: [CategoryAllocationRow]
+    let currencyCode: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Portfolio")
+                .font(.headline)
+
+            Chart(rows) { row in
+                SectorMark(
+                    angle: .value("Amount", row.amount),
+                    innerRadius: .ratio(0.62),
+                    angularInset: 1.5
+                )
+                .foregroundStyle(by: .value("Category", row.category.rawValue))
+            }
+            .frame(height: 180)
+            .chartLegend(position: .bottom, alignment: .leading)
+
+            VStack(spacing: 8) {
+                ForEach(rows) { row in
+                    HStack(spacing: 10) {
+                        Image(systemName: row.category.icon)
+                            .frame(width: 22)
+                            .foregroundStyle(.secondary)
+                        Text(row.category.rawValue)
+                        Spacer()
+                        Text(row.percentage, format: .percent.precision(.fractionLength(0)))
+                            .foregroundStyle(.secondary)
+                        Text(row.amount, format: .currency(code: currencyCode))
+                            .font(.subheadline.weight(.semibold))
+                            .monospacedDigit()
+                    }
+                    .font(.subheadline)
+                }
+            }
+        }
+    }
+}
+
+private struct AssetHistoryListView: View {
+    let rows: [AssetHistoryRow]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Recent Values")
+                .font(.headline)
+
+            VStack(spacing: 10) {
+                ForEach(rows) { row in
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(row.assetName.isEmpty ? "Unnamed Asset" : row.assetName)
+                                .font(.subheadline.weight(.medium))
+                            Text(row.recordedAt, format: .dateTime.month(.abbreviated).day().hour().minute())
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        Spacer()
+
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text(row.amount, format: .currency(code: row.currencyCode.isEmpty ? "USD" : row.currencyCode))
+                                .font(.subheadline.weight(.semibold))
+                                .monospacedDigit()
+                            Text(row.categoryName)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
