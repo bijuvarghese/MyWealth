@@ -32,12 +32,16 @@ class ReminderManager: ObservableObject {
     
     func enableReminders(
         frequency: ReminderFrequency = .weekly,
+        weekday: ReminderWeekday = ReminderPreference.defaultWeeklyWeekday(),
+        monthDay: Int = ReminderPreference.defaultMonthlyDay(),
         time: Date = ReminderPreference.defaultReminderTime(),
         type: ReminderType = .reviewPortfolio
     ) {
         preference.isEnabled = true
         preference.hasMadeChoice = true
         preference.frequency = frequency
+        preference.weekday = weekday
+        preference.monthDay = ReminderPreference.normalizedMonthDay(monthDay)
         preference.reminderTime = time
         preference.reminderType = type
         preferenceStore.preference = preference
@@ -52,10 +56,18 @@ class ReminderManager: ObservableObject {
     
     func updateReminderPreference(
         frequency: ReminderFrequency? = nil,
+        weekday: ReminderWeekday? = nil,
+        monthDay: Int? = nil,
         time: Date? = nil
     ) {
         if let frequency = frequency {
             preference.frequency = frequency
+        }
+        if let weekday = weekday {
+            preference.weekday = weekday
+        }
+        if let monthDay = monthDay {
+            preference.monthDay = ReminderPreference.normalizedMonthDay(monthDay)
         }
         if let time = time {
             preference.reminderTime = time
@@ -64,6 +76,8 @@ class ReminderManager: ObservableObject {
     }
     
     func handleNotificationTap(with userInfo: [AnyHashable: Any]) {
+        scheduler.clearDeliveredReminderBadge()
+
         guard let reminderTypeRaw = userInfo["reminderType"] as? String,
               let reminderType = ReminderType(rawValue: reminderTypeRaw) else {
             return

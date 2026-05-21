@@ -7,9 +7,14 @@
 
 import SwiftUI
 import SwiftData
+import UserNotifications
 
 @main
 struct MyWealthApp: App {
+    init() {
+        UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
+    }
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Asset.self,

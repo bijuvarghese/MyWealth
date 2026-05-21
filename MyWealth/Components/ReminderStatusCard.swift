@@ -33,6 +33,30 @@ struct ReminderStatusCard: View {
                             .font(.caption)
                             .fontWeight(.semibold)
                     }
+
+                    if reminderManager.preference.frequency == .weekly {
+                        HStack {
+                            Text("Day:")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text(reminderManager.preference.weekday.displayName)
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                        }
+                    }
+
+                    if reminderManager.preference.frequency == .monthly {
+                        HStack {
+                            Text("Day:")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text("\(reminderManager.preference.monthDay)")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                        }
+                    }
                     
                     HStack {
                         Text("Time:")

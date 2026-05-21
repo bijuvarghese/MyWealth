@@ -258,6 +258,53 @@ struct MyWealthTests {
         let preference = try JSONDecoder().decode(ReminderPreference.self, from: data)
 
         #expect(preference.hasMadeChoice == true)
+        #expect(ReminderWeekday.allCases.contains(preference.weekday))
+        #expect((1...ReminderPreference.maximumMonthlyReminderDay).contains(preference.monthDay))
+    }
+
+    @MainActor
+    @Test func reminderPreferencePersistsWeeklyAlertDay() async throws {
+        let preference = ReminderPreference(
+            isEnabled: true,
+            hasMadeChoice: true,
+            frequency: .weekly,
+            weekday: .friday,
+            reminderTime: ReminderPreference.defaultReminderTime(),
+            reminderType: .reviewPortfolio,
+            lastReminderDate: nil
+        )
+
+        let data = try JSONEncoder().encode(preference)
+        let restoredPreference = try JSONDecoder().decode(ReminderPreference.self, from: data)
+
+        #expect(restoredPreference.weekday == .friday)
+    }
+
+    @MainActor
+    @Test func reminderPreferencePersistsMonthlyAlertDay() async throws {
+        let preference = ReminderPreference(
+            isEnabled: true,
+            hasMadeChoice: true,
+            frequency: .monthly,
+            monthDay: 15,
+            reminderTime: ReminderPreference.defaultReminderTime(),
+            reminderType: .reviewPortfolio,
+            lastReminderDate: nil
+        )
+
+        let data = try JSONEncoder().encode(preference)
+        let restoredPreference = try JSONDecoder().decode(ReminderPreference.self, from: data)
+
+        #expect(restoredPreference.monthDay == 15)
+    }
+
+    @MainActor
+    @Test func reminderPreferenceNormalizesMonthlyAlertDay() async throws {
+        let earlyPreference = ReminderPreference(monthDay: 0)
+        let latePreference = ReminderPreference(monthDay: 40)
+
+        #expect(earlyPreference.monthDay == 1)
+        #expect(latePreference.monthDay == ReminderPreference.maximumMonthlyReminderDay)
     }
 
     private func makeIsolatedDefaults() throws -> UserDefaults {

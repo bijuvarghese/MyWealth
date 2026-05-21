@@ -3,7 +3,6 @@ import SwiftUI
 struct ReminderSettingsView: View {
     @StateObject private var reminderManager = ReminderManager.shared
     @State private var showPermissionAlert = false
-    @State private var selectedTime = ReminderPreference.defaultReminderTime()
     
     var body: some View {
         NavigationStack {
@@ -50,6 +49,40 @@ struct ReminderSettingsView: View {
                                 ForEach(ReminderFrequency.allCases, id: \.self) { frequency in
                                     Text(frequency.displayName).tag(frequency)
                                 }
+                            }
+                        }
+
+                        if reminderManager.preference.frequency == .weekly {
+                            Section("Alert Day") {
+                                Picker("Day of Week", selection: Binding(
+                                    get: { reminderManager.preference.weekday },
+                                    set: { newWeekday in
+                                        reminderManager.updateReminderPreference(weekday: newWeekday)
+                                    }
+                                )) {
+                                    ForEach(ReminderWeekday.allCases) { weekday in
+                                        Text(weekday.displayName).tag(weekday)
+                                    }
+                                }
+                            }
+                        }
+
+                        if reminderManager.preference.frequency == .monthly {
+                            Section {
+                                Picker("Day of Month", selection: Binding(
+                                    get: { reminderManager.preference.monthDay },
+                                    set: { newMonthDay in
+                                        reminderManager.updateReminderPreference(monthDay: newMonthDay)
+                                    }
+                                )) {
+                                    ForEach(1...ReminderPreference.maximumMonthlyReminderDay, id: \.self) { day in
+                                        Text("\(day)").tag(day)
+                                    }
+                                }
+                            } header: {
+                                Text("Alert Day")
+                            } footer: {
+                                Text("Monthly reminders use days 1-28 so they run every month, including February and leap years. Days 29-31 are not offered because some months do not have them.")
                             }
                         }
                         

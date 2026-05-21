@@ -30,6 +30,22 @@ enum ReminderFrequency: String, Codable, CaseIterable {
     }
 }
 
+enum ReminderWeekday: Int, Codable, CaseIterable, Identifiable {
+    case sunday = 1
+    case monday = 2
+    case tuesday = 3
+    case wednesday = 4
+    case thursday = 5
+    case friday = 6
+    case saturday = 7
+
+    var id: Int { rawValue }
+
+    var displayName: String {
+        DateFormatter().weekdaySymbols[rawValue - 1]
+    }
+}
+
 enum ReminderType: String, Codable, CaseIterable {
     case addAsset
     case updateAssets
@@ -74,9 +90,13 @@ enum ReminderType: String, Codable, CaseIterable {
 // MARK: - Reminder Preference Model
 
 struct ReminderPreference: Codable {
+    static let maximumMonthlyReminderDay = 28
+
     var isEnabled: Bool
     var hasMadeChoice: Bool
     var frequency: ReminderFrequency
+    var weekday: ReminderWeekday
+    var monthDay: Int
     var reminderTime: Date
     var reminderType: ReminderType
     var lastReminderDate: Date?
@@ -85,6 +105,8 @@ struct ReminderPreference: Codable {
         isEnabled: Bool = false,
         hasMadeChoice: Bool = false,
         frequency: ReminderFrequency = .weekly,
+        weekday: ReminderWeekday = Self.defaultWeeklyWeekday(),
+        monthDay: Int = Self.defaultMonthlyDay(),
         reminderTime: Date = Self.defaultReminderTime(),
         reminderType: ReminderType = .reviewPortfolio,
         lastReminderDate: Date? = nil
@@ -92,6 +114,8 @@ struct ReminderPreference: Codable {
         self.isEnabled = isEnabled
         self.hasMadeChoice = hasMadeChoice
         self.frequency = frequency
+        self.weekday = weekday
+        self.monthDay = Self.normalizedMonthDay(monthDay)
         self.reminderTime = reminderTime
         self.reminderType = reminderType
         self.lastReminderDate = lastReminderDate
@@ -101,6 +125,8 @@ struct ReminderPreference: Codable {
         case isEnabled
         case hasMadeChoice
         case frequency
+        case weekday
+        case monthDay
         case reminderTime
         case reminderType
         case lastReminderDate
@@ -111,6 +137,10 @@ struct ReminderPreference: Codable {
         self.isEnabled = try container.decode(Bool.self, forKey: .isEnabled)
         self.hasMadeChoice = try container.decodeIfPresent(Bool.self, forKey: .hasMadeChoice) ?? true
         self.frequency = try container.decode(ReminderFrequency.self, forKey: .frequency)
+        self.weekday = try container.decodeIfPresent(ReminderWeekday.self, forKey: .weekday) ?? Self.defaultWeeklyWeekday()
+        self.monthDay = Self.normalizedMonthDay(
+            try container.decodeIfPresent(Int.self, forKey: .monthDay) ?? Self.defaultMonthlyDay()
+        )
         self.reminderTime = try container.decode(Date.self, forKey: .reminderTime)
         self.reminderType = try container.decode(ReminderType.self, forKey: .reminderType)
         self.lastReminderDate = try container.decodeIfPresent(Date.self, forKey: .lastReminderDate)
@@ -121,5 +151,18 @@ struct ReminderPreference: Codable {
         components.hour = 9
         components.minute = 0
         return Calendar.current.date(from: components) ?? Date()
+    }
+
+    static func defaultWeeklyWeekday() -> ReminderWeekday {
+        let weekday = Calendar.current.component(.weekday, from: Date())
+        return ReminderWeekday(rawValue: weekday) ?? .monday
+    }
+
+    static func defaultMonthlyDay() -> Int {
+        normalizedMonthDay(Calendar.current.component(.day, from: Date()))
+    }
+
+    static func normalizedMonthDay(_ day: Int) -> Int {
+        min(max(day, 1), maximumMonthlyReminderDay)
     }
 }
