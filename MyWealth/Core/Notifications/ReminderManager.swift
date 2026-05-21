@@ -47,7 +47,7 @@ class ReminderManager: ObservableObject {
         preference.isEnabled = false
         preference.hasMadeChoice = true
         preferenceStore.preference = preference
-        scheduler.cancelAllReminders()
+        scheduler.cancelReminder()
     }
     
     func updateReminderPreference(
@@ -104,8 +104,9 @@ class ReminderManager: ObservableObject {
     
     private func checkNotificationPermissionStatus() {
         UNUserNotificationCenter.current().getNotificationSettings { [weak self] (settings: UNNotificationSettings) in
+            let isGranted = settings.authorizationStatus == UNAuthorizationStatus.authorized
             DispatchQueue.main.async {
-                self?.isNotificationPermissionGranted = settings.authorizationStatus == UNAuthorizationStatus.authorized
+                self?.isNotificationPermissionGranted = isGranted
             }
         }
     }

@@ -18,97 +18,92 @@ struct DashboardView: View {
     @State private var viewModel = DashboardViewModel()
     @State private var settings = AppSettings()
     
-    fileprivate func contentView() -> AnyView {
-        return AnyView(
-            VStack(spacing: 0) {
-                if assets.isEmpty {
-                    ContentUnavailableView(
-                        "No Assets",
-                        systemImage: "banknote",
-                        description: Text("Tap '+' to add your first asset.")
-                    )
-                } else {
-                    List {
-                        Section {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .fill(.ultraThinMaterial)
-                                    .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+    @ViewBuilder
+    private var contentView: some View {
+        VStack(spacing: 0) {
+            if assets.isEmpty {
+                ContentUnavailableView(
+                    "No Assets",
+                    systemImage: "banknote",
+                    description: Text("Tap '+' to add your first asset.")
+                )
+            } else {
+                List {
+                    Section {
+                        DashboardCard {
+                            VStack(spacing: 10) {
                                 CurrencyTotalsView(
-                                    totals: viewModel.totalsByCurrency(assets),
-                                    useCompactFormatting: settings.usesCompactCurrencyTotals
-                                )
-                                    .padding(12)
-                            }
-                            .listRowBackground(Color.clear)
-                            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
-                        } header: {
-                            HStack {
-                                Text("Net Worth")
-                                Spacer()
-                                HStack(spacing: 6) {
-                                    Text("Compact")
-                                        .font(.caption)
-                                    Toggle("Compact", isOn: $settings.usesCompactCurrencyTotals)
-                                        .labelsHidden()
-                                }
-                            }
-                        }
-
-                        Section(footer: FooterView(
-                            model: viewModel.getFooterData(
-                                assets,
-                                baseCurrency: settings.baseCurrency,
-                                displayCurrencies: settings.totalCurrencies
-                            )
-                        )) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .fill(.ultraThinMaterial)
-                                    .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
-                                TransferRateWidgetView(
-                                    rows: viewModel.transferRateRows(
+                                    totals: viewModel.totalsByCurrency(
+                                        assets,
                                         baseCurrency: settings.baseCurrency,
                                         displayCurrencies: settings.totalCurrencies
                                     ),
-                                    baseCurrency: settings.baseCurrency,
-                                    lastUpdated: viewModel.lastUpdated
+                                    useCompactFormatting: settings.usesCompactCurrencyTotals
                                 )
-                                .padding(12)
-                            }
-                            .listRowBackground(Color.clear)
-                            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
-                        }
-                        Section(header: Text("Assets")) {
-                            ForEach(assets) { asset in
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                        .fill(.ultraThinMaterial)
-                                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
-                                    AssetRowView(asset: asset)
-                                        .padding(12)
-                                }
-                                .listRowBackground(Color.clear)
-                                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
-                                .listRowSeparator(.hidden)      // hide separators for these rows
-                                .onTapGesture {
-                                    viewModel.selectedAsset = asset
-                                    showAddSheet = true
-                                }
-                            }
-                            .onDelete { indexSet in
-                                for index in indexSet {
-                                    modelContext.delete(assets[index])
+
+                                if let rateStatus = viewModel.rateStatus {
+                                    Divider()
+                                    RateStatusBannerView(status: rateStatus)
                                 }
                             }
                         }
-                        
+                        .dashboardListRow()
+                    } header: {
+                        HStack {
+                            Text("Net Worth")
+                            Spacer()
+                            HStack(spacing: 6) {
+                                Text("Compact")
+                                    .font(.caption)
+                                Toggle("Compact", isOn: $settings.usesCompactCurrencyTotals)
+                                    .labelsHidden()
+                            }
+                        }
                     }
-                    .scrollContentBackground(.hidden)
-                    .scrollIndicators(.hidden)
+
+                    Section(footer: FooterView(
+                        model: viewModel.getFooterData(
+                            assets,
+                            baseCurrency: settings.baseCurrency,
+                            displayCurrencies: settings.totalCurrencies
+                        )
+                    )) {
+                        DashboardCard {
+                            TransferRateWidgetView(
+                                rows: viewModel.transferRateRows(
+                                    baseCurrency: settings.baseCurrency,
+                                    displayCurrencies: settings.totalCurrencies
+                                ),
+                                baseCurrency: settings.baseCurrency,
+                                lastUpdated: viewModel.lastUpdated
+                            )
+                        }
+                        .dashboardListRow()
+                    }
+
+                    Section(header: Text("Assets")) {
+                        ForEach(assets) { asset in
+                            DashboardCard {
+                                AssetRowView(asset: asset)
+                            }
+                            .dashboardListRow()
+                            .listRowSeparator(.hidden)
+                            .onTapGesture {
+                                viewModel.selectedAsset = asset
+                                showAddSheet = true
+                            }
+                        }
+                        .onDelete { indexSet in
+                            for index in indexSet {
+                                modelContext.delete(assets[index])
+                            }
+                        }
+                    }
                 }
+                .scrollContentBackground(.hidden)
+                .scrollIndicators(.hidden)
             }
-        )
+        }
     }
     
     var body: some View {
@@ -116,7 +111,7 @@ struct DashboardView: View {
             ZStack {
                 RadialDotBackground(dotRadius: 1, spacing: 20)
                     .ignoresSafeArea(.all)
-                contentView()
+                contentView
             }
             .navigationTitle("My Assets")
             .toolbar {
@@ -151,5 +146,32 @@ struct DashboardView: View {
         .task {
             await viewModel.refreshExchangeRateIfNeeded()
         }
+    }
+}
+
+private struct DashboardCard<Content: View>: View {
+    let content: Content
+
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+
+            content
+                .padding(12)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+private extension View {
+    func dashboardListRow() -> some View {
+        listRowBackground(Color.clear)
+            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
     }
 }

@@ -18,20 +18,31 @@ final class DashboardViewModel: AssetOperations {
         static let rates = "exchangeRate.rates"
     }
 
+    @ObservationIgnored private let userDefaults: UserDefaults
+    @ObservationIgnored private let exchangeRateService: any ExchangeRateFetching
+
     var exchangeRate: Double = 0
     var exchangeRates: [String: Double] = ["USD": 1]
     var isLoadingRate = false
+    var rateErrorMessage: String?
     var lastUpdated: Date? = nil
     var selectedAsset: Asset?
 
-    init(autoRefreshRate: Bool = true) {
-        if let savedRate = UserDefaults.standard.object(forKey: DefaultsKeys.rate) as? Double {
+    init(
+        autoRefreshRate: Bool = true,
+        userDefaults: UserDefaults = .standard,
+        exchangeRateService: any ExchangeRateFetching = FirebaseExchangeRateService.shared
+    ) {
+        self.userDefaults = userDefaults
+        self.exchangeRateService = exchangeRateService
+
+        if let savedRate = userDefaults.object(forKey: DefaultsKeys.rate) as? Double {
             self.exchangeRate = savedRate
         }
-        if let savedRates = UserDefaults.standard.object(forKey: DefaultsKeys.rates) as? [String: Double] {
+        if let savedRates = userDefaults.object(forKey: DefaultsKeys.rates) as? [String: Double] {
             self.exchangeRates = savedRates.merging(["USD": 1]) { current, _ in current }
         }
-        if let savedDateInterval = UserDefaults.standard.object(forKey: DefaultsKeys.lastUpdated) as? TimeInterval {
+        if let savedDateInterval = userDefaults.object(forKey: DefaultsKeys.lastUpdated) as? TimeInterval {
             self.lastUpdated = Date(timeIntervalSince1970: savedDateInterval)
         }
         guard autoRefreshRate else {
@@ -57,62 +68,111 @@ final class DashboardViewModel: AssetOperations {
         isLoadingRate = true
         defer { isLoadingRate = false }
         do {
-            let decoded = try await FirebaseExchangeRateService.shared.fetchLatestExchangeRates()
+            let decoded = try await exchangeRateService.fetchLatestExchangeRates()
             let rates = (decoded.rates ?? [:]).merging(["USD": 1]) { current, _ in current }
-            guard let rate = rates["INR"] else { return }
+            guard let rate = rates["INR"] else {
+                rateErrorMessage = "Exchange rates are missing INR. Totals may be incomplete."
+                return
+            }
 
             let now = Date()
             exchangeRates = rates
             exchangeRate = rate
             lastUpdated = now
+            rateErrorMessage = nil
             persistRates(rates, inrRate: rate, at: now)
         } catch {
+            rateErrorMessage = "Unable to refresh exchange rates. Showing the last saved rates."
             print("Warning: Error fetching rate:", error.localizedDescription)
         }
     }
     
     private func persistRates(_ rates: [String: Double], inrRate: Double, at date: Date) {
-        UserDefaults.standard.set(inrRate, forKey: DefaultsKeys.rate)
-        UserDefaults.standard.set(rates, forKey: DefaultsKeys.rates)
-        UserDefaults.standard.set(date.timeIntervalSince1970, forKey: DefaultsKeys.lastUpdated)
+        userDefaults.set(inrRate, forKey: DefaultsKeys.rate)
+        userDefaults.set(rates, forKey: DefaultsKeys.rates)
+        userDefaults.set(date.timeIntervalSince1970, forKey: DefaultsKeys.lastUpdated)
     }
     
     func groupedByCategory(_ assets: [Asset]) -> [(Asset.CategoryType, Double)] {
-        let dict = Dictionary(grouping: assets) { $0.category }
+        let dict = Dictionary(grouping: assets) { $0.displayCategory }
         return dict.map { (key, group) in
-            let total = totalInUSD(group, exchangeRate: exchangeRate)
-            return (key ?? .others, total)
+            let total = totalInUSD(group, exchangeRates: exchangeRates) ?? 0
+            return (key, total)
         }.sorted { $0.1 > $1.1 }
     }
     
     func totalsByCurrency(_ assets: [Asset]) -> [CurrencyTotal] {
-        let assetCurrencies = assets.reduce(into: [Asset.CurrencyType]()) { result, asset in
-            guard let currency = asset.currency, !result.contains(currency) else {
-                return
-            }
-            result.append(currency)
-        }
+        totalsByCurrency(assets, currencies: uniqueCurrencies(assets.compactMap(\.currency)))
+    }
 
-        return assetCurrencies.compactMap { currency in
+    func totalsByCurrency(
+        _ assets: [Asset],
+        baseCurrency: Asset.CurrencyType,
+        displayCurrencies: [Asset.CurrencyType]
+    ) -> [CurrencyTotal] {
+        totalsByCurrency(assets, currencies: uniqueCurrencies([baseCurrency] + displayCurrencies))
+    }
+
+    private func totalsByCurrency(_ assets: [Asset], currencies: [Asset.CurrencyType]) -> [CurrencyTotal] {
+        currencies.compactMap { currency in
             guard let total = convertedTotal(assets, to: currency, exchangeRates: exchangeRates) else {
                 return nil
             }
             return CurrencyTotal(currency: currency, amount: total)
         }
-        .filter { $0.amount > 0 }
-        .sorted { $0.currency.rawValue < $1.currency.rawValue }
+    }
+
+    private func uniqueCurrencies(_ currencies: [Asset.CurrencyType]) -> [Asset.CurrencyType] {
+        currencies.reduce(into: [Asset.CurrencyType]()) { result, currency in
+            guard currency != .none, !result.contains(currency) else {
+                return
+            }
+            result.append(currency)
+        }
+    }
+
+    var rateStatus: RateStatusModel? {
+        if isLoadingRate {
+            return RateStatusModel(
+                systemImage: "arrow.triangle.2.circlepath",
+                message: "Refreshing exchange rates...",
+                style: .loading
+            )
+        }
+
+        if let rateErrorMessage {
+            return RateStatusModel(
+                systemImage: "exclamationmark.triangle",
+                message: rateErrorMessage,
+                style: .warning
+            )
+        }
+
+        guard let lastUpdated else {
+            return RateStatusModel(
+                systemImage: "clock",
+                message: "Exchange rates have not been refreshed yet.",
+                style: .neutral
+            )
+        }
+
+        if !Calendar.current.isDateInToday(lastUpdated) {
+            return RateStatusModel(
+                systemImage: "clock.badge.exclamationmark",
+                message: "Exchange rates are from \(lastUpdated.formatted(date: .abbreviated, time: .shortened)).",
+                style: .warning
+            )
+        }
+
+        return nil
     }
 
     func transferRateRows(
         baseCurrency: Asset.CurrencyType,
         displayCurrencies: [Asset.CurrencyType]
     ) -> [TransferRateRow] {
-        let targetCurrencies = displayCurrencies.reduce(into: [Asset.CurrencyType]()) { result, currency in
-            guard currency != .none, currency != baseCurrency, !result.contains(currency) else {
-                return
-            }
-            result.append(currency)
-        }
+        let targetCurrencies = uniqueCurrencies(displayCurrencies)
+            .filter { $0 != baseCurrency }
 
         return targetCurrencies.map { targetCurrency in
             TransferRateRow(
@@ -193,6 +253,20 @@ struct TransferRateRow: Identifiable {
     let rate: Double?
 
     var id: String { "\(baseCurrency.rawValue)-\(targetCurrency.rawValue)" }
+}
+
+struct RateStatusModel: Identifiable {
+    enum Style {
+        case loading
+        case neutral
+        case warning
+    }
+
+    let systemImage: String
+    let message: String
+    let style: Style
+
+    var id: String { "\(systemImage)-\(message)" }
 }
 
 struct RateResponse: Codable {

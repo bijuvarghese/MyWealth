@@ -11,7 +11,11 @@ enum ExchangeRateServiceError: Error, LocalizedError {
     }
 }
 
-final class FirebaseExchangeRateService {
+protocol ExchangeRateFetching {
+    func fetchLatestExchangeRates() async throws -> RateResponse
+}
+
+final class FirebaseExchangeRateService: ExchangeRateFetching {
     static let shared = FirebaseExchangeRateService()
 
     private init() {}

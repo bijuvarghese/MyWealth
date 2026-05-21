@@ -6,26 +6,13 @@
 //
 
 protocol AssetOperations {
-    func totalInUSD(_ assets: [Asset], exchangeRate: Double) -> Double
+    func totalInUSD(_ assets: [Asset], exchangeRates: [String: Double]) -> Double?
     func convertedTotal(_ assets: [Asset], to targetCurrency: Asset.CurrencyType, exchangeRates: [String: Double]) -> Double?
 }
 
 extension AssetOperations {
-    func totalInUSD(_ assets: [Asset], exchangeRate: Double) -> Double {
-        assets.reduce(0.0) { total, a in
-            let amount = a.amount ?? 0
-            guard let currency = a.currency, currency.isSupportedForTotals else {
-                return total
-            }
-
-            let valueInUSD: Double
-            if currency == .usd {
-                valueInUSD = amount
-            } else {
-                valueInUSD = amount / exchangeRate
-            }
-            return total + valueInUSD
-        }
+    func totalInUSD(_ assets: [Asset], exchangeRates: [String: Double]) -> Double? {
+        convertedTotal(assets, to: .usd, exchangeRates: exchangeRates)
     }
     
     func convertedTotal(_ assets: [Asset], to targetCurrency: Asset.CurrencyType, exchangeRates: [String: Double]) -> Double? {
@@ -37,12 +24,14 @@ extension AssetOperations {
         for asset in assets {
             guard
                 let sourceCurrency = asset.currency,
-                let sourceRate = rate(for: sourceCurrency, exchangeRates: exchangeRates)
+                let amount = asset.amount,
+                let sourceRate = rate(for: sourceCurrency, exchangeRates: exchangeRates),
+                sourceRate > 0
             else {
                 return nil
             }
 
-            totalInUSD += (asset.amount ?? 0) / sourceRate
+            totalInUSD += amount / sourceRate
         }
 
         return totalInUSD * targetRate

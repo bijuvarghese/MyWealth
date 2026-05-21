@@ -16,10 +16,6 @@ extension Asset.CurrencyType {
         return name
     }
 
-    var isSupportedForTotals: Bool {
-        self == .usd || self == .inr
-    }
-
     private static let names: [String: String] = [
         "AED": "United Arab Emirates Dirham",
         "AFN": "Afghan Afghani",

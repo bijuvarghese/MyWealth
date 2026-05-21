@@ -25,6 +25,22 @@ final class Asset {
         self.category = category
         self.lastUpdated = lastUpdated
     }
+
+    var displayName: String {
+        name ?? ""
+    }
+
+    var displayAmount: Double {
+        amount ?? 0
+    }
+
+    var displayCurrency: CurrencyType {
+        currency ?? .none
+    }
+
+    var displayCategory: CategoryType {
+        category ?? .others
+    }
     
     enum CurrencyType: String, Codable, CaseIterable, Identifiable {
         case aed = "AED"

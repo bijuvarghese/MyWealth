@@ -96,10 +96,10 @@ struct AddorEditAssetView: View {
         .onAppear {
             // Prefill fields when editing
             if let asset {
-                name = asset.name ?? ""
-                amount = String(asset.amount ?? 0)
+                name = asset.displayName
+                amount = String(asset.displayAmount)
                 currency = asset.currency ?? .usd
-                category = asset.category ?? .others
+                category = asset.displayCategory
             }
         }
     }
