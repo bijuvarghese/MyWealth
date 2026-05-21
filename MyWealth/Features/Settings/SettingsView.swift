@@ -3,57 +3,241 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Bindable var settings: AppSettings
+    var showsDoneButton = true
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Features") {
-                    NavigationLink(destination: ReminderSettingsView()) {
-                        HStack {
-                            Image(systemName: "bell.badge.fill")
-                                .foregroundColor(.accent)
-                            Text("Reminders")
-                        }
-                    }
-                }
-
-                Section("Totals") {
-                    Toggle("Compact Amounts", isOn: $settings.usesCompactCurrencyTotals)
-
-                    NavigationLink {
-                        BaseCurrencySelectionView(settings: settings)
-                    } label: {
-                        LabeledContent("Base Currency") {
-                            VStack(alignment: .trailing, spacing: 2) {
-                                Text(settings.baseCurrency.rawValue)
-                                    .foregroundStyle(.primary)
-                                Text(settings.baseCurrency.name)
-                                    .font(.caption)
-                                    .foregroundStyle(.gray)
-                            }
-                        }
-                    }
-
-                    NavigationLink {
-                        TotalCurrencySelectionView(settings: settings)
-                    } label: {
-                        LabeledContent("Display Currencies") {
-                            Text(settings.totalCurrencies.map(\.rawValue).joined(separator: ", "))
-                                .foregroundStyle(.primary)
-                        }
-                    }
-                }
-            }
+            settingsContent
             .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(showsDoneButton ? .inline : .automatic)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
-                        dismiss()
+                if showsDoneButton {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") {
+                            dismiss()
+                        }
                     }
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private var settingsContent: some View {
+        if showsDoneButton {
+            formContent
+        } else {
+            dashboardStyledContent
+        }
+    }
+
+    private var formContent: some View {
+        Form {
+            Section("Features") {
+                NavigationLink(destination: ReminderSettingsView()) {
+                    HStack {
+                        Image(systemName: "bell.badge.fill")
+                            .foregroundColor(.accent)
+                        Text("Reminders")
+                    }
+                }
+            }
+
+            Section("Totals") {
+                Toggle("Compact Amounts", isOn: $settings.usesCompactCurrencyTotals)
+
+                NavigationLink {
+                    BaseCurrencySelectionView(settings: settings)
+                } label: {
+                    baseCurrencyContent
+                }
+
+                NavigationLink {
+                    TotalCurrencySelectionView(settings: settings)
+                } label: {
+                    displayCurrenciesContent
+                }
+            }
+        }
+    }
+
+    private var dashboardStyledContent: some View {
+        ZStack {
+            RadialDotBackground(dotRadius: 1, spacing: 20)
+                .ignoresSafeArea(.all)
+
+            List {
+                Section("Features") {
+                    SettingsCard {
+                        NavigationLink(destination: ReminderSettingsView()) {
+                            SettingsRow(
+                                title: "Reminders",
+                                systemImage: "bell.badge.fill"
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .settingsListRow()
+                }
+
+                Section("Totals") {
+                    SettingsCard {
+                        VStack(spacing: 0) {
+                            Toggle(isOn: $settings.usesCompactCurrencyTotals) {
+                                SettingsRow(
+                                    title: "Compact Amounts",
+                                    subtitle: "Shorten large totals",
+                                    systemImage: "textformat.size"
+                                )
+                            }
+                            .tint(.accent)
+
+                            Divider()
+                                .padding(.leading, 44)
+                                .padding(.vertical, 10)
+
+                            NavigationLink {
+                                BaseCurrencySelectionView(settings: settings)
+                            } label: {
+                                SettingsValueRow(
+                                    title: "Base Currency",
+                                    value: settings.baseCurrency.rawValue,
+                                    subtitle: settings.baseCurrency.name,
+                                    systemImage: "banknote.fill"
+                                )
+                            }
+                            .buttonStyle(.plain)
+
+                            Divider()
+                                .padding(.leading, 44)
+                                .padding(.vertical, 10)
+
+                            NavigationLink {
+                                TotalCurrencySelectionView(settings: settings)
+                            } label: {
+                                SettingsValueRow(
+                                    title: "Display Currencies",
+                                    value: settings.totalCurrencies.map(\.rawValue).joined(separator: ", "),
+                                    systemImage: "list.bullet.rectangle.fill"
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .settingsListRow()
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .scrollIndicators(.hidden)
+        }
+    }
+
+    private var baseCurrencyContent: some View {
+        LabeledContent("Base Currency") {
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(settings.baseCurrency.rawValue)
+                    .foregroundStyle(.primary)
+                Text(settings.baseCurrency.name)
+                    .font(.caption)
+                    .foregroundStyle(.gray)
+            }
+        }
+    }
+
+    private var displayCurrenciesContent: some View {
+        LabeledContent("Display Currencies") {
+            Text(settings.totalCurrencies.map(\.rawValue).joined(separator: ", "))
+                .foregroundStyle(.primary)
+        }
+    }
+}
+
+private struct SettingsCard<Content: View>: View {
+    let content: Content
+
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+
+            content
+                .padding(12)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+private struct SettingsRow: View {
+    let title: String
+    var subtitle: String?
+    let systemImage: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: systemImage)
+                .font(.body.weight(.semibold))
+                .foregroundStyle(.accent)
+                .frame(width: 32, height: 32)
+                .background(.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.body.weight(.medium))
+                    .foregroundStyle(.primary)
+
+                if let subtitle {
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Spacer(minLength: 8)
+        }
+        .frame(minHeight: 40)
+    }
+}
+
+private struct SettingsValueRow: View {
+    let title: String
+    let value: String
+    var subtitle: String?
+    let systemImage: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            SettingsRow(
+                title: title,
+                subtitle: subtitle,
+                systemImage: systemImage
+            )
+
+            Spacer(minLength: 8)
+
+            HStack(spacing: 8) {
+                Text(value)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+        }
+    }
+}
+
+private extension View {
+    func settingsListRow() -> some View {
+        listRowBackground(Color.clear)
+            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
     }
 }
 

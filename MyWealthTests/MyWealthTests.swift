@@ -150,6 +150,75 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func categoryAllocationRowsCalculatePercentages() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        viewModel.exchangeRates = [
+            "USD": 1,
+            "EUR": 0.5
+        ]
+
+        let assets = [
+            Asset(name: "Cash", amount: 100, currency: .usd, category: .bank),
+            Asset(name: "Stocks", amount: 100, currency: .eur, category: .stocks)
+        ]
+
+        let rows = viewModel.categoryAllocationRows(assets)
+        let stocks = try #require(rows.first { $0.category == .stocks })
+        let bank = try #require(rows.first { $0.category == .bank })
+
+        #expect(stocks.amount == 200)
+        #expect(stocks.percentage == 2.0 / 3.0)
+        #expect(bank.amount == 100)
+        #expect(bank.percentage == 1.0 / 3.0)
+    }
+
+    @MainActor
+    @Test func netWorthTrendRowsSortFilterAndLimitSnapshots() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        let now = Date()
+        let snapshots = [
+            NetWorthSnapshot(amount: 1, currencyCode: "EUR", recordedAt: now),
+            NetWorthSnapshot(amount: 3, currencyCode: "USD", recordedAt: now.addingTimeInterval(30)),
+            NetWorthSnapshot(amount: 1, currencyCode: "USD", recordedAt: now.addingTimeInterval(10)),
+            NetWorthSnapshot(amount: 2, currencyCode: "USD", recordedAt: now.addingTimeInterval(20))
+        ]
+
+        let rows = viewModel.netWorthTrendRows(snapshots, baseCurrency: .usd, limit: 2)
+
+        #expect(rows.map(\.amount) == [2, 3])
+        #expect(rows.allSatisfy { $0.currencyCode == "USD" })
+    }
+
+    @MainActor
+    @Test func recentAssetHistoryRowsUseLatestSnapshotsFirst() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        let now = Date()
+        let snapshots = [
+            AssetValueSnapshot(
+                assetIdentifier: "1",
+                assetName: "Old",
+                amount: 1,
+                currencyCode: "USD",
+                categoryName: "Bank Deposits",
+                recordedAt: now
+            ),
+            AssetValueSnapshot(
+                assetIdentifier: "2",
+                assetName: "New",
+                amount: 2,
+                currencyCode: "EUR",
+                categoryName: "Stocks",
+                recordedAt: now.addingTimeInterval(60)
+            )
+        ]
+
+        let rows = viewModel.recentAssetHistoryRows(snapshots, limit: 1)
+
+        #expect(rows.map(\.assetName) == ["New"])
+        #expect(rows.first?.currencyCode == "EUR")
+    }
+
+    @MainActor
     @Test func onboardingCompletionRequiresReminderChoice() async throws {
         let defaults = try makeIsolatedDefaults()
         let settings = AppSettings(
@@ -189,6 +258,53 @@ struct MyWealthTests {
         let preference = try JSONDecoder().decode(ReminderPreference.self, from: data)
 
         #expect(preference.hasMadeChoice == true)
+        #expect(ReminderWeekday.allCases.contains(preference.weekday))
+        #expect((1...ReminderPreference.maximumMonthlyReminderDay).contains(preference.monthDay))
+    }
+
+    @MainActor
+    @Test func reminderPreferencePersistsWeeklyAlertDay() async throws {
+        let preference = ReminderPreference(
+            isEnabled: true,
+            hasMadeChoice: true,
+            frequency: .weekly,
+            weekday: .friday,
+            reminderTime: ReminderPreference.defaultReminderTime(),
+            reminderType: .reviewPortfolio,
+            lastReminderDate: nil
+        )
+
+        let data = try JSONEncoder().encode(preference)
+        let restoredPreference = try JSONDecoder().decode(ReminderPreference.self, from: data)
+
+        #expect(restoredPreference.weekday == .friday)
+    }
+
+    @MainActor
+    @Test func reminderPreferencePersistsMonthlyAlertDay() async throws {
+        let preference = ReminderPreference(
+            isEnabled: true,
+            hasMadeChoice: true,
+            frequency: .monthly,
+            monthDay: 15,
+            reminderTime: ReminderPreference.defaultReminderTime(),
+            reminderType: .reviewPortfolio,
+            lastReminderDate: nil
+        )
+
+        let data = try JSONEncoder().encode(preference)
+        let restoredPreference = try JSONDecoder().decode(ReminderPreference.self, from: data)
+
+        #expect(restoredPreference.monthDay == 15)
+    }
+
+    @MainActor
+    @Test func reminderPreferenceNormalizesMonthlyAlertDay() async throws {
+        let earlyPreference = ReminderPreference(monthDay: 0)
+        let latePreference = ReminderPreference(monthDay: 40)
+
+        #expect(earlyPreference.monthDay == 1)
+        #expect(latePreference.monthDay == ReminderPreference.maximumMonthlyReminderDay)
     }
 
     private func makeIsolatedDefaults() throws -> UserDefaults {

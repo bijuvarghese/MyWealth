@@ -44,7 +44,7 @@ My Wealth is a SwiftUI iOS app for tracking personal assets across currencies. U
 - **FR3.7**: Users must be able to delete assets from the dashboard list.
 - **FR3.8**: Users must be able to delete an asset from the edit form.
 - **FR3.9**: Assets must record a last-updated timestamp when created or changed.
-- **FR3.10**: Supported asset categories must include Stocks, Real Estate, Crypto, Bank Deposits, Mutual Funds, and Others.
+- **FR3.10**: Supported asset categories must include Stocks, Real Estate, Crypto, Bank Deposits, Mutual Funds, Gold, Cars, and Others.
 
 ### 4. Dashboard
 

@@ -226,6 +226,8 @@ final class Asset {
         case crypto = "Crypto"
         case bank = "Bank Deposits"
         case mutualFunds = "Mutual Funds"
+        case gold = "Gold"
+        case cars = "Cars"
         case others = "Others"
         
         var id: String { rawValue }
@@ -237,8 +239,85 @@ final class Asset {
             case .crypto: "bitcoinsign.circle"
             case .bank: "banknote"
             case .mutualFunds: "chart.pie"
+            case .gold: "rectangle.stack.fill"
+            case .cars: "car.fill"
             case .others: "tray.full"
             }
         }
+    }
+}
+
+@Model
+final class AssetValueSnapshot {
+    var assetIdentifier: String? = nil
+    var assetName: String? = nil
+    var amount: Double? = nil
+    var currencyCode: String? = nil
+    var categoryName: String? = nil
+    var recordedAt: Date? = nil
+
+    init(
+        assetIdentifier: String,
+        assetName: String,
+        amount: Double,
+        currencyCode: String,
+        categoryName: String,
+        recordedAt: Date = Date()
+    ) {
+        self.assetIdentifier = assetIdentifier
+        self.assetName = assetName
+        self.amount = amount
+        self.currencyCode = currencyCode
+        self.categoryName = categoryName
+        self.recordedAt = recordedAt
+    }
+
+    var displayAssetIdentifier: String {
+        assetIdentifier ?? ""
+    }
+
+    var displayAssetName: String {
+        assetName ?? ""
+    }
+
+    var displayAmount: Double {
+        amount ?? 0
+    }
+
+    var displayCurrencyCode: String {
+        currencyCode ?? ""
+    }
+
+    var displayCategoryName: String {
+        categoryName ?? ""
+    }
+
+    var displayRecordedAt: Date {
+        recordedAt ?? .distantPast
+    }
+}
+
+@Model
+final class NetWorthSnapshot {
+    var amount: Double? = nil
+    var currencyCode: String? = nil
+    var recordedAt: Date? = nil
+
+    init(amount: Double, currencyCode: String, recordedAt: Date = Date()) {
+        self.amount = amount
+        self.currencyCode = currencyCode
+        self.recordedAt = recordedAt
+    }
+
+    var displayAmount: Double {
+        amount ?? 0
+    }
+
+    var displayCurrencyCode: String {
+        currencyCode ?? ""
+    }
+
+    var displayRecordedAt: Date {
+        recordedAt ?? .distantPast
     }
 }

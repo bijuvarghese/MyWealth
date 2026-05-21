@@ -72,6 +72,19 @@ class NotificationScheduler {
             withIdentifiers: [ReminderNotification.identifier]
         )
     }
+
+    func clearDeliveredReminderBadge() {
+        let notificationCenter = UNUserNotificationCenter.current()
+
+        notificationCenter.removeDeliveredNotifications(
+            withIdentifiers: [ReminderNotification.identifier]
+        )
+        notificationCenter.setBadgeCount(0) { error in
+            if let error = error {
+                print("Error clearing reminder badge: \(error)")
+            }
+        }
+    }
     
     // MARK: - Private Helpers
     
@@ -90,14 +103,14 @@ class NotificationScheduler {
             
         case .weekly:
             var weeklyComponents = DateComponents()
-            weeklyComponents.weekday = calendar.component(.weekday, from: Date())
+            weeklyComponents.weekday = preference.weekday.rawValue
             weeklyComponents.hour = components.hour
             weeklyComponents.minute = components.minute
             return UNCalendarNotificationTrigger(dateMatching: weeklyComponents, repeats: true)
             
         case .monthly:
             var monthlyComponents = DateComponents()
-            monthlyComponents.day = calendar.component(.day, from: Date())
+            monthlyComponents.day = preference.monthDay
             monthlyComponents.hour = components.hour
             monthlyComponents.minute = components.minute
             return UNCalendarNotificationTrigger(dateMatching: monthlyComponents, repeats: true)
