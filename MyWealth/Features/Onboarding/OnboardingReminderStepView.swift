@@ -19,6 +19,7 @@ struct OnboardingReminderStepView: View {
         Form {
             Section {
                 Toggle("Enable Portfolio Reminders", isOn: $remindersEnabled)
+                    .tint(.accentColor)
                     .padding(12)
                     .background {
                         RoundedRectangle(cornerRadius: 12, style: .continuous)

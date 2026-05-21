@@ -4,7 +4,6 @@ struct TransferRatesView: View {
     @Bindable var settings: AppSettings
 
     @State private var viewModel = DashboardViewModel()
-    @State private var showSettings = false
 
     private var rows: [TransferRateRow] {
         viewModel.transferRateRows(
@@ -43,14 +42,6 @@ struct TransferRatesView: View {
             }
             .navigationTitle("Transfer Rates")
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        showSettings = true
-                    } label: {
-                        Label("Settings", systemImage: "gearshape")
-                    }
-                }
-
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         Task {
@@ -61,10 +52,7 @@ struct TransferRatesView: View {
                     }
                     .disabled(viewModel.isLoadingRate)
                 }
-            }
-            .sheet(isPresented: $showSettings) {
-                SettingsView(settings: settings)
-            }
+            }            
         }
         .task {
             await viewModel.refreshExchangeRateIfNeeded()

@@ -18,7 +18,7 @@ struct DashboardView: View {
     @Bindable var settings: AppSettings
     
     @State private var showAddSheet = false
-    @State private var showSettings = false
+    @State private var hasAnimatedPortfolioChart = false
     @State private var viewModel = DashboardViewModel()
 
     private var assetSnapshotSignature: String {
@@ -53,11 +53,18 @@ struct DashboardView: View {
                 )
             } else {
                 List {
-                    Section(header: Text("Allocation")) {
+                    Section(header: PillLabel("Allocation")) {
                         DashboardCard {
                             PortfolioAllocationView(
                                 rows: viewModel.categoryAllocationRows(assets),
-                                currencyCode: Asset.CurrencyType.usd.rawValue
+                                portfolioTotal: viewModel.convertedTotal(
+                                    assets,
+                                    to: settings.baseCurrency,
+                                    exchangeRates: viewModel.exchangeRates
+                                ),
+                                currencyCode: Asset.CurrencyType.usd.rawValue,
+                                totalCurrencyCode: settings.baseCurrency.rawValue,
+                                hasAnimatedEntrance: $hasAnimatedPortfolioChart
                             )
                         }
                         .dashboardListRow()
@@ -83,12 +90,13 @@ struct DashboardView: View {
                         .dashboardListRow()
                     } header: {
                         HStack {
-                            Text("Net Worth")
+                            PillLabel("Net Worth")
                             Spacer()
                             HStack(spacing: 6) {
                                 Text("Compact")
-                                    .font(.caption)
+                                    .font(.footnote)
                                 Toggle("Compact", isOn: $settings.usesCompactCurrencyTotals)
+                                    .tint(.accentColor)
                                     .labelsHidden()
                             }
                         }
@@ -114,7 +122,7 @@ struct DashboardView: View {
                         .dashboardListRow()
                     }
 
-                    Section(header: Text("Trend")) {
+                    Section(header: PillLabel("Trend")) {
                         DashboardCard {
                             NetWorthTrendChartView(
                                 rows: viewModel.netWorthTrendRows(
@@ -129,7 +137,7 @@ struct DashboardView: View {
 
                     let historyRows = viewModel.recentAssetHistoryRows(assetValueSnapshots)
                     if !historyRows.isEmpty {
-                        Section(header: Text("History")) {
+                        Section(header: PillLabel("History")) {
                             DashboardCard {
                                 AssetHistoryListView(rows: historyRows)
                             }
@@ -152,13 +160,6 @@ struct DashboardView: View {
             }
             .navigationTitle("My Assets")
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        showSettings = true
-                    } label: {
-                        Label("Settings", systemImage: "gearshape")
-                    }
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showAddSheet = true
@@ -176,9 +177,6 @@ struct DashboardView: View {
                     AddorEditAssetView()
                 }
             )
-            .sheet(isPresented: $showSettings) {
-                SettingsView(settings: settings)
-            }
         }
         .task {
             await viewModel.refreshExchangeRateIfNeeded()
@@ -286,17 +284,43 @@ private struct NetWorthTrendChartView: View {
 }
 
 private struct PortfolioAllocationView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var chartProgress = 0.0
+
     let rows: [CategoryAllocationRow]
+    let portfolioTotal: Double?
     let currencyCode: String
+    let totalCurrencyCode: String
+    @Binding var hasAnimatedEntrance: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Portfolio")
-                .font(.headline)
+            HStack(alignment: .firstTextBaseline) {
+                Text("Portfolio")
+                    .font(.headline)
+
+                Spacer()
+
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("Total")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    if let portfolioTotal {
+                        Text(portfolioTotal, format: .currency(code: totalCurrencyCode))
+                            .font(.headline.weight(.semibold))
+                            .monospacedDigit()
+                    } else {
+                        Text("Unavailable")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
 
             Chart(rows) { row in
                 SectorMark(
-                    angle: .value("Amount", row.amount),
+                    angle: .value("Amount", row.amount * chartProgress),
                     innerRadius: .ratio(0.62),
                     angularInset: 1.5
                 )
@@ -304,6 +328,9 @@ private struct PortfolioAllocationView: View {
             }
             .frame(height: 180)
             .chartLegend(position: .bottom, alignment: .leading)
+            .onAppear {
+                animateChart()
+            }
 
             VStack(spacing: 8) {
                 ForEach(rows) { row in
@@ -321,6 +348,26 @@ private struct PortfolioAllocationView: View {
                     }
                     .font(.subheadline)
                 }
+            }
+        }
+    }
+
+    private func animateChart() {
+        guard !hasAnimatedEntrance else {
+            chartProgress = 1
+            return
+        }
+
+        hasAnimatedEntrance = true
+        chartProgress = reduceMotion ? 1 : 0
+
+        guard !reduceMotion else {
+            return
+        }
+
+        DispatchQueue.main.async {
+            withAnimation(.easeOut(duration: 0.85)) {
+                chartProgress = 1
             }
         }
     }
