@@ -45,7 +45,7 @@ struct SettingsView: View {
 
             Section("Totals") {
                 Toggle("Compact Amounts", isOn: $settings.usesCompactCurrencyTotals)
-
+                    .tint(.accentColor)
                 NavigationLink {
                     BaseCurrencySelectionView(settings: settings)
                 } label: {
@@ -67,7 +67,7 @@ struct SettingsView: View {
                 .ignoresSafeArea(.all)
 
             List {
-                Section("Features") {
+                Section {
                     SettingsCard {
                         NavigationLink(destination: ReminderSettingsView()) {
                             SettingsRow(
@@ -79,8 +79,7 @@ struct SettingsView: View {
                     }
                     .settingsListRow()
                 }
-
-                Section("Totals") {
+                Section {
                     SettingsCard {
                         VStack(spacing: 0) {
                             Toggle(isOn: $settings.usesCompactCurrencyTotals) {
@@ -116,8 +115,8 @@ struct SettingsView: View {
                                 TotalCurrencySelectionView(settings: settings)
                             } label: {
                                 SettingsValueRow(
-                                    title: "Display Currencies",
-                                    value: settings.totalCurrencies.map(\.rawValue).joined(separator: ", "),
+                                    title: "View Net Worth In",
+                                    value: currencySummary,
                                     systemImage: "list.bullet.rectangle.fill"
                                 )
                             }
@@ -126,12 +125,35 @@ struct SettingsView: View {
                     }
                     .settingsListRow()
                 }
+                Section {
+                    SettingsCard {
+                        SettingsValueRow(
+                            title: "App Version",
+                            value: AppInfo.fullVersion,
+                            systemImage: "info.circle"
+                        )
+                    }
+                    .settingsListRow()
+                }
             }
             .scrollContentBackground(.hidden)
             .scrollIndicators(.hidden)
         }
     }
+    private var currencySummary: String {
+        let currencies = settings.totalCurrencies.map(\.rawValue)
 
+        if currencies.count <= 1 {
+            return currencies.joined(separator: ", ")
+        } else {
+            if let first = currencies.first {
+                return "\(first) +\(currencies.count - 1) more"
+            } else {
+                return ""
+            }
+        }
+    }
+    
     private var baseCurrencyContent: some View {
         LabeledContent("Base Currency") {
             VStack(alignment: .trailing, spacing: 2) {
@@ -225,10 +247,6 @@ private struct SettingsValueRow: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
-
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.tertiary)
             }
         }
     }

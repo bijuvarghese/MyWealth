@@ -215,7 +215,7 @@ private struct OnboardingDisplayCurrencyStepView: View {
                     Label("Track Wealth Across Global Currencies", systemImage: "globe")
                         .font(.title3.bold())
                         .foregroundStyle(primaryTextColor)
-                    Text("Display currencies let you see your total wealth converted into different currencies around the world.")
+                    Text("View your net worth in multiple global currencies for a clearer perspective on your wealth around the world.")
                         .font(.body)
                         .foregroundStyle(primaryTextColor)
                     Text("Your base currency will always be included.")

@@ -7,6 +7,7 @@
 
 import Testing
 import Foundation
+import SwiftData
 @testable import MyWealth
 
 struct MyWealthTests {
@@ -219,6 +220,62 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func assetSnapshotRecordingIgnoresMetadataChanges() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        viewModel.exchangeRates = ["USD": 1, "EUR": 0.5]
+        let modelContext = try makeInMemoryModelContext()
+        let asset = Asset(name: "Cash", amount: 100, currency: .usd, category: .bank)
+        modelContext.insert(asset)
+        let existingSnapshot = AssetValueSnapshot(
+            assetIdentifier: String(describing: asset.persistentModelID),
+            assetName: "Old Cash",
+            amount: 100,
+            currencyCode: "EUR",
+            categoryName: "Stocks"
+        )
+        modelContext.insert(existingSnapshot)
+
+        viewModel.recordPortfolioHistory(
+            assets: [asset],
+            baseCurrency: .usd,
+            netWorthSnapshots: [],
+            assetValueSnapshots: [existingSnapshot],
+            modelContext: modelContext
+        )
+
+        let snapshots = try modelContext.fetch(FetchDescriptor<AssetValueSnapshot>())
+        #expect(snapshots.count == 1)
+    }
+
+    @MainActor
+    @Test func assetSnapshotRecordingUsesValueChanges() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        viewModel.exchangeRates = ["USD": 1]
+        let modelContext = try makeInMemoryModelContext()
+        let asset = Asset(name: "Cash", amount: 100, currency: .usd, category: .bank)
+        modelContext.insert(asset)
+        let existingSnapshot = AssetValueSnapshot(
+            assetIdentifier: String(describing: asset.persistentModelID),
+            assetName: "Cash",
+            amount: 90,
+            currencyCode: "USD",
+            categoryName: "Bank Deposits"
+        )
+        modelContext.insert(existingSnapshot)
+
+        viewModel.recordPortfolioHistory(
+            assets: [asset],
+            baseCurrency: .usd,
+            netWorthSnapshots: [],
+            assetValueSnapshots: [existingSnapshot],
+            modelContext: modelContext
+        )
+
+        let snapshots = try modelContext.fetch(FetchDescriptor<AssetValueSnapshot>())
+        #expect(snapshots.count == 2)
+    }
+
+    @MainActor
     @Test func onboardingCompletionRequiresReminderChoice() async throws {
         let defaults = try makeIsolatedDefaults()
         let settings = AppSettings(
@@ -312,6 +369,18 @@ struct MyWealthTests {
         let defaults = try #require(UserDefaults(suiteName: suiteName))
         defaults.removePersistentDomain(forName: suiteName)
         return defaults
+    }
+
+    @MainActor
+    private func makeInMemoryModelContext() throws -> ModelContext {
+        let schema = Schema([
+            Asset.self,
+            AssetValueSnapshot.self,
+            NetWorthSnapshot.self,
+        ])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: schema, configurations: [configuration])
+        return ModelContext(container)
     }
 
     private struct LegacyReminderPreference: Codable {

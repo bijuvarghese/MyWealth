@@ -35,6 +35,7 @@ struct ReminderSettingsView: View {
                                 }
                             }
                         ))
+                        .tint(.accentColor)
                     }
                     
                     if reminderManager.preference.isEnabled {
