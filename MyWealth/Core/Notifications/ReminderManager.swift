@@ -47,7 +47,7 @@ class ReminderManager: ObservableObject {
         preference.isEnabled = false
         preference.hasMadeChoice = true
         preferenceStore.preference = preference
-        scheduler.cancelAllReminders()
+        scheduler.cancelReminder()
     }
     
     func updateReminderPreference(

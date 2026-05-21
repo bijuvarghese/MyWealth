@@ -3,6 +3,10 @@ import UserNotifications
 
 class NotificationScheduler {
     static let shared = NotificationScheduler()
+
+    private enum ReminderNotification {
+        static let identifier = "com.mywealth.reminder.portfolio-review"
+    }
     
     private init() {}
     
@@ -23,7 +27,7 @@ class NotificationScheduler {
     
     func scheduleReminder(preference: ReminderPreference) {
         // Cancel existing reminders first
-        cancelAllReminders()
+        cancelReminder()
         
         guard preference.isEnabled else {
             return
@@ -44,7 +48,7 @@ class NotificationScheduler {
         // Calculate trigger time
         let trigger = createTrigger(from: preference)
         let request = UNNotificationRequest(
-            identifier: UUID().uuidString,
+            identifier: ReminderNotification.identifier,
             content: content,
             trigger: trigger
         )
@@ -58,8 +62,13 @@ class NotificationScheduler {
         }
     }
     
-    func cancelAllReminders() {
-        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+    func cancelReminder() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(
+            withIdentifiers: [ReminderNotification.identifier]
+        )
+        UNUserNotificationCenter.current().removeDeliveredNotifications(
+            withIdentifiers: [ReminderNotification.identifier]
+        )
     }
     
     // MARK: - Private Helpers
