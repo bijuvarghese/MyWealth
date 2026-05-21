@@ -12,12 +12,12 @@ class NotificationScheduler {
     
     // MARK: - Permission Handling
     
-    func requestNotificationPermission(completion: @escaping (Bool) -> Void) {
+    func requestNotificationPermission(completion: @escaping @MainActor @Sendable (Bool) -> Void) {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
             if let error = error {
                 print("Error requesting notification permission: \(error)")
             }
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 completion(granted)
             }
         }
@@ -52,12 +52,14 @@ class NotificationScheduler {
             content: content,
             trigger: trigger
         )
+        let reminderDisplayName = preference.reminderType.displayName
+        let reminderTime = preference.reminderTime
         
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
                 print("Error scheduling reminder: \(error)")
             } else {
-                print("Reminder scheduled: \(preference.reminderType.displayName) at \(preference.reminderTime)")
+                print("Reminder scheduled: \(reminderDisplayName) at \(reminderTime)")
             }
         }
     }

@@ -167,6 +167,7 @@ struct MyWealthTests {
         #expect(settings.firstMissingOnboardingStep() == .reminders)
     }
 
+    @MainActor
     @Test func defaultReminderPreferenceHasNoRecordedChoice() async throws {
         let preference = ReminderPreference()
 
@@ -174,6 +175,7 @@ struct MyWealthTests {
         #expect(preference.hasMadeChoice == false)
     }
 
+    @MainActor
     @Test func legacyReminderPreferenceDecodesAsRecordedChoice() async throws {
         let legacyPreference = LegacyReminderPreference(
             isEnabled: false,
