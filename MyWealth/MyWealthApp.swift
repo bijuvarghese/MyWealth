@@ -71,6 +71,11 @@ private struct AppRootView: View {
                         Label("Assets", systemImage: "list.bullet.rectangle")
                     }
 
+                NetWorthView(settings: settings)
+                    .tabItem {
+                        Label("Net Worth", systemImage: "chart.line.uptrend.xyaxis")
+                    }
+
                 TransferRatesView(settings: settings)
                     .tabItem {
                         Label("Rates", systemImage: "arrow.left.arrow.right.circle.fill")

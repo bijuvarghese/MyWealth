@@ -1,6 +1,8 @@
 import SwiftUI
+import SwiftData
 
 struct TransferRatesView: View {
+    @Query private var assets: [Asset]
     @Bindable var settings: AppSettings
 
     @State private var viewModel = DashboardViewModel()
@@ -13,7 +15,7 @@ struct TransferRatesView: View {
     }
 
     private var requiredExchangeRateCurrencies: [Asset.CurrencyType] {
-        [settings.baseCurrency] + settings.totalCurrencies
+        [settings.baseCurrency] + settings.totalCurrencies + assets.compactMap(\.currency)
     }
 
     var body: some View {
@@ -23,7 +25,13 @@ struct TransferRatesView: View {
                     .ignoresSafeArea(.all)
 
                 List {
-                    Section {
+                    Section(footer: FooterView(
+                        model: viewModel.getFooterData(
+                            assets,
+                            baseCurrency: settings.baseCurrency,
+                            displayCurrencies: settings.totalCurrencies
+                        )
+                    )) {
                         TransferRatesCard {
                             TransferRateWidgetView(
                                 rows: rows,
