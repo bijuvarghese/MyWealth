@@ -221,10 +221,15 @@ final class DashboardViewModel: AssetOperations {
 
     func transferRateRows(
         baseCurrency: Asset.CurrencyType,
-        displayCurrencies: [Asset.CurrencyType]
+        displayCurrencies: [Asset.CurrencyType],
+        limit: Int? = nil
     ) -> [TransferRateRow] {
-        let targetCurrencies = uniqueCurrencies(displayCurrencies)
+        var targetCurrencies = uniqueCurrencies(displayCurrencies)
             .filter { $0 != baseCurrency }
+
+        if let limit {
+            targetCurrencies = Array(targetCurrencies.prefix(limit))
+        }
 
         return targetCurrencies.map { targetCurrency in
             TransferRateRow(

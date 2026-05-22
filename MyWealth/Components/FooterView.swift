@@ -18,9 +18,7 @@ struct FooterView: View {
     var body: some View {
         VStack {
             if let updated = viewModel.lastUpdated {
-                Text("Last updated: \(updated.formatted(date: .abbreviated, time: .shortened))")
-                    .font(.caption2)
-                    .foregroundStyle(.gray)
+                PillLabel("Last updated: \(updated.formatted(date: .abbreviated, time: .shortened))")
             }
         }
         .frame(maxWidth: .infinity)

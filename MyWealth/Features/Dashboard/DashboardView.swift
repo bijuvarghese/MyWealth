@@ -80,10 +80,13 @@ struct DashboardView: View {
                         DashboardCard {
                             VStack(spacing: 10) {
                                 CurrencyTotalsView(
-                                    totals: viewModel.totalsByCurrency(
-                                        assets,
-                                        baseCurrency: settings.baseCurrency,
-                                        displayCurrencies: settings.totalCurrencies
+                                    totals: Array(
+                                        viewModel.totalsByCurrency(
+                                            assets,
+                                            baseCurrency: settings.baseCurrency,
+                                            displayCurrencies: settings.totalCurrencies
+                                        )
+                                        .prefix(3)
                                     ),
                                     useCompactFormatting: settings.usesCompactCurrencyTotals
                                 )
@@ -109,18 +112,13 @@ struct DashboardView: View {
                         }
                     }
 
-                    Section(footer: FooterView(
-                        model: viewModel.getFooterData(
-                            assets,
-                            baseCurrency: settings.baseCurrency,
-                            displayCurrencies: settings.totalCurrencies
-                        )
-                    )) {
+                    Section {
                         DashboardCard {
                             TransferRateWidgetView(
                                 rows: viewModel.transferRateRows(
                                     baseCurrency: settings.baseCurrency,
-                                    displayCurrencies: settings.totalCurrencies
+                                    displayCurrencies: settings.totalCurrencies,
+                                    limit: 3
                                 ),
                                 baseCurrency: settings.baseCurrency,
                                 lastUpdated: viewModel.lastUpdated
@@ -184,6 +182,177 @@ struct DashboardView: View {
                     AddorEditAssetView()
                 }
             )
+        }
+        .task {
+            await viewModel.refreshExchangeRateIfNeeded(
+                requiredCurrencies: requiredExchangeRateCurrencies
+            )
+            recordPortfolioHistory()
+        }
+        .onChange(of: assetSnapshotSignature) {
+            Task {
+                await viewModel.refreshExchangeRateIfNeeded(
+                    requiredCurrencies: requiredExchangeRateCurrencies
+                )
+                recordPortfolioHistory()
+            }
+        }
+        .onChange(of: settings.baseCurrency) {
+            Task {
+                await viewModel.refreshExchangeRateIfNeeded(
+                    requiredCurrencies: requiredExchangeRateCurrencies
+                )
+                recordPortfolioHistory()
+            }
+        }
+        .onChange(of: settings.totalCurrencies) {
+            Task {
+                await viewModel.refreshExchangeRateIfNeeded(
+                    requiredCurrencies: requiredExchangeRateCurrencies
+                )
+                recordPortfolioHistory()
+            }
+        }
+        .onChange(of: rateSnapshotSignature) {
+            recordPortfolioHistory()
+        }
+    }
+
+    private func recordPortfolioHistory() {
+        viewModel.recordPortfolioHistory(
+            assets: assets,
+            baseCurrency: settings.baseCurrency,
+            netWorthSnapshots: netWorthSnapshots,
+            assetValueSnapshots: assetValueSnapshots,
+            modelContext: modelContext
+        )
+    }
+}
+
+struct NetWorthView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query private var assets: [Asset]
+    @Query private var netWorthSnapshots: [NetWorthSnapshot]
+    @Query private var assetValueSnapshots: [AssetValueSnapshot]
+    @Bindable var settings: AppSettings
+
+    @State private var viewModel = DashboardViewModel()
+
+    private var assetSnapshotSignature: String {
+        assets.map { asset in
+            [
+                String(describing: asset.persistentModelID),
+                asset.displayName,
+                "\(asset.displayAmount)",
+                asset.displayCurrency.rawValue,
+                asset.displayCategory.rawValue,
+                "\(asset.lastUpdated?.timeIntervalSince1970 ?? 0)"
+            ].joined(separator: ":")
+        }
+        .joined(separator: "|")
+    }
+
+    private var rateSnapshotSignature: String {
+        viewModel.exchangeRates
+            .sorted { $0.key < $1.key }
+            .map { "\($0.key):\($0.value)" }
+            .joined(separator: "|")
+    }
+
+    private var requiredExchangeRateCurrencies: [Asset.CurrencyType] {
+        [settings.baseCurrency] + settings.totalCurrencies + assets.compactMap(\.currency)
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                RadialDotBackground(dotRadius: 1, spacing: 20)
+                    .ignoresSafeArea(.all)
+
+                if assets.isEmpty {
+                    ContentUnavailableView(
+                        "No Assets",
+                        systemImage: "banknote",
+                        description: Text("Tap '+' in Dashboard or Assets to add your first asset.")
+                    )
+                } else {
+                    List {
+                        Section {
+                            DashboardCard {
+                                VStack(spacing: 10) {
+                                    CurrencyTotalsView(
+                                        totals: viewModel.totalsByCurrency(
+                                            assets,
+                                            baseCurrency: settings.baseCurrency,
+                                            displayCurrencies: settings.totalCurrencies
+                                        ),
+                                        useCompactFormatting: settings.usesCompactCurrencyTotals
+                                    )
+
+                                    if let rateStatus = viewModel.rateStatus {
+                                        Divider()
+                                        RateStatusBannerView(status: rateStatus)
+                                    }
+                                }
+                            }
+                            .dashboardListRow()
+                        } header: {
+                            HStack {
+                                PillLabel("Net Worth")
+                                Spacer()
+                                HStack(spacing: 6) {
+                                    Text("Compact")
+                                        .font(.footnote)
+                                    Toggle("Compact", isOn: $settings.usesCompactCurrencyTotals)
+                                        .tint(.accentColor)
+                                        .labelsHidden()
+                                }
+                            }
+                        }
+
+                        Section(header: PillLabel("Trend")) {
+                            DashboardCard {
+                                NetWorthTrendChartView(
+                                    rows: viewModel.netWorthTrendRows(
+                                        netWorthSnapshots,
+                                        baseCurrency: settings.baseCurrency
+                                    ),
+                                    currencyCode: settings.baseCurrency.rawValue
+                                )
+                            }
+                            .dashboardListRow()
+                        }
+
+                        let historyRows = viewModel.recentAssetHistoryRows(assetValueSnapshots)
+                        if !historyRows.isEmpty {
+                            Section(header: PillLabel("History")) {
+                                DashboardCard {
+                                    AssetHistoryListView(rows: historyRows)
+                                }
+                                .dashboardListRow()
+                            }
+                        }
+                    }
+                    .scrollContentBackground(.hidden)
+                    .scrollIndicators(.hidden)
+                }
+            }
+            .navigationTitle("Net Worth")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        Task {
+                            await viewModel.fetchExchangeRate(
+                                requiredCurrencies: requiredExchangeRateCurrencies
+                            )
+                            recordPortfolioHistory()
+                        }
+                    } label: {
+                        Label("Refresh Rates", systemImage: "arrow.clockwise")
+                    }
+                    .disabled(viewModel.isLoadingRate)
+                }
+            }
         }
         .task {
             await viewModel.refreshExchangeRateIfNeeded(

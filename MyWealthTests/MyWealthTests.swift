@@ -106,6 +106,26 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func transferRateRowsCanBeLimitedForDashboard() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        viewModel.exchangeRates = [
+            "USD": 1,
+            "EUR": 0.5,
+            "INR": 80,
+            "GBP": 0.8,
+            "CAD": 1.3
+        ]
+
+        let rows = viewModel.transferRateRows(
+            baseCurrency: .usd,
+            displayCurrencies: [.usd, .eur, .inr, .gbp, .cad],
+            limit: 3
+        )
+
+        #expect(rows.map(\.targetCurrency) == [.eur, .inr, .gbp])
+    }
+
+    @MainActor
     @Test func rateStatusShowsMissingRefreshAndErrors() async throws {
         let viewModel = DashboardViewModel(autoRefreshRate: false)
 
