@@ -3,6 +3,7 @@ import SwiftData
 
 struct TransferRatesView: View {
     @Query private var assets: [Asset]
+    @Query private var liabilities: [Liability]
     @Bindable var settings: AppSettings
 
     @State private var viewModel = DashboardViewModel()
@@ -15,7 +16,7 @@ struct TransferRatesView: View {
     }
 
     private var requiredExchangeRateCurrencies: [Asset.CurrencyType] {
-        [settings.baseCurrency] + settings.totalCurrencies + assets.compactMap(\.currency)
+        [settings.baseCurrency] + settings.totalCurrencies + assets.compactMap(\.currency) + liabilities.compactMap(\.currency)
     }
 
     var body: some View {
@@ -28,6 +29,7 @@ struct TransferRatesView: View {
                     Section(footer: FooterView(
                         model: viewModel.getFooterData(
                             assets,
+                            liabilities: liabilities,
                             baseCurrency: settings.baseCurrency,
                             displayCurrencies: settings.totalCurrencies
                         )

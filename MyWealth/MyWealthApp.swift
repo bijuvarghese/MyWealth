@@ -18,6 +18,7 @@ struct MyWealthApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Asset.self,
+            Liability.self,
             AssetValueSnapshot.self,
             NetWorthSnapshot.self,
         ])

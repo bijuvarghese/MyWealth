@@ -150,9 +150,40 @@ final class DashboardViewModel: AssetOperations {
         totalsByCurrency(assets, currencies: uniqueCurrencies([baseCurrency] + displayCurrencies))
     }
 
+    func totalsByCurrency(
+        _ assets: [Asset],
+        liabilities: [Liability],
+        baseCurrency: Asset.CurrencyType,
+        displayCurrencies: [Asset.CurrencyType]
+    ) -> [CurrencyTotal] {
+        totalsByCurrency(
+            assets,
+            liabilities: liabilities,
+            currencies: uniqueCurrencies([baseCurrency] + displayCurrencies)
+        )
+    }
+
     private func totalsByCurrency(_ assets: [Asset], currencies: [Asset.CurrencyType]) -> [CurrencyTotal] {
         currencies.compactMap { currency in
             guard let total = convertedTotal(assets, to: currency, exchangeRates: exchangeRates) else {
+                return nil
+            }
+            return CurrencyTotal(currency: currency, amount: total)
+        }
+    }
+
+    private func totalsByCurrency(
+        _ assets: [Asset],
+        liabilities: [Liability],
+        currencies: [Asset.CurrencyType]
+    ) -> [CurrencyTotal] {
+        currencies.compactMap { currency in
+            guard let total = netWorthTotal(
+                assets,
+                liabilities: liabilities,
+                to: currency,
+                exchangeRates: exchangeRates
+            ) else {
                 return nil
             }
             return CurrencyTotal(currency: currency, amount: total)
@@ -242,6 +273,7 @@ final class DashboardViewModel: AssetOperations {
 
     func getFooterData(
         _ assets: [Asset],
+        liabilities: [Liability] = [],
         baseCurrency: Asset.CurrencyType,
         displayCurrencies: [Asset.CurrencyType]
     ) -> FooterModel {
@@ -252,7 +284,12 @@ final class DashboardViewModel: AssetOperations {
         }
 
         let totals = orderedCurrencies.compactMap { currency -> ConvertedCurrencyTotal? in
-            guard let amount = convertedTotal(assets, to: currency, exchangeRates: exchangeRates) else {
+            guard let amount = netWorthTotal(
+                assets,
+                liabilities: liabilities,
+                to: currency,
+                exchangeRates: exchangeRates
+            ) else {
                 return nil
             }
             return ConvertedCurrencyTotal(currency: currency, amount: amount)
@@ -304,12 +341,13 @@ final class DashboardViewModel: AssetOperations {
 
     func recordPortfolioHistory(
         assets: [Asset],
+        liabilities: [Liability] = [],
         baseCurrency: Asset.CurrencyType,
         netWorthSnapshots: [NetWorthSnapshot],
         assetValueSnapshots: [AssetValueSnapshot],
         modelContext: ModelContext
     ) {
-        guard !assets.isEmpty else {
+        guard !assets.isEmpty || !liabilities.isEmpty else {
             return
         }
 
@@ -319,7 +357,12 @@ final class DashboardViewModel: AssetOperations {
             modelContext: modelContext
         )
 
-        guard let netWorth = convertedTotal(assets, to: baseCurrency, exchangeRates: exchangeRates) else {
+        guard let netWorth = netWorthTotal(
+            assets,
+            liabilities: liabilities,
+            to: baseCurrency,
+            exchangeRates: exchangeRates
+        ) else {
             return
         }
 
