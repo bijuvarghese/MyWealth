@@ -12,6 +12,10 @@ struct TransferRatesView: View {
         )
     }
 
+    private var requiredExchangeRateCurrencies: [Asset.CurrencyType] {
+        [settings.baseCurrency] + settings.totalCurrencies
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -45,7 +49,9 @@ struct TransferRatesView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         Task {
-                            await viewModel.fetchExchangeRate()
+                            await viewModel.fetchExchangeRate(
+                                requiredCurrencies: requiredExchangeRateCurrencies
+                            )
                         }
                     } label: {
                         Label("Refresh Rates", systemImage: "arrow.clockwise")
@@ -55,7 +61,23 @@ struct TransferRatesView: View {
             }            
         }
         .task {
-            await viewModel.refreshExchangeRateIfNeeded()
+            await viewModel.refreshExchangeRateIfNeeded(
+                requiredCurrencies: requiredExchangeRateCurrencies
+            )
+        }
+        .onChange(of: settings.baseCurrency) {
+            Task {
+                await viewModel.refreshExchangeRateIfNeeded(
+                    requiredCurrencies: requiredExchangeRateCurrencies
+                )
+            }
+        }
+        .onChange(of: settings.totalCurrencies) {
+            Task {
+                await viewModel.refreshExchangeRateIfNeeded(
+                    requiredCurrencies: requiredExchangeRateCurrencies
+                )
+            }
         }
     }
 }

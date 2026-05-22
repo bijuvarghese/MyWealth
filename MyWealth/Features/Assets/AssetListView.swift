@@ -20,22 +20,18 @@ struct AssetListView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        selectedAsset = nil
                         showAddSheet = true
                     } label: {
                         Label("Add Asset", systemImage: "plus.circle.fill")
                     }
                 }
             }
-            .sheet(
-                isPresented: $showAddSheet,
-                onDismiss: {
-                    selectedAsset = nil
-                },
-                content: {
-                    AddorEditAssetView(asset: selectedAsset)
-                }
-            )
+            .sheet(isPresented: $showAddSheet) {
+                AddorEditAssetView()
+            }
+            .sheet(item: $selectedAsset) { asset in
+                AddorEditAssetView(asset: asset)
+            }
         }
     }
 
@@ -58,7 +54,6 @@ struct AssetListView: View {
                         .listRowSeparator(.hidden)
                         .onTapGesture {
                             selectedAsset = asset
-                            showAddSheet = true
                         }
                     }
                     .onDelete(perform: deleteAssets)

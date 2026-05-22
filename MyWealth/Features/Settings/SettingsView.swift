@@ -2,11 +2,12 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @State private var navigationPath: [SettingsRoute] = []
     @Bindable var settings: AppSettings
     var showsDoneButton = true
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             settingsContent
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(showsDoneButton ? .inline : .automatic)
@@ -17,6 +18,16 @@ struct SettingsView: View {
                             dismiss()
                         }
                     }
+                }
+            }
+            .navigationDestination(for: SettingsRoute.self) { route in
+                switch route {
+                case .reminders:
+                    ReminderSettingsView()
+                case .baseCurrency:
+                    BaseCurrencySelectionView(settings: settings)
+                case .displayCurrencies:
+                    TotalCurrencySelectionView(settings: settings)
                 }
             }
         }
@@ -34,7 +45,7 @@ struct SettingsView: View {
     private var formContent: some View {
         Form {
             Section("Features") {
-                NavigationLink(destination: ReminderSettingsView()) {
+                NavigationLink(value: SettingsRoute.reminders) {
                     HStack {
                         Image(systemName: "bell.badge.fill")
                             .foregroundColor(.accent)
@@ -46,15 +57,11 @@ struct SettingsView: View {
             Section("Totals") {
                 Toggle("Compact Amounts", isOn: $settings.usesCompactCurrencyTotals)
                     .tint(.accentColor)
-                NavigationLink {
-                    BaseCurrencySelectionView(settings: settings)
-                } label: {
+                NavigationLink(value: SettingsRoute.baseCurrency) {
                     baseCurrencyContent
                 }
 
-                NavigationLink {
-                    TotalCurrencySelectionView(settings: settings)
-                } label: {
+                NavigationLink(value: SettingsRoute.displayCurrencies) {
                     displayCurrenciesContent
                 }
             }
@@ -69,11 +76,15 @@ struct SettingsView: View {
             List {
                 Section {
                     SettingsCard {
-                        NavigationLink(destination: ReminderSettingsView()) {
+                        Button {
+                            navigationPath.append(.reminders)
+                        } label: {
                             SettingsRow(
                                 title: "Reminders",
-                                systemImage: "bell.badge.fill"
+                                systemImage: "bell.badge.fill",
+                                showsDisclosureIndicator: true
                             )
+                            .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
                     }
@@ -95,8 +106,8 @@ struct SettingsView: View {
                                 .padding(.leading, 44)
                                 .padding(.vertical, 10)
 
-                            NavigationLink {
-                                BaseCurrencySelectionView(settings: settings)
+                            Button {
+                                navigationPath.append(.baseCurrency)
                             } label: {
                                 SettingsValueRow(
                                     title: "Base Currency",
@@ -104,6 +115,7 @@ struct SettingsView: View {
                                     subtitle: settings.baseCurrency.name,
                                     systemImage: "banknote.fill"
                                 )
+                                .contentShape(Rectangle())
                             }
                             .buttonStyle(.plain)
 
@@ -111,14 +123,15 @@ struct SettingsView: View {
                                 .padding(.leading, 44)
                                 .padding(.vertical, 10)
 
-                            NavigationLink {
-                                TotalCurrencySelectionView(settings: settings)
+                            Button {
+                                navigationPath.append(.displayCurrencies)
                             } label: {
                                 SettingsValueRow(
                                     title: "View Net Worth In",
                                     value: currencySummary,
                                     systemImage: "list.bullet.rectangle.fill"
                                 )
+                                .contentShape(Rectangle())
                             }
                             .buttonStyle(.plain)
                         }
@@ -174,6 +187,12 @@ struct SettingsView: View {
     }
 }
 
+private enum SettingsRoute: Hashable {
+    case reminders
+    case baseCurrency
+    case displayCurrencies
+}
+
 private struct SettingsCard<Content: View>: View {
     let content: Content
 
@@ -198,6 +217,7 @@ private struct SettingsRow: View {
     let title: String
     var subtitle: String?
     let systemImage: String
+    var showsDisclosureIndicator = false
 
     var body: some View {
         HStack(spacing: 12) {
@@ -220,6 +240,12 @@ private struct SettingsRow: View {
             }
 
             Spacer(minLength: 8)
+
+            if showsDisclosureIndicator {
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
         }
         .frame(minHeight: 40)
     }
@@ -247,6 +273,10 @@ private struct SettingsValueRow: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
+
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.tertiary)
             }
         }
     }

@@ -17,6 +17,7 @@ final class Asset {
     var currency: CurrencyType?
     var category: CategoryType?
     var lastUpdated: Date?
+    var historyIdentifier: String?
     
     init(name: String, amount: Double, currency: CurrencyType, category: CategoryType, lastUpdated: Date? = Date()) {
         self.name = name
@@ -24,6 +25,7 @@ final class Asset {
         self.currency = currency
         self.category = category
         self.lastUpdated = lastUpdated
+        self.historyIdentifier = UUID().uuidString
     }
 
     var displayName: String {
@@ -40,6 +42,16 @@ final class Asset {
 
     var displayCategory: CategoryType {
         category ?? .others
+    }
+
+    var stableHistoryIdentifier: String {
+        if let historyIdentifier, !historyIdentifier.isEmpty {
+            return historyIdentifier
+        }
+
+        let identifier = UUID().uuidString
+        historyIdentifier = identifier
+        return identifier
     }
     
     enum CurrencyType: String, Codable, CaseIterable, Identifiable {

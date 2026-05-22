@@ -151,6 +151,56 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func exchangeRateFetchDoesNotRequireINRUnlessNeeded() async throws {
+        let defaults = try makeIsolatedDefaults()
+        let service = StubExchangeRateService(
+            response: RateResponse(
+                base: "USD",
+                date: "2026-05-20",
+                rates: ["EUR": 0.5],
+                success: true,
+                timestamp: 1_779_264_000
+            )
+        )
+        let viewModel = DashboardViewModel(
+            autoRefreshRate: false,
+            userDefaults: defaults,
+            exchangeRateService: service
+        )
+
+        await viewModel.fetchExchangeRate(requiredCurrencies: [.eur])
+
+        #expect(viewModel.exchangeRates["USD"] == 1)
+        #expect(viewModel.exchangeRates["EUR"] == 0.5)
+        #expect(viewModel.rateErrorMessage == nil)
+        #expect(defaults.object(forKey: "exchangeRate.rates") as? [String: Double] == ["EUR": 0.5, "USD": 1])
+    }
+
+    @MainActor
+    @Test func exchangeRateFetchWarnsOnlyForMissingRequiredCurrencies() async throws {
+        let defaults = try makeIsolatedDefaults()
+        let service = StubExchangeRateService(
+            response: RateResponse(
+                base: "USD",
+                date: "2026-05-20",
+                rates: ["EUR": 0.5],
+                success: true,
+                timestamp: 1_779_264_000
+            )
+        )
+        let viewModel = DashboardViewModel(
+            autoRefreshRate: false,
+            userDefaults: defaults,
+            exchangeRateService: service
+        )
+
+        await viewModel.fetchExchangeRate(requiredCurrencies: [.eur, .inr])
+
+        #expect(viewModel.exchangeRates["EUR"] == 0.5)
+        #expect(viewModel.rateErrorMessage == "Exchange rates are missing INR. Totals may be incomplete.")
+    }
+
+    @MainActor
     @Test func categoryAllocationRowsCalculatePercentages() async throws {
         let viewModel = DashboardViewModel(autoRefreshRate: false)
         viewModel.exchangeRates = [
@@ -170,6 +220,30 @@ struct MyWealthTests {
         #expect(stocks.amount == 200)
         #expect(stocks.percentage == 2.0 / 3.0)
         #expect(bank.amount == 100)
+        #expect(bank.percentage == 1.0 / 3.0)
+    }
+
+    @MainActor
+    @Test func categoryAllocationRowsCanUseSelectedCurrency() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        viewModel.exchangeRates = [
+            "USD": 1,
+            "EUR": 0.5,
+            "INR": 80
+        ]
+
+        let assets = [
+            Asset(name: "Cash", amount: 100, currency: .usd, category: .bank),
+            Asset(name: "Stocks", amount: 100, currency: .eur, category: .stocks)
+        ]
+
+        let rows = viewModel.categoryAllocationRows(assets, targetCurrency: .inr)
+        let stocks = try #require(rows.first { $0.category == .stocks })
+        let bank = try #require(rows.first { $0.category == .bank })
+
+        #expect(stocks.amount == 16_000)
+        #expect(stocks.percentage == 2.0 / 3.0)
+        #expect(bank.amount == 8_000)
         #expect(bank.percentage == 1.0 / 3.0)
     }
 
@@ -273,6 +347,28 @@ struct MyWealthTests {
 
         let snapshots = try modelContext.fetch(FetchDescriptor<AssetValueSnapshot>())
         #expect(snapshots.count == 2)
+    }
+
+    @MainActor
+    @Test func assetSnapshotRecordingUsesStableAssetIdentifier() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        viewModel.exchangeRates = ["USD": 1]
+        let modelContext = try makeInMemoryModelContext()
+        let asset = Asset(name: "Cash", amount: 100, currency: .usd, category: .bank)
+        modelContext.insert(asset)
+
+        viewModel.recordPortfolioHistory(
+            assets: [asset],
+            baseCurrency: .usd,
+            netWorthSnapshots: [],
+            assetValueSnapshots: [],
+            modelContext: modelContext
+        )
+
+        let snapshots = try modelContext.fetch(FetchDescriptor<AssetValueSnapshot>())
+        let snapshot = try #require(snapshots.first)
+        #expect(snapshot.assetIdentifier == asset.stableHistoryIdentifier)
+        #expect(snapshot.assetIdentifier != String(describing: asset.persistentModelID))
     }
 
     @MainActor
