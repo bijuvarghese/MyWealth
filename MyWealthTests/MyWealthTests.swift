@@ -358,6 +358,22 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func netWorthTrendRowsUseStableUniqueSnapshotIds() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        let context = try makeInMemoryModelContext()
+        let now = Date()
+        let snapshots = [
+            NetWorthSnapshot(amount: 100, currencyCode: "USD", recordedAt: now),
+            NetWorthSnapshot(amount: 200, currencyCode: "USD", recordedAt: now)
+        ]
+        snapshots.forEach { context.insert($0) }
+
+        let rows = viewModel.netWorthTrendRows(snapshots, baseCurrency: .usd)
+
+        #expect(Set(rows.map(\.id)).count == rows.count)
+    }
+
+    @MainActor
     @Test func recentAssetHistoryRowsUseLatestSnapshotsFirst() async throws {
         let viewModel = DashboardViewModel(autoRefreshRate: false)
         let now = Date()
@@ -384,6 +400,36 @@ struct MyWealthTests {
 
         #expect(rows.map(\.assetName) == ["New"])
         #expect(rows.first?.currencyCode == "EUR")
+    }
+
+    @MainActor
+    @Test func recentAssetHistoryRowsUseStableUniqueSnapshotIds() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        let context = try makeInMemoryModelContext()
+        let now = Date()
+        let snapshots = [
+            AssetValueSnapshot(
+                assetIdentifier: "asset-1",
+                assetName: "Cash",
+                amount: 100,
+                currencyCode: "USD",
+                categoryName: "Bank Deposits",
+                recordedAt: now
+            ),
+            AssetValueSnapshot(
+                assetIdentifier: "asset-2",
+                assetName: "Cash",
+                amount: 100,
+                currencyCode: "USD",
+                categoryName: "Bank Deposits",
+                recordedAt: now
+            )
+        ]
+        snapshots.forEach { context.insert($0) }
+
+        let rows = viewModel.recentAssetHistoryRows(snapshots)
+
+        #expect(Set(rows.map(\.id)).count == rows.count)
     }
 
     @MainActor

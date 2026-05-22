@@ -124,6 +124,7 @@ final class DashboardViewModel: AssetOperations {
         targetCurrency: Asset.CurrencyType
     ) -> [CategoryAllocationRow] {
         let totals = groupedByCategory(assets, targetCurrency: targetCurrency)
+            .filter { $0.1 > 0 }
         let portfolioTotal = totals.reduce(0) { $0 + $1.1 }
         guard portfolioTotal > 0 else {
             return []
@@ -312,8 +313,16 @@ final class DashboardViewModel: AssetOperations {
             .filter { $0.displayCurrencyCode == baseCurrency.rawValue }
             .sorted { $0.displayRecordedAt < $1.displayRecordedAt }
             .suffix(limit)
-            .map { snapshot in
+            .enumerated()
+            .map { offset, snapshot in
                 NetWorthTrendRow(
+                    id: [
+                        String(describing: snapshot.persistentModelID),
+                        snapshot.displayCurrencyCode,
+                        "\(snapshot.displayRecordedAt.timeIntervalSince1970)",
+                        "\(snapshot.displayAmount)",
+                        "\(offset)"
+                    ].joined(separator: "-"),
                     recordedAt: snapshot.displayRecordedAt,
                     amount: snapshot.displayAmount,
                     currencyCode: snapshot.displayCurrencyCode
@@ -328,8 +337,18 @@ final class DashboardViewModel: AssetOperations {
         snapshots
             .sorted { $0.displayRecordedAt > $1.displayRecordedAt }
             .prefix(limit)
-            .map { snapshot in
+            .enumerated()
+            .map { offset, snapshot in
                 AssetHistoryRow(
+                    id: [
+                        String(describing: snapshot.persistentModelID),
+                        snapshot.displayAssetIdentifier,
+                        snapshot.displayAssetName,
+                        snapshot.displayCurrencyCode,
+                        "\(snapshot.displayRecordedAt.timeIntervalSince1970)",
+                        "\(snapshot.displayAmount)",
+                        "\(offset)"
+                    ].joined(separator: "-"),
                     assetName: snapshot.displayAssetName,
                     amount: snapshot.displayAmount,
                     currencyCode: snapshot.displayCurrencyCode,
@@ -354,6 +373,19 @@ final class DashboardViewModel: AssetOperations {
                 PortfolioInsightRow(
                     systemImage: largestAllocation.category.icon,
                     message: "\(Int((largestAllocation.percentage * 100).rounded()))% of your assets are in \(largestAllocation.category.rawValue)."
+                )
+            )
+        }
+
+        if
+            let bankAllocation = allocationRows.first(where: { $0.category == .bank }),
+            bankAllocation.percentage > 0,
+            allocationRows.first?.category != .bank
+        {
+            rows.append(
+                PortfolioInsightRow(
+                    systemImage: Asset.CategoryType.bank.icon,
+                    message: "Cash and bank deposits make up \(Int((bankAllocation.percentage * 100).rounded()))% of your assets."
                 )
             )
         }
@@ -552,21 +584,19 @@ struct CategoryAllocationRow: Identifiable {
 }
 
 struct NetWorthTrendRow: Identifiable {
+    let id: String
     let recordedAt: Date
     let amount: Double
     let currencyCode: String
-
-    var id: String { "\(currencyCode)-\(recordedAt.timeIntervalSince1970)" }
 }
 
 struct AssetHistoryRow: Identifiable {
+    let id: String
     let assetName: String
     let amount: Double
     let currencyCode: String
     let categoryName: String
     let recordedAt: Date
-
-    var id: String { "\(assetName)-\(currencyCode)-\(recordedAt.timeIntervalSince1970)" }
 }
 
 struct PortfolioInsightRow: Identifiable {
