@@ -339,6 +339,67 @@ final class DashboardViewModel: AssetOperations {
             }
     }
 
+    func portfolioInsightRows(
+        assets: [Asset],
+        liabilities: [Liability],
+        netWorthSnapshots: [NetWorthSnapshot],
+        baseCurrency: Asset.CurrencyType,
+        limit: Int = 3
+    ) -> [PortfolioInsightRow] {
+        var rows: [PortfolioInsightRow] = []
+
+        let allocationRows = categoryAllocationRows(assets, targetCurrency: baseCurrency)
+        if let largestAllocation = allocationRows.first {
+            rows.append(
+                PortfolioInsightRow(
+                    systemImage: largestAllocation.category.icon,
+                    message: "\(Int((largestAllocation.percentage * 100).rounded()))% of your assets are in \(largestAllocation.category.rawValue)."
+                )
+            )
+        }
+
+        if
+            let assetTotal = convertedTotal(assets, to: baseCurrency, exchangeRates: exchangeRates),
+            let liabilityTotal = convertedLiabilityTotal(liabilities, to: baseCurrency, exchangeRates: exchangeRates),
+            assetTotal > 0,
+            liabilityTotal > 0
+        {
+            let debtPercentage = Int(((liabilityTotal / assetTotal) * 100).rounded())
+            rows.append(
+                PortfolioInsightRow(
+                    systemImage: "minus.circle.fill",
+                    message: "Liabilities are \(debtPercentage)% of your asset value."
+                )
+            )
+        }
+
+        let trendRows = netWorthTrendRows(netWorthSnapshots, baseCurrency: baseCurrency, limit: 2)
+        if
+            let previous = trendRows.dropLast().last,
+            let latest = trendRows.last,
+            abs(latest.amount - previous.amount) >= 0.01
+        {
+            let direction = latest.amount >= previous.amount ? "increased" : "decreased"
+            rows.append(
+                PortfolioInsightRow(
+                    systemImage: latest.amount >= previous.amount ? "arrow.up.right.circle.fill" : "arrow.down.right.circle.fill",
+                    message: "Net worth \(direction) by \(abs(latest.amount - previous.amount).formatted(.currency(code: baseCurrency.rawValue))) since the last snapshot."
+                )
+            )
+        }
+
+        if rows.isEmpty, !assets.isEmpty || !liabilities.isEmpty {
+            rows.append(
+                PortfolioInsightRow(
+                    systemImage: "sparkles",
+                    message: "Add more history to unlock richer portfolio insights."
+                )
+            )
+        }
+
+        return Array(rows.prefix(limit))
+    }
+
     func recordPortfolioHistory(
         assets: [Asset],
         liabilities: [Liability] = [],
@@ -506,6 +567,13 @@ struct AssetHistoryRow: Identifiable {
     let recordedAt: Date
 
     var id: String { "\(assetName)-\(currencyCode)-\(recordedAt.timeIntervalSince1970)" }
+}
+
+struct PortfolioInsightRow: Identifiable {
+    let systemImage: String
+    let message: String
+
+    var id: String { "\(systemImage)-\(message)" }
 }
 
 struct ConvertedCurrencyTotal: Identifiable {
