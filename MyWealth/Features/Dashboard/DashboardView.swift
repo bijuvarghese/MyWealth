@@ -41,6 +41,10 @@ struct DashboardView: View {
             .map { "\($0.key):\($0.value)" }
             .joined(separator: "|")
     }
+
+    private var requiredExchangeRateCurrencies: [Asset.CurrencyType] {
+        [settings.baseCurrency] + settings.totalCurrencies + assets.compactMap(\.currency)
+    }
     
     @ViewBuilder
     private var contentView: some View {
@@ -56,13 +60,16 @@ struct DashboardView: View {
                     Section(header: PillLabel("Allocation")) {
                         DashboardCard {
                             PortfolioAllocationView(
-                                rows: viewModel.categoryAllocationRows(assets),
+                                rows: viewModel.categoryAllocationRows(
+                                    assets,
+                                    targetCurrency: settings.baseCurrency
+                                ),
                                 portfolioTotal: viewModel.convertedTotal(
                                     assets,
                                     to: settings.baseCurrency,
                                     exchangeRates: viewModel.exchangeRates
                                 ),
-                                currencyCode: Asset.CurrencyType.usd.rawValue,
+                                currencyCode: settings.baseCurrency.rawValue,
                                 totalCurrencyCode: settings.baseCurrency.rawValue,
                                 hasAnimatedEntrance: $hasAnimatedPortfolioChart
                             )
@@ -179,14 +186,34 @@ struct DashboardView: View {
             )
         }
         .task {
-            await viewModel.refreshExchangeRateIfNeeded()
+            await viewModel.refreshExchangeRateIfNeeded(
+                requiredCurrencies: requiredExchangeRateCurrencies
+            )
             recordPortfolioHistory()
         }
         .onChange(of: assetSnapshotSignature) {
-            recordPortfolioHistory()
+            Task {
+                await viewModel.refreshExchangeRateIfNeeded(
+                    requiredCurrencies: requiredExchangeRateCurrencies
+                )
+                recordPortfolioHistory()
+            }
         }
         .onChange(of: settings.baseCurrency) {
-            recordPortfolioHistory()
+            Task {
+                await viewModel.refreshExchangeRateIfNeeded(
+                    requiredCurrencies: requiredExchangeRateCurrencies
+                )
+                recordPortfolioHistory()
+            }
+        }
+        .onChange(of: settings.totalCurrencies) {
+            Task {
+                await viewModel.refreshExchangeRateIfNeeded(
+                    requiredCurrencies: requiredExchangeRateCurrencies
+                )
+                recordPortfolioHistory()
+            }
         }
         .onChange(of: rateSnapshotSignature) {
             recordPortfolioHistory()

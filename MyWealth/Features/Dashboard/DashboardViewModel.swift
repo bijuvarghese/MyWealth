@@ -54,33 +54,40 @@ final class DashboardViewModel: AssetOperations {
     }
     
     @MainActor
-    func refreshExchangeRateIfNeeded() async {
+    func refreshExchangeRateIfNeeded(requiredCurrencies: [Asset.CurrencyType] = []) async {
         let now = Date()
         let startOfToday = Calendar.current.startOfDay(for: now)
-        if let last = lastUpdated, last >= startOfToday {
+        let hasRequiredRates = missingRequiredRateCodes(
+            in: exchangeRates,
+            requiredCurrencies: requiredCurrencies
+        ).isEmpty
+
+        if let last = lastUpdated, last >= startOfToday, hasRequiredRates {
             // Already refreshed sometime today
             return
         }
-        await fetchExchangeRate()
+        await fetchExchangeRate(requiredCurrencies: requiredCurrencies)
     }
     
-    func fetchExchangeRate() async {
+    func fetchExchangeRate(requiredCurrencies: [Asset.CurrencyType] = []) async {
         isLoadingRate = true
         defer { isLoadingRate = false }
         do {
             let decoded = try await exchangeRateService.fetchLatestExchangeRates()
             let rates = (decoded.rates ?? [:]).merging(["USD": 1]) { current, _ in current }
-            guard let rate = rates["INR"] else {
-                rateErrorMessage = "Exchange rates are missing INR. Totals may be incomplete."
-                return
-            }
+            let missingRateCodes = missingRequiredRateCodes(
+                in: rates,
+                requiredCurrencies: requiredCurrencies
+            )
 
             let now = Date()
             exchangeRates = rates
-            exchangeRate = rate
+            exchangeRate = rates["INR"] ?? exchangeRate
             lastUpdated = now
-            rateErrorMessage = nil
-            persistRates(rates, inrRate: rate, at: now)
+            rateErrorMessage = missingRateCodes.isEmpty
+                ? nil
+                : "Exchange rates are missing \(missingRateCodes.joined(separator: ", ")). Totals may be incomplete."
+            persistRates(rates, inrRate: exchangeRate, at: now)
         } catch {
             rateErrorMessage = "Unable to refresh exchange rates. Showing the last saved rates."
             print("Warning: Error fetching rate:", error.localizedDescription)
@@ -94,15 +101,29 @@ final class DashboardViewModel: AssetOperations {
     }
     
     func groupedByCategory(_ assets: [Asset]) -> [(Asset.CategoryType, Double)] {
+        groupedByCategory(assets, targetCurrency: .usd)
+    }
+
+    func groupedByCategory(
+        _ assets: [Asset],
+        targetCurrency: Asset.CurrencyType
+    ) -> [(Asset.CategoryType, Double)] {
         let dict = Dictionary(grouping: assets) { $0.displayCategory }
         return dict.map { (key, group) in
-            let total = totalInUSD(group, exchangeRates: exchangeRates) ?? 0
+            let total = convertedTotal(group, to: targetCurrency, exchangeRates: exchangeRates) ?? 0
             return (key, total)
         }.sorted { $0.1 > $1.1 }
     }
 
     func categoryAllocationRows(_ assets: [Asset]) -> [CategoryAllocationRow] {
-        let totals = groupedByCategory(assets)
+        categoryAllocationRows(assets, targetCurrency: .usd)
+    }
+
+    func categoryAllocationRows(
+        _ assets: [Asset],
+        targetCurrency: Asset.CurrencyType
+    ) -> [CategoryAllocationRow] {
+        let totals = groupedByCategory(assets, targetCurrency: targetCurrency)
         let portfolioTotal = totals.reduce(0) { $0 + $1.1 }
         guard portfolioTotal > 0 else {
             return []
@@ -145,6 +166,21 @@ final class DashboardViewModel: AssetOperations {
             }
             result.append(currency)
         }
+    }
+
+    private func missingRequiredRateCodes(
+        in rates: [String: Double],
+        requiredCurrencies: [Asset.CurrencyType]
+    ) -> [String] {
+        uniqueCurrencies(requiredCurrencies)
+            .filter { $0 != .usd }
+            .map(\.rawValue)
+            .filter { code in
+                guard let rate = rates[code] else {
+                    return true
+                }
+                return rate <= 0
+            }
     }
 
     var rateStatus: RateStatusModel? {
@@ -335,7 +371,9 @@ final class DashboardViewModel: AssetOperations {
 
         for asset in assets {
             let identifier = assetHistoryIdentifier(for: asset)
-            let latestSnapshot = latestSnapshotsByAsset[identifier]
+            let latestSnapshot = assetHistoryIdentifiers(for: asset)
+                .compactMap { latestSnapshotsByAsset[$0] }
+                .max { $0.displayRecordedAt < $1.displayRecordedAt }
             guard shouldRecordAssetSnapshot(asset, after: latestSnapshot) else {
                 continue
             }
@@ -369,6 +407,22 @@ final class DashboardViewModel: AssetOperations {
     }
 
     private func assetHistoryIdentifier(for asset: Asset) -> String {
+        asset.stableHistoryIdentifier
+    }
+
+    private func assetHistoryIdentifiers(for asset: Asset) -> [String] {
+        [
+            assetHistoryIdentifier(for: asset),
+            legacyAssetHistoryIdentifier(for: asset)
+        ].reduce(into: [String]()) { identifiers, identifier in
+            guard !identifier.isEmpty, !identifiers.contains(identifier) else {
+                return
+            }
+            identifiers.append(identifier)
+        }
+    }
+
+    private func legacyAssetHistoryIdentifier(for asset: Asset) -> String {
         String(describing: asset.persistentModelID)
     }
 }
