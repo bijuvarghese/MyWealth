@@ -4,9 +4,12 @@ import SwiftData
 struct AssetListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var assets: [Asset]
+    @Query private var liabilities: [Liability]
 
     @State private var showAddSheet = false
+    @State private var showAddLiabilitySheet = false
     @State private var selectedAsset: Asset?
+    @State private var selectedLiability: Liability?
 
     var body: some View {
         NavigationStack {
@@ -19,44 +22,78 @@ struct AssetListView: View {
             .navigationTitle("Assets")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showAddSheet = true
+                    Menu {
+                        Button {
+                            showAddSheet = true
+                        } label: {
+                            Label("Asset", systemImage: "plus.circle.fill")
+                        }
+
+                        Button {
+                            showAddLiabilitySheet = true
+                        } label: {
+                            Label("Debt", systemImage: "minus.circle.fill")
+                        }
                     } label: {
-                        Label("Add Asset", systemImage: "plus.circle.fill")
+                        Label("Add", systemImage: "plus.circle.fill")
                     }
                 }
             }
             .sheet(isPresented: $showAddSheet) {
                 AddorEditAssetView()
             }
+            .sheet(isPresented: $showAddLiabilitySheet) {
+                AddOrEditLiabilityView()
+            }
             .sheet(item: $selectedAsset) { asset in
                 AddorEditAssetView(asset: asset)
+            }
+            .sheet(item: $selectedLiability) { liability in
+                AddOrEditLiabilityView(liability: liability)
             }
         }
     }
 
     @ViewBuilder
     private var contentView: some View {
-        if assets.isEmpty {
+        if assets.isEmpty && liabilities.isEmpty {
             ContentUnavailableView(
-                "No Assets",
+                "No Assets or Debt",
                 systemImage: "banknote",
-                description: Text("Tap '+' to add your first asset.")
+                description: Text("Tap '+' to add your first asset or debt.")
             )
         } else {
             List {
-                Section {
-                    ForEach(assets) { asset in
-                        AssetListCard {
-                            AssetRowView(asset: asset)
+                if !assets.isEmpty {
+                    Section(header: PillLabel("Assets")) {
+                        ForEach(assets) { asset in
+                            AssetListCard {
+                                AssetRowView(asset: asset)
+                            }
+                            .assetListRow()
+                            .listRowSeparator(.hidden)
+                            .onTapGesture {
+                                selectedAsset = asset
+                            }
                         }
-                        .assetListRow()
-                        .listRowSeparator(.hidden)
-                        .onTapGesture {
-                            selectedAsset = asset
-                        }
+                        .onDelete(perform: deleteAssets)
                     }
-                    .onDelete(perform: deleteAssets)
+                }
+
+                if !liabilities.isEmpty {
+                    Section(header: PillLabel("Liabilities")) {
+                        ForEach(liabilities) { liability in
+                            AssetListCard {
+                                LiabilityRowView(liability: liability)
+                            }
+                            .assetListRow()
+                            .listRowSeparator(.hidden)
+                            .onTapGesture {
+                                selectedLiability = liability
+                            }
+                        }
+                        .onDelete(perform: deleteLiabilities)
+                    }
                 }
             }
             .scrollContentBackground(.hidden)
@@ -67,6 +104,12 @@ struct AssetListView: View {
     private func deleteAssets(at indexSet: IndexSet) {
         for index in indexSet {
             modelContext.delete(assets[index])
+        }
+    }
+
+    private func deleteLiabilities(at indexSet: IndexSet) {
+        for index in indexSet {
+            modelContext.delete(liabilities[index])
         }
     }
 }

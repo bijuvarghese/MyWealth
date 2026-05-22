@@ -13,6 +13,7 @@ import Charts
 struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var assets: [Asset]
+    @Query private var liabilities: [Liability]
     @Query private var netWorthSnapshots: [NetWorthSnapshot]
     @Query private var assetValueSnapshots: [AssetValueSnapshot]
     @Bindable var settings: AppSettings
@@ -35,6 +36,20 @@ struct DashboardView: View {
         .joined(separator: "|")
     }
 
+    private var liabilitySnapshotSignature: String {
+        liabilities.map { liability in
+            [
+                String(describing: liability.persistentModelID),
+                liability.displayName,
+                "\(liability.displayAmount)",
+                liability.displayCurrency.rawValue,
+                liability.displayCategory.rawValue,
+                "\(liability.lastUpdated?.timeIntervalSince1970 ?? 0)"
+            ].joined(separator: ":")
+        }
+        .joined(separator: "|")
+    }
+
     private var rateSnapshotSignature: String {
         viewModel.exchangeRates
             .sorted { $0.key < $1.key }
@@ -43,38 +58,67 @@ struct DashboardView: View {
     }
 
     private var requiredExchangeRateCurrencies: [Asset.CurrencyType] {
-        [settings.baseCurrency] + settings.totalCurrencies + assets.compactMap(\.currency)
+        [settings.baseCurrency] + settings.totalCurrencies + assets.compactMap(\.currency) + liabilities.compactMap(\.currency)
     }
     
     @ViewBuilder
     private var contentView: some View {
         VStack(spacing: 0) {
-            if assets.isEmpty {
+            if assets.isEmpty && liabilities.isEmpty {
                 ContentUnavailableView(
-                    "No Assets",
+                    "No Assets or Debt",
                     systemImage: "banknote",
-                    description: Text("Tap '+' to add your first asset.")
+                    description: Text("Add assets or liabilities to start tracking net worth.")
                 )
             } else {
                 List {
-                    Section(header: PillLabel("Allocation")) {
-                        DashboardCard {
-                            PortfolioAllocationView(
-                                rows: viewModel.categoryAllocationRows(
-                                    assets,
-                                    targetCurrency: settings.baseCurrency
-                                ),
-                                portfolioTotal: viewModel.convertedTotal(
+                    Section {
+                        DashboardCard(
+                            contentPadding: EdgeInsets(top: 12, leading: 0, bottom: 0, trailing: 0)
+                        ) {
+                            AssetLiabilitySummaryView(
+                                assetTotal: viewModel.convertedTotal(
                                     assets,
                                     to: settings.baseCurrency,
                                     exchangeRates: viewModel.exchangeRates
                                 ),
-                                currencyCode: settings.baseCurrency.rawValue,
-                                totalCurrencyCode: settings.baseCurrency.rawValue,
-                                hasAnimatedEntrance: $hasAnimatedPortfolioChart
+                                liabilityTotal: viewModel.convertedLiabilityTotal(
+                                    liabilities,
+                                    to: settings.baseCurrency,
+                                    exchangeRates: viewModel.exchangeRates
+                                ),
+                                netWorthTotal: viewModel.netWorthTotal(
+                                    assets,
+                                    liabilities: liabilities,
+                                    to: settings.baseCurrency,
+                                    exchangeRates: viewModel.exchangeRates
+                                ),
+                                currencyCode: settings.baseCurrency.rawValue
                             )
                         }
                         .dashboardListRow()
+                    }
+
+                    if !assets.isEmpty {
+                        Section(header: PillLabel("Allocation")) {
+                            DashboardCard {
+                                PortfolioAllocationView(
+                                    rows: viewModel.categoryAllocationRows(
+                                        assets,
+                                        targetCurrency: settings.baseCurrency
+                                    ),
+                                    portfolioTotal: viewModel.convertedTotal(
+                                        assets,
+                                        to: settings.baseCurrency,
+                                        exchangeRates: viewModel.exchangeRates
+                                    ),
+                                    currencyCode: settings.baseCurrency.rawValue,
+                                    totalCurrencyCode: settings.baseCurrency.rawValue,
+                                    hasAnimatedEntrance: $hasAnimatedPortfolioChart
+                                )
+                            }
+                            .dashboardListRow()
+                        }
                     }
                     Section {
                         DashboardCard {
@@ -83,6 +127,7 @@ struct DashboardView: View {
                                     totals: Array(
                                         viewModel.totalsByCurrency(
                                             assets,
+                                            liabilities: liabilities,
                                             baseCurrency: settings.baseCurrency,
                                             displayCurrencies: settings.totalCurrencies
                                         )
@@ -100,7 +145,7 @@ struct DashboardView: View {
                         .dashboardListRow()
                     } header: {
                         HStack {
-                            PillLabel("Net Worth")
+                            PillLabel("Global Net Worth")
                             Spacer()
                             HStack(spacing: 6) {
                                 Text("Compact")
@@ -197,6 +242,14 @@ struct DashboardView: View {
                 recordPortfolioHistory()
             }
         }
+        .onChange(of: liabilitySnapshotSignature) {
+            Task {
+                await viewModel.refreshExchangeRateIfNeeded(
+                    requiredCurrencies: requiredExchangeRateCurrencies
+                )
+                recordPortfolioHistory()
+            }
+        }
         .onChange(of: settings.baseCurrency) {
             Task {
                 await viewModel.refreshExchangeRateIfNeeded(
@@ -221,6 +274,7 @@ struct DashboardView: View {
     private func recordPortfolioHistory() {
         viewModel.recordPortfolioHistory(
             assets: assets,
+            liabilities: liabilities,
             baseCurrency: settings.baseCurrency,
             netWorthSnapshots: netWorthSnapshots,
             assetValueSnapshots: assetValueSnapshots,
@@ -232,6 +286,7 @@ struct DashboardView: View {
 struct NetWorthView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var assets: [Asset]
+    @Query private var liabilities: [Liability]
     @Query private var netWorthSnapshots: [NetWorthSnapshot]
     @Query private var assetValueSnapshots: [AssetValueSnapshot]
     @Bindable var settings: AppSettings
@@ -252,6 +307,20 @@ struct NetWorthView: View {
         .joined(separator: "|")
     }
 
+    private var liabilitySnapshotSignature: String {
+        liabilities.map { liability in
+            [
+                String(describing: liability.persistentModelID),
+                liability.displayName,
+                "\(liability.displayAmount)",
+                liability.displayCurrency.rawValue,
+                liability.displayCategory.rawValue,
+                "\(liability.lastUpdated?.timeIntervalSince1970 ?? 0)"
+            ].joined(separator: ":")
+        }
+        .joined(separator: "|")
+    }
+
     private var rateSnapshotSignature: String {
         viewModel.exchangeRates
             .sorted { $0.key < $1.key }
@@ -260,7 +329,7 @@ struct NetWorthView: View {
     }
 
     private var requiredExchangeRateCurrencies: [Asset.CurrencyType] {
-        [settings.baseCurrency] + settings.totalCurrencies + assets.compactMap(\.currency)
+        [settings.baseCurrency] + settings.totalCurrencies + assets.compactMap(\.currency) + liabilities.compactMap(\.currency)
     }
 
     var body: some View {
@@ -269,11 +338,11 @@ struct NetWorthView: View {
                 RadialDotBackground(dotRadius: 1, spacing: 20)
                     .ignoresSafeArea(.all)
 
-                if assets.isEmpty {
+                if assets.isEmpty && liabilities.isEmpty {
                     ContentUnavailableView(
-                        "No Assets",
+                        "No Net Worth Data",
                         systemImage: "banknote",
-                        description: Text("Tap '+' in Dashboard or Assets to add your first asset.")
+                        description: Text("Add assets or liabilities to calculate net worth.")
                     )
                 } else {
                     List {
@@ -283,6 +352,7 @@ struct NetWorthView: View {
                                     CurrencyTotalsView(
                                         totals: viewModel.totalsByCurrency(
                                             assets,
+                                            liabilities: liabilities,
                                             baseCurrency: settings.baseCurrency,
                                             displayCurrencies: settings.totalCurrencies
                                         ),
@@ -337,7 +407,7 @@ struct NetWorthView: View {
                     .scrollIndicators(.hidden)
                 }
             }
-            .navigationTitle("Net Worth")
+            .navigationTitle("Global Net Worth")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -361,6 +431,14 @@ struct NetWorthView: View {
             recordPortfolioHistory()
         }
         .onChange(of: assetSnapshotSignature) {
+            Task {
+                await viewModel.refreshExchangeRateIfNeeded(
+                    requiredCurrencies: requiredExchangeRateCurrencies
+                )
+                recordPortfolioHistory()
+            }
+        }
+        .onChange(of: liabilitySnapshotSignature) {
             Task {
                 await viewModel.refreshExchangeRateIfNeeded(
                     requiredCurrencies: requiredExchangeRateCurrencies
@@ -392,6 +470,7 @@ struct NetWorthView: View {
     private func recordPortfolioHistory() {
         viewModel.recordPortfolioHistory(
             assets: assets,
+            liabilities: liabilities,
             baseCurrency: settings.baseCurrency,
             netWorthSnapshots: netWorthSnapshots,
             assetValueSnapshots: assetValueSnapshots,
@@ -402,9 +481,14 @@ struct NetWorthView: View {
 
 private struct DashboardCard<Content: View>: View {
     let content: Content
+    let contentPadding: EdgeInsets
 
-    init(@ViewBuilder content: () -> Content) {
+    init(
+        contentPadding: EdgeInsets = EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12),
+        @ViewBuilder content: () -> Content
+    ) {
         self.content = content()
+        self.contentPadding = contentPadding
     }
 
     var body: some View {
@@ -414,7 +498,7 @@ private struct DashboardCard<Content: View>: View {
                 .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
 
             content
-                .padding(12)
+                .padding(contentPadding)
         }
         .frame(maxWidth: .infinity)
     }
@@ -479,6 +563,101 @@ private struct NetWorthTrendChartView: View {
     }
 }
 
+private struct AssetLiabilitySummaryView: View {
+    let assetTotal: Double?
+    let liabilityTotal: Double?
+    let netWorthTotal: Double?
+    let currencyCode: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 12) {
+                SummaryMetricView(
+                    title: "Assets",
+                    systemImage: "plus.circle.fill",
+                    amount: assetTotal,
+                    currencyCode: currencyCode,
+                    tint: .green
+                )
+
+                Divider()
+                    .frame(height: 42)
+
+                SummaryMetricView(
+                    title: "Liabilities",
+                    systemImage: "minus.circle.fill",
+                    amount: liabilityTotal,
+                    currencyCode: currencyCode,
+                    tint: .red
+                )
+            }
+            .padding(.horizontal, 12)
+
+            HStack(alignment: .center, spacing: 2) {
+                Text("Net Worth")
+                Spacer()
+                amountText(netWorthTotal)
+            }
+            .font(.title3.weight(.semibold))
+            .foregroundStyle(.black)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(Color.yellow)
+            .clipShape(.rect(bottomLeadingRadius: 12, bottomTrailingRadius: 12))
+        }
+    }
+
+    @ViewBuilder
+    private func amountText(_ amount: Double?) -> some View {
+        if let amount {
+            Text(amount, format: .currency(code: currencyCode))
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+        } else {
+            Text("Unavailable")
+                .foregroundStyle(.secondary)
+        }
+    }
+}
+
+private struct SummaryMetricView: View {
+    let title: String
+    let systemImage: String
+    let amount: Double?
+    let currencyCode: String
+    let tint: Color
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: systemImage)
+                .foregroundStyle(tint)
+                .frame(width: 22)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                if let amount {
+                    Text(amount, format: .currency(code: currencyCode))
+                        .font(.subheadline.weight(.semibold))
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
+                } else {
+                    Text("Unavailable")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
 private struct PortfolioAllocationView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var chartProgress = 0.0
@@ -496,22 +675,6 @@ private struct PortfolioAllocationView: View {
                     .font(.headline)
 
                 Spacer()
-
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text("Total")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-
-                    if let portfolioTotal {
-                        Text(portfolioTotal, format: .currency(code: totalCurrencyCode))
-                            .font(.headline.weight(.semibold))
-                            .monospacedDigit()
-                    } else {
-                        Text("Unavailable")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                    }
-                }
             }
 
             Chart(rows) { row in

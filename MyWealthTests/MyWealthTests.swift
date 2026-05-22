@@ -60,6 +60,35 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func configuredCurrencyTotalsSubtractLiabilitiesForNetWorth() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        viewModel.exchangeRates = [
+            "USD": 1,
+            "EUR": 0.5,
+            "INR": 80
+        ]
+
+        let assets = [
+            Asset(name: "Cash", amount: 1_000, currency: .usd, category: .bank),
+            Asset(name: "Euro Cash", amount: 500, currency: .eur, category: .bank)
+        ]
+        let liabilities = [
+            Liability(name: "Mortgage", amount: 200, currency: .usd, category: .mortgage)
+        ]
+
+        let totals = viewModel.totalsByCurrency(
+            assets,
+            liabilities: liabilities,
+            baseCurrency: .usd,
+            displayCurrencies: [.eur, .inr]
+        )
+
+        #expect(totals.first { $0.currency == .usd }?.amount == 1_800)
+        #expect(totals.first { $0.currency == .eur }?.amount == 900)
+        #expect(totals.first { $0.currency == .inr }?.amount == 144_000)
+    }
+
+    @MainActor
     @Test func onboardingCompletionPersistsSelectedCurrencies() async throws {
         let defaults = try makeIsolatedDefaults()
         let settings = AppSettings(
@@ -392,6 +421,30 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func netWorthSnapshotRecordingSubtractsLiabilities() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        viewModel.exchangeRates = ["USD": 1]
+        let modelContext = try makeInMemoryModelContext()
+        let asset = Asset(name: "Cash", amount: 1_000, currency: .usd, category: .bank)
+        let liability = Liability(name: "Credit Card", amount: 250, currency: .usd, category: .creditCard)
+        modelContext.insert(asset)
+        modelContext.insert(liability)
+
+        viewModel.recordPortfolioHistory(
+            assets: [asset],
+            liabilities: [liability],
+            baseCurrency: .usd,
+            netWorthSnapshots: [],
+            assetValueSnapshots: [],
+            modelContext: modelContext
+        )
+
+        let snapshots = try modelContext.fetch(FetchDescriptor<NetWorthSnapshot>())
+        let snapshot = try #require(snapshots.first)
+        #expect(snapshot.displayAmount == 750)
+    }
+
+    @MainActor
     @Test func onboardingCompletionRequiresReminderChoice() async throws {
         let defaults = try makeIsolatedDefaults()
         let settings = AppSettings(
@@ -491,6 +544,7 @@ struct MyWealthTests {
     private func makeInMemoryModelContext() throws -> ModelContext {
         let schema = Schema([
             Asset.self,
+            Liability.self,
             AssetValueSnapshot.self,
             NetWorthSnapshot.self,
         ])

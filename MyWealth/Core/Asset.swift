@@ -260,6 +260,71 @@ final class Asset {
 }
 
 @Model
+final class Liability {
+    var name: String?
+    var amount: Double?
+    var currency: Asset.CurrencyType?
+    var category: CategoryType?
+    var lastUpdated: Date?
+    var historyIdentifier: String?
+
+    init(
+        name: String,
+        amount: Double,
+        currency: Asset.CurrencyType,
+        category: CategoryType,
+        lastUpdated: Date? = Date()
+    ) {
+        self.name = name
+        self.amount = amount
+        self.currency = currency
+        self.category = category
+        self.lastUpdated = lastUpdated
+        self.historyIdentifier = UUID().uuidString
+    }
+
+    var displayName: String {
+        name ?? ""
+    }
+
+    var displayAmount: Double {
+        amount ?? 0
+    }
+
+    var displayCurrency: Asset.CurrencyType {
+        currency ?? .none
+    }
+
+    var displayCategory: CategoryType {
+        category ?? .other
+    }
+
+    enum CategoryType: String, Codable, CaseIterable, Identifiable {
+        case mortgage = "Mortgage"
+        case autoLoan = "Auto Loan"
+        case personalLoan = "Personal Loan"
+        case studentLoan = "Student Loan"
+        case creditCard = "Credit Card"
+        case lineOfCredit = "Line of Credit"
+        case other = "Other Debt"
+
+        var id: String { rawValue }
+
+        var icon: String {
+            switch self {
+            case .mortgage: "house.and.flag.fill"
+            case .autoLoan: "car.fill"
+            case .personalLoan: "person.text.rectangle"
+            case .studentLoan: "graduationcap.fill"
+            case .creditCard: "creditcard.fill"
+            case .lineOfCredit: "building.columns.fill"
+            case .other: "minus.circle.fill"
+            }
+        }
+    }
+}
+
+@Model
 final class AssetValueSnapshot {
     var assetIdentifier: String? = nil
     var assetName: String? = nil
