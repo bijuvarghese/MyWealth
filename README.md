@@ -55,7 +55,7 @@ Snapshot history powers the dashboard history list and net worth trend chart. Ol
 
 The app fetches exchange rates through a Firebase HTTPS Cloud Function so the Apilayer API key is not shipped in the iOS app.
 
-The iOS app reads `ExchangeRateProxyURL` from `MyWealth/Info.plist`, which is currently configured for the `mywealth-api-router` Firebase project.
+The iOS app reads `ExchangeRateProxyURL` from `MyWealth/Info.plist`, which is currently configured for the `mywealth-api-router` Firebase project. The HTTPS function returns the latest cached Datastore copy instead of calling Apilayer for every app user. A scheduled Firebase function refreshes that Datastore cache three times per day at `00:00`, `08:00`, and `16:00` UTC. Refreshes request the app-supported Apilayer symbol set explicitly, using USD as the base currency.
 
 ### Firebase Setup
 
@@ -67,13 +67,15 @@ The iOS app reads `ExchangeRateProxyURL` from `MyWealth/Info.plist`, which is cu
    firebase use mywealth-api-router
    ```
 
-3. Store the Apilayer key in Secret Manager:
+3. Confirm the project has a default Datastore database. The functions store the shared exchange-rate payload as `ExchangeRateCache/latest`.
+
+4. Store the Apilayer key in Secret Manager:
 
    ```sh
    firebase functions:secrets:set EXCHANGE_RATES_API_KEY
    ```
 
-4. Install function dependencies:
+5. Install function dependencies:
 
    ```sh
    cd functions
@@ -81,11 +83,13 @@ The iOS app reads `ExchangeRateProxyURL` from `MyWealth/Info.plist`, which is cu
    cd ..
    ```
 
-5. Deploy the function:
+6. Deploy the functions:
 
    ```sh
    firebase deploy --only functions
    ```
+
+After deployment, `refreshExchangeRateCache` keeps the server cache warm automatically. If the cache entity does not exist yet, the public `latestExchangeRate` endpoint will fetch and create it once, then future user requests will read from Datastore.
 
 ## Local Development
 

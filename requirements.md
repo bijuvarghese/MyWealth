@@ -105,9 +105,9 @@ User financial data is currently local to the device. The app does not provide c
 - **FR7.2**: The iOS app must read the Firebase proxy URL from `Info.plist`.
 - **FR7.3**: The iOS app must not call the external exchange-rate provider directly.
 - **FR7.4**: The iOS app must not ship the external provider API key.
-- **FR7.5**: The Firebase function must call the Apilayer exchange-rate API using USD as the base currency.
+- **FR7.5**: A scheduled Firebase function must call the Apilayer exchange-rate API using USD as the base currency, request the app-supported symbol set explicitly, and refresh the shared server cache three times per day.
 - **FR7.6**: The Firebase function must accept only GET requests and return 405 for other methods.
-- **FR7.7**: The Firebase function must return an error response when the provider request fails.
+- **FR7.7**: The public Firebase HTTPS function must return the cached server copy from Datastore and avoid calling the external provider during normal user requests.
 - **FR7.8**: The app must cache exchange rates locally after a successful fetch.
 - **FR7.9**: The app must refresh exchange rates at most once per calendar day during normal app use when all required rates are present.
 - **FR7.10**: The app must refresh rates sooner when required currencies are missing from the local cache.
@@ -116,6 +116,7 @@ User financial data is currently local to the device. The app does not provide c
 - **FR7.13**: Conversion must return no total when a required source or target currency rate is unavailable.
 - **FR7.14**: Network and decoding failures must not crash the app.
 - **FR7.15**: Rate status messaging must distinguish loading, missing refresh, stale cache, missing required rates, and refresh failure states.
+- **FR7.16**: If the server cache is empty, the public Firebase HTTPS function may populate it once from Apilayer and must return an error if that fallback fails.
 
 ### 8. Reminders and Notifications
 
