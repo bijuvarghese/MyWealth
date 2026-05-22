@@ -143,7 +143,8 @@ struct SettingsView: View {
                         SettingsValueRow(
                             title: "App Version",
                             value: AppInfo.fullVersion,
-                            systemImage: "info.circle"
+                            systemImage: "info.circle",
+                            hidesDisclosureIndicator: true
                         )
                     }
                     .settingsListRow()
@@ -256,6 +257,7 @@ private struct SettingsValueRow: View {
     let value: String
     var subtitle: String?
     let systemImage: String
+    var hidesDisclosureIndicator: Bool = false
 
     var body: some View {
         HStack(spacing: 12) {
@@ -273,10 +275,11 @@ private struct SettingsValueRow: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
-
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.tertiary)
+                if !hidesDisclosureIndicator {
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
             }
         }
     }

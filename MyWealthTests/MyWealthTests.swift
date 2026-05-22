@@ -89,6 +89,50 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func portfolioInsightsDescribeAllocationAndDebt() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        viewModel.exchangeRates = ["USD": 1]
+        let assets = [
+            Asset(name: "House", amount: 700, currency: .usd, category: .realEstate),
+            Asset(name: "Cash", amount: 300, currency: .usd, category: .bank)
+        ]
+        let liabilities = [
+            Liability(name: "Mortgage", amount: 250, currency: .usd, category: .mortgage)
+        ]
+
+        let rows = viewModel.portfolioInsightRows(
+            assets: assets,
+            liabilities: liabilities,
+            netWorthSnapshots: [],
+            baseCurrency: .usd
+        )
+
+        #expect(rows.map(\.message).contains("70% of your assets are in Real Estate."))
+        #expect(rows.map(\.message).contains("Cash and bank deposits make up 30% of your assets."))
+        #expect(rows.map(\.message).contains("Liabilities are 25% of your asset value."))
+    }
+
+    @MainActor
+    @Test func portfolioInsightsDescribeNetWorthTrend() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        viewModel.exchangeRates = ["USD": 1]
+        let now = Date()
+        let snapshots = [
+            NetWorthSnapshot(amount: 1_000, currencyCode: "USD", recordedAt: now),
+            NetWorthSnapshot(amount: 1_250, currencyCode: "USD", recordedAt: now.addingTimeInterval(60))
+        ]
+
+        let rows = viewModel.portfolioInsightRows(
+            assets: [],
+            liabilities: [],
+            netWorthSnapshots: snapshots,
+            baseCurrency: .usd
+        )
+
+        #expect(rows.first?.message == "Net worth increased by $250.00 since the last snapshot.")
+    }
+
+    @MainActor
     @Test func onboardingCompletionPersistsSelectedCurrencies() async throws {
         let defaults = try makeIsolatedDefaults()
         let settings = AppSettings(

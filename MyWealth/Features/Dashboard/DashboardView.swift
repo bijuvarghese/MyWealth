@@ -99,6 +99,21 @@ struct DashboardView: View {
                         .dashboardListRow()
                     }
 
+                    let insightRows = viewModel.portfolioInsightRows(
+                        assets: assets,
+                        liabilities: liabilities,
+                        netWorthSnapshots: netWorthSnapshots,
+                        baseCurrency: settings.baseCurrency
+                    )
+                    if !insightRows.isEmpty {
+                        Section(header: PillLabel("Insights")) {
+                            DashboardCard {
+                                PortfolioInsightsView(rows: insightRows)
+                            }
+                            .dashboardListRow()
+                        }
+                    }
+
                     if !assets.isEmpty {
                         Section(header: PillLabel("Allocation")) {
                             DashboardCard {
@@ -618,6 +633,34 @@ private struct AssetLiabilitySummaryView: View {
         } else {
             Text("Unavailable")
                 .foregroundStyle(.secondary)
+        }
+    }
+}
+
+private struct PortfolioInsightsView: View {
+    let rows: [PortfolioInsightRow]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Portfolio Insights")
+                .font(.headline)
+
+            VStack(alignment: .leading, spacing: 10) {
+                ForEach(rows) { row in
+                    HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: row.systemImage)
+                            .foregroundStyle(.accent)
+                            .frame(width: 22)
+
+                        Text(row.message)
+                            .font(.subheadline)
+                            .foregroundStyle(.primary)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Spacer(minLength: 0)
+                    }
+                }
+            }
         }
     }
 }
