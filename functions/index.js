@@ -5,6 +5,7 @@ const logger = require("firebase-functions/logger");
 const { Datastore } = require("@google-cloud/datastore");
 
 const exchangeRatesApiKey = defineSecret("EXCHANGE_RATES_API_KEY");
+const metalPriceApiKey = defineSecret("METAL_PRICE_API_KEY");
 const REGION = "us-central1";
 const EXCHANGE_RATE_CACHE_KIND = "ExchangeRateCache";
 const EXCHANGE_RATE_CACHE_NAME = "latest";
@@ -246,6 +247,209 @@ exports.latestExchangeRate = onRequest(
       response.status(500).json({
         success: false,
         error: "Exchange rate cache is unavailable",
+      });
+    }
+  }
+);
+
+// ─── Metal Price ──────────────────────────────────────────────────────────────
+
+const METAL_PRICE_CACHE_KIND = "MetalPriceCache";
+const METAL_PRICE_CACHE_NAME = "latest";
+const METAL_PRICE_BASE = "USD";
+
+// Symbols supported by metalpriceapi.com.
+// Adjust this list to match your subscription tier.
+const SUPPORTED_METALS = [
+  // Precious metals (per troy oz)
+  "XAU",        // Gold
+  "XAG",        // Silver
+  "XPT",        // Platinum
+  "XPD",        // Palladium
+  "XRH",        // Rhodium
+
+  // Base metals
+  "XCU",        // Copper
+  "ALU",        // Aluminum
+  "NI",         // Nickel
+  "ZNC",        // Zinc
+  "XPB",        // Lead
+  "XSN",        // Tin
+  "IRON",       // Iron Ore
+  "XCO",        // Cobalt
+
+  // Specialty / rare metals
+  "XLI",        // Lithium
+  "XMO",        // Molybdenum
+  "XND",        // Neodymium
+  "XGA",        // Gallium
+  "XIN",        // Indium
+  "XTE",        // Tellurium
+  "XU",         // Uranium
+];
+const supportedMetalSet = new Set(SUPPORTED_METALS);
+
+function metalCacheKey() {
+  return datastore.key([METAL_PRICE_CACHE_KIND, METAL_PRICE_CACHE_NAME]);
+}
+
+function validateMetalPricePayload(payload) {
+  return payload && typeof payload === "object" && typeof payload.rates === "object";
+}
+
+function normalizeMetalPricePayload(payload) {
+  const filteredRates = Object.fromEntries(
+    Object.entries(payload.rates ?? {})
+      .filter(([symbol, rate]) => supportedMetalSet.has(symbol) && typeof rate === "number")
+  );
+
+  return {
+    ...payload,
+    base: payload.base ?? METAL_PRICE_BASE,
+    rates: filteredRates,
+  };
+}
+
+// Symbols to request from the API. Energy commodities (BRENT, WTI,
+// NATURALGAS, GASOLINE) require a paid plan and are excluded.
+// Specialty/rare metals are also omitted — requesting unavailable symbols
+// causes the whole response to fail with success:false.
+const FETCH_CURRENCIES = [
+  // Precious metals
+  "XAU", "XAG", "XPT", "XPD", "XRH",
+  // Base metals
+  "XCU", "ALU", "NI", "ZNC", "XPB", "XSN", "IRON", "XCO",
+];
+
+async function fetchLatestMetalPricePayload() {
+  const apiKey = metalPriceApiKey.value();
+  const url = new URL("https://api.metalpriceapi.com/v1/latest");
+  url.searchParams.set("api_key", apiKey);
+  url.searchParams.set("base", METAL_PRICE_BASE);
+  url.searchParams.set("currencies", FETCH_CURRENCIES.join(","));
+
+  const externalResponse = await fetch(url);
+  const payload = await externalResponse.json();
+
+  if (!externalResponse.ok || payload?.success === false || !validateMetalPricePayload(payload)) {
+    logger.error("Metal price API request failed", {
+      status: externalResponse.status,
+      providerError: sanitizeProviderError(payload),
+      providerInfo: payload?.error?.info ?? payload?.message ?? null,
+    });
+    throw new Error("Metal price provider request failed");
+  }
+
+  return normalizeMetalPricePayload(payload);
+}
+
+async function writeMetalPriceCache(payload) {
+  await datastore.save({
+    key: metalCacheKey(),
+    data: [
+      {
+        name: "payload",
+        value: JSON.stringify(payload),
+        excludeFromIndexes: true,
+      },
+      {
+        name: "base",
+        value: payload.base ?? METAL_PRICE_BASE,
+      },
+      {
+        name: "providerTimestamp",
+        value: payload.timestamp ?? null,
+      },
+      {
+        name: "refreshedAt",
+        value: new Date(),
+      },
+    ],
+  });
+}
+
+async function readCachedMetalPricePayload() {
+  const [entity] = await datastore.get(metalCacheKey());
+  if (!entity?.payload) {
+    return null;
+  }
+
+  const payload = JSON.parse(entity.payload);
+  return validateMetalPricePayload(payload)
+    ? normalizeMetalPricePayload(payload)
+    : null;
+}
+
+async function refreshCachedMetalPrices(reason) {
+  const payload = await fetchLatestMetalPricePayload();
+  await writeMetalPriceCache(payload);
+  logger.info("Metal price cache refreshed", {
+    reason,
+    base: payload.base ?? METAL_PRICE_BASE,
+    metalCount: Object.keys(payload.rates ?? {}).length,
+    providerTimestamp: payload.timestamp ?? null,
+  });
+  return payload;
+}
+
+exports.refreshMetalPriceCache = onSchedule(
+  {
+    region: REGION,
+    schedule: "0 0,12 * * *",
+    timeZone: "Etc/UTC",
+    secrets: [metalPriceApiKey],
+    maxInstances: 1,
+    timeoutSeconds: 30,
+  },
+  async () => {
+    await refreshCachedMetalPrices("scheduled-refresh");
+  }
+);
+
+exports.latestMetalPrice = onRequest(
+  {
+    region: REGION,
+    secrets: [metalPriceApiKey],
+    cors: false,
+    maxInstances: 2,
+    timeoutSeconds: 15,
+  },
+  async (request, response) => {
+    response.set("X-Content-Type-Options", "nosniff");
+
+    if (request.method !== "GET") {
+      response.set("Allow", "GET");
+      response.status(405).json({ success: false, error: "Method not allowed" });
+      return;
+    }
+
+    const now = Date.now();
+    const client = clientIdentifier(request);
+    if (isRateLimited(client, now)) {
+      response.set("Retry-After", String(RATE_LIMIT_WINDOW_MS / 1000));
+      response.status(429).json({ success: false, error: "Too many requests" });
+      return;
+    }
+
+    try {
+      const cachedPayload = await readCachedMetalPricePayload();
+      if (cachedPayload) {
+        response.set("Cache-Control", cacheControlHeader());
+        response.status(200).json(cachedPayload);
+        return;
+      }
+
+      const payload = await refreshCachedMetalPrices("cache-miss");
+      response.set("Cache-Control", cacheControlHeader());
+      response.status(200).json(payload);
+    } catch (error) {
+      logger.error("Unable to fetch metal price", {
+        message: error instanceof Error ? error.message : String(error),
+      });
+
+      response.status(500).json({
+        success: false,
+        error: "Metal price cache is unavailable",
       });
     }
   }

@@ -4,6 +4,8 @@
 <dict>
 	<key>ExchangeRateProxyURL</key>
 	<string>https://us-central1-mywealth-api-router.cloudfunctions.net/latestExchangeRate</string>
+	<key>MetalPriceProxyURL</key>
+	<string>https://us-central1-mywealth-api-router.cloudfunctions.net/latestMetalPrice</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>UILaunchScreen</key>
