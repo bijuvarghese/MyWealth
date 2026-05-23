@@ -67,7 +67,7 @@ private struct AppRootView: View {
                         Label("Dashboard", systemImage: "chart.pie.fill")
                     }
 
-                AssetListView()
+                AssetListView(settings: settings)
                     .tabItem {
                         Label("Assets", systemImage: "list.bullet.rectangle")
                     }

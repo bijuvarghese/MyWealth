@@ -5,6 +5,7 @@ struct AssetListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var assets: [Asset]
     @Query private var liabilities: [Liability]
+    @Bindable var settings: AppSettings
 
     @State private var showAddSheet = false
     @State private var showAddLiabilitySheet = false
@@ -45,11 +46,11 @@ struct AssetListView: View {
             .sheet(isPresented: $showAddLiabilitySheet) {
                 AddOrEditLiabilityView()
             }
-            .sheet(item: $selectedAsset) { asset in
-                AddorEditAssetView(asset: asset)
-            }
             .sheet(item: $selectedLiability) { liability in
                 AddOrEditLiabilityView(liability: liability)
+            }
+            .navigationDestination(item: $selectedAsset) { asset in
+                AssetDetailView(asset: asset, settings: settings)
             }
         }
     }
@@ -67,14 +68,23 @@ struct AssetListView: View {
                 if !assets.isEmpty {
                     Section(header: PillLabel("Assets")) {
                         ForEach(assets) { asset in
-                            AssetListCard {
-                                AssetRowView(asset: asset)
+                            Button {
+                                selectedAsset = asset
+                            } label: {
+                                AssetListCard {
+                                    HStack(spacing: 12) {
+                                        AssetRowView(asset: asset)
+
+                                        Image(systemName: "chevron.right")
+                                            .font(.footnote.weight(.semibold))
+                                            .foregroundStyle(.tertiary)
+                                    }
+                                }
+                                .contentShape(Rectangle())
                             }
+                            .buttonStyle(.plain)
                             .assetListRow()
                             .listRowSeparator(.hidden)
-                            .onTapGesture {
-                                selectedAsset = asset
-                            }
                         }
                         .onDelete(perform: deleteAssets)
                     }

@@ -358,6 +358,39 @@ final class DashboardViewModel: AssetOperations {
             }
     }
 
+    func assetHistoryRows(
+        for asset: Asset,
+        snapshots: [AssetValueSnapshot],
+        limit: Int? = nil
+    ) -> [AssetHistoryRow] {
+        let identifiers = Set(assetHistoryIdentifiers(for: asset))
+        let rows = snapshots
+            .filter { identifiers.contains($0.displayAssetIdentifier) }
+            .sorted { $0.displayRecordedAt > $1.displayRecordedAt }
+
+        return rows
+            .prefix(limit ?? rows.count)
+            .enumerated()
+            .map { offset, snapshot in
+                AssetHistoryRow(
+                    id: [
+                        String(describing: snapshot.persistentModelID),
+                        snapshot.displayAssetIdentifier,
+                        snapshot.displayAssetName,
+                        snapshot.displayCurrencyCode,
+                        "\(snapshot.displayRecordedAt.timeIntervalSince1970)",
+                        "\(snapshot.displayAmount)",
+                        "\(offset)"
+                    ].joined(separator: "-"),
+                    assetName: snapshot.displayAssetName,
+                    amount: snapshot.displayAmount,
+                    currencyCode: snapshot.displayCurrencyCode,
+                    categoryName: snapshot.displayCategoryName,
+                    recordedAt: snapshot.displayRecordedAt
+                )
+            }
+    }
+
     func portfolioInsightRows(
         assets: [Asset],
         liabilities: [Liability],

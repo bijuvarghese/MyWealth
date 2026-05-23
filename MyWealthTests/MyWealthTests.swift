@@ -433,6 +433,64 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func assetHistoryRowsFilterToSelectedAssetNewestFirst() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        let asset = Asset(name: "Cash", amount: 100, currency: .usd, category: .bank)
+        let otherAsset = Asset(name: "Stocks", amount: 250, currency: .usd, category: .stocks)
+        let now = Date()
+        let snapshots = [
+            AssetValueSnapshot(
+                assetIdentifier: asset.stableHistoryIdentifier,
+                assetName: "Cash",
+                amount: 90,
+                currencyCode: "USD",
+                categoryName: "Bank Deposits",
+                recordedAt: now
+            ),
+            AssetValueSnapshot(
+                assetIdentifier: otherAsset.stableHistoryIdentifier,
+                assetName: "Stocks",
+                amount: 250,
+                currencyCode: "USD",
+                categoryName: "Stocks",
+                recordedAt: now.addingTimeInterval(30)
+            ),
+            AssetValueSnapshot(
+                assetIdentifier: asset.stableHistoryIdentifier,
+                assetName: "Cash",
+                amount: 100,
+                currencyCode: "USD",
+                categoryName: "Bank Deposits",
+                recordedAt: now.addingTimeInterval(60)
+            )
+        ]
+
+        let rows = viewModel.assetHistoryRows(for: asset, snapshots: snapshots)
+
+        #expect(rows.map(\.amount) == [100, 90])
+        #expect(rows.allSatisfy { $0.assetName == "Cash" })
+    }
+
+    @MainActor
+    @Test func assetHistoryRowsIncludeLegacyPersistentModelIdentifier() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        let context = try makeInMemoryModelContext()
+        let asset = Asset(name: "Legacy", amount: 100, currency: .usd, category: .bank)
+        context.insert(asset)
+        let legacySnapshot = AssetValueSnapshot(
+            assetIdentifier: String(describing: asset.persistentModelID),
+            assetName: "Legacy",
+            amount: 80,
+            currencyCode: "USD",
+            categoryName: "Bank Deposits"
+        )
+
+        let rows = viewModel.assetHistoryRows(for: asset, snapshots: [legacySnapshot])
+
+        #expect(rows.map(\.amount) == [80])
+    }
+
+    @MainActor
     @Test func assetSnapshotRecordingIgnoresMetadataChanges() async throws {
         let viewModel = DashboardViewModel(autoRefreshRate: false)
         viewModel.exchangeRates = ["USD": 1, "EUR": 0.5]
