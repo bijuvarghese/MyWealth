@@ -1,8 +1,12 @@
 import SwiftUI
+import SwiftData
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
     @State private var navigationPath: [SettingsRoute] = []
+    @State private var isConfirmingCleanup = false
+    @State private var cleanupResultMessage: String? = nil
     @Bindable var settings: AppSettings
     var showsDoneButton = true
 
@@ -65,7 +69,16 @@ struct SettingsView: View {
                     displayCurrenciesContent
                 }
             }
+
+            Section("Data") {
+                cleanupButton
+            }
         }
+        .cleanupAlerts(
+            isConfirming: $isConfirmingCleanup,
+            resultMessage: $cleanupResultMessage,
+            onConfirm: runCleanup
+        )
     }
 
     private var dashboardStyledContent: some View {
@@ -140,6 +153,14 @@ struct SettingsView: View {
                 }
                 Section {
                     SettingsCard {
+                        cleanupButton
+                            .buttonStyle(.plain)
+                    }
+                    .settingsListRow()
+                }
+
+                Section {
+                    SettingsCard {
                         SettingsValueRow(
                             title: "App Version",
                             value: AppInfo.fullVersion,
@@ -153,7 +174,37 @@ struct SettingsView: View {
             .scrollContentBackground(.hidden)
             .scrollIndicators(.hidden)
         }
+        .cleanupAlerts(
+            isConfirming: $isConfirmingCleanup,
+            resultMessage: $cleanupResultMessage,
+            onConfirm: runCleanup
+        )
     }
+    // MARK: - History cleanup
+
+    private var cleanupButton: some View {
+        Button {
+            isConfirmingCleanup = true
+        } label: {
+            SettingsRow(
+                title: "Clean Up History",
+                subtitle: "Remove duplicate snapshot entries",
+                systemImage: "clock.badge.xmark"
+            )
+        }
+    }
+
+    private func runCleanup() {
+        do {
+            let removed = try HistorySanitizer.sanitize(modelContext: modelContext)
+            cleanupResultMessage = removed > 0
+                ? "Removed \(removed) duplicate \(removed == 1 ? "entry" : "entries")."
+                : "No duplicates found — your history is already clean."
+        } catch {
+            cleanupResultMessage = "Cleanup failed: \(error.localizedDescription)"
+        }
+    }
+
     private var currencySummary: String {
         let currencies = settings.totalCurrencies.map(\.rawValue)
 
@@ -289,6 +340,36 @@ private extension View {
     func settingsListRow() -> some View {
         listRowBackground(Color.clear)
             .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+    }
+
+    /// Attaches the confirmation dialog and result alert for the history cleanup action.
+    func cleanupAlerts(
+        isConfirming: Binding<Bool>,
+        resultMessage: Binding<String?>,
+        onConfirm: @escaping () -> Void
+    ) -> some View {
+        self
+            .confirmationDialog(
+                "Clean Up History?",
+                isPresented: isConfirming,
+                titleVisibility: .visible
+            ) {
+                Button("Remove Duplicates") { onConfirm() }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Scans your history for duplicate entries recorded by an older bug and removes them. This cannot be undone.")
+            }
+            .alert(
+                "History Cleanup",
+                isPresented: Binding(
+                    get: { resultMessage.wrappedValue != nil },
+                    set: { if !$0 { resultMessage.wrappedValue = nil } }
+                )
+            ) {
+                Button("OK") { resultMessage.wrappedValue = nil }
+            } message: {
+                Text(resultMessage.wrappedValue ?? "")
+            }
     }
 }
 

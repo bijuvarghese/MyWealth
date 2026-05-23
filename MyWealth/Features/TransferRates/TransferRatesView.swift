@@ -7,6 +7,7 @@ struct TransferRatesView: View {
     @Bindable var settings: AppSettings
 
     @State private var viewModel = DashboardViewModel()
+    @State private var metalViewModel = MetalPricesViewModel()
 
     private var rows: [TransferRateRow] {
         viewModel.transferRateRows(
@@ -15,8 +16,19 @@ struct TransferRatesView: View {
         )
     }
 
+    private var metalGroups: [(group: MetalGroup, rows: [MetalPriceRow])] {
+        metalViewModel.groupedRows(
+            baseCurrency: settings.baseCurrency,
+            exchangeRates: viewModel.exchangeRates
+        )
+    }
+
     private var requiredExchangeRateCurrencies: [Asset.CurrencyType] {
         [settings.baseCurrency] + settings.totalCurrencies + assets.compactMap(\.currency) + liabilities.compactMap(\.currency)
+    }
+
+    private var isRefreshing: Bool {
+        viewModel.isLoadingRate || metalViewModel.isLoading
     }
 
     var body: some View {
@@ -26,6 +38,7 @@ struct TransferRatesView: View {
                     .ignoresSafeArea(.all)
 
                 List {
+                    // Transfer rates
                     Section(footer: FooterView(
                         model: viewModel.getFooterData(
                             assets,
@@ -50,30 +63,53 @@ struct TransferRatesView: View {
                                 .transferRatesListRow()
                         }
                     }
+
+                    // Metal prices
+                    Section {
+                        TransferRatesCard {
+                            MetalPriceWidgetView(
+                                groups: metalGroups,
+                                isLoading: metalViewModel.isLoading,
+                                lastUpdated: metalViewModel.lastUpdated
+                            )
+                        }
+                        .transferRatesListRow()
+                    }
+
+                    if let metalStatus = metalViewModel.statusBanner {
+                        Section {
+                            RateStatusBannerView(status: metalStatus)
+                                .transferRatesListRow()
+                        }
+                    }
                 }
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
             }
-            .navigationTitle("Transfer Rates")
+            .navigationTitle("Rates")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         Task {
-                            await viewModel.fetchExchangeRate(
+                            async let exchangeRefresh: Void = viewModel.fetchExchangeRate(
                                 requiredCurrencies: requiredExchangeRateCurrencies
                             )
+                            async let metalRefresh: Void = metalViewModel.refresh()
+                            _ = await (exchangeRefresh, metalRefresh)
                         }
                     } label: {
                         Label("Refresh Rates", systemImage: "arrow.clockwise")
                     }
-                    .disabled(viewModel.isLoadingRate)
+                    .disabled(isRefreshing)
                 }
-            }            
+            }
         }
         .task {
-            await viewModel.refreshExchangeRateIfNeeded(
+            async let exchangeRefresh: Void = viewModel.refreshExchangeRateIfNeeded(
                 requiredCurrencies: requiredExchangeRateCurrencies
             )
+            async let metalRefresh: Void = metalViewModel.refreshIfNeeded()
+            _ = await (exchangeRefresh, metalRefresh)
         }
         .onChange(of: settings.baseCurrency) {
             Task {

@@ -17,48 +17,22 @@ struct DashboardView: View {
     @Query private var netWorthSnapshots: [NetWorthSnapshot]
     @Query private var assetValueSnapshots: [AssetValueSnapshot]
     @Bindable var settings: AppSettings
-    
+
     @State private var showAddSheet = false
     @State private var hasAnimatedPortfolioChart = false
     @State private var viewModel = DashboardViewModel()
+    @State private var metalViewModel = MetalPricesViewModel()
 
-    private var assetSnapshotSignature: String {
-        assets.map { asset in
-            [
-                String(describing: asset.persistentModelID),
-                asset.displayName,
-                "\(asset.displayAmount)",
-                asset.displayCurrency.rawValue,
-                asset.displayCategory.rawValue,
-                "\(asset.lastUpdated?.timeIntervalSince1970 ?? 0)"
-            ].joined(separator: ":")
-        }
-        .joined(separator: "|")
-    }
-
-    private var liabilitySnapshotSignature: String {
-        liabilities.map { liability in
-            [
-                String(describing: liability.persistentModelID),
-                liability.displayName,
-                "\(liability.displayAmount)",
-                liability.displayCurrency.rawValue,
-                liability.displayCategory.rawValue,
-                "\(liability.lastUpdated?.timeIntervalSince1970 ?? 0)"
-            ].joined(separator: ":")
-        }
-        .joined(separator: "|")
-    }
-
-    private var rateSnapshotSignature: String {
-        viewModel.exchangeRates
-            .sorted { $0.key < $1.key }
-            .map { "\($0.key):\($0.value)" }
-            .joined(separator: "|")
-    }
-
-    private var requiredExchangeRateCurrencies: [Asset.CurrencyType] {
-        [settings.baseCurrency] + settings.totalCurrencies + assets.compactMap(\.currency) + liabilities.compactMap(\.currency)
+    private var coordinator: PortfolioHistoryCoordinator {
+        PortfolioHistoryCoordinator(
+            assets: assets,
+            liabilities: liabilities,
+            netWorthSnapshots: netWorthSnapshots,
+            assetValueSnapshots: assetValueSnapshots,
+            settings: settings,
+            viewModel: viewModel,
+            modelContext: modelContext
+        )
     }
     
     @ViewBuilder
@@ -243,58 +217,11 @@ struct DashboardView: View {
                 }
             )
         }
-        .task {
-            await viewModel.refreshExchangeRateIfNeeded(
-                requiredCurrencies: requiredExchangeRateCurrencies
-            )
-            recordPortfolioHistory()
+        .coordinatePortfolioHistory(coordinator)
+        .task(id: "metalRates") {
+            await metalViewModel.refreshIfNeeded()
+            viewModel.enrichWithMetalRates(metalViewModel.metalRates)
         }
-        .onChange(of: assetSnapshotSignature) {
-            Task {
-                await viewModel.refreshExchangeRateIfNeeded(
-                    requiredCurrencies: requiredExchangeRateCurrencies
-                )
-                recordPortfolioHistory()
-            }
-        }
-        .onChange(of: liabilitySnapshotSignature) {
-            Task {
-                await viewModel.refreshExchangeRateIfNeeded(
-                    requiredCurrencies: requiredExchangeRateCurrencies
-                )
-                recordPortfolioHistory()
-            }
-        }
-        .onChange(of: settings.baseCurrency) {
-            Task {
-                await viewModel.refreshExchangeRateIfNeeded(
-                    requiredCurrencies: requiredExchangeRateCurrencies
-                )
-                recordPortfolioHistory()
-            }
-        }
-        .onChange(of: settings.totalCurrencies) {
-            Task {
-                await viewModel.refreshExchangeRateIfNeeded(
-                    requiredCurrencies: requiredExchangeRateCurrencies
-                )
-                recordPortfolioHistory()
-            }
-        }
-        .onChange(of: rateSnapshotSignature) {
-            recordPortfolioHistory()
-        }
-    }
-
-    private func recordPortfolioHistory() {
-        viewModel.recordPortfolioHistory(
-            assets: assets,
-            liabilities: liabilities,
-            baseCurrency: settings.baseCurrency,
-            netWorthSnapshots: netWorthSnapshots,
-            assetValueSnapshots: assetValueSnapshots,
-            modelContext: modelContext
-        )
     }
 }
 
@@ -307,44 +234,18 @@ struct NetWorthView: View {
     @Bindable var settings: AppSettings
 
     @State private var viewModel = DashboardViewModel()
+    @State private var metalViewModel = MetalPricesViewModel()
 
-    private var assetSnapshotSignature: String {
-        assets.map { asset in
-            [
-                String(describing: asset.persistentModelID),
-                asset.displayName,
-                "\(asset.displayAmount)",
-                asset.displayCurrency.rawValue,
-                asset.displayCategory.rawValue,
-                "\(asset.lastUpdated?.timeIntervalSince1970 ?? 0)"
-            ].joined(separator: ":")
-        }
-        .joined(separator: "|")
-    }
-
-    private var liabilitySnapshotSignature: String {
-        liabilities.map { liability in
-            [
-                String(describing: liability.persistentModelID),
-                liability.displayName,
-                "\(liability.displayAmount)",
-                liability.displayCurrency.rawValue,
-                liability.displayCategory.rawValue,
-                "\(liability.lastUpdated?.timeIntervalSince1970 ?? 0)"
-            ].joined(separator: ":")
-        }
-        .joined(separator: "|")
-    }
-
-    private var rateSnapshotSignature: String {
-        viewModel.exchangeRates
-            .sorted { $0.key < $1.key }
-            .map { "\($0.key):\($0.value)" }
-            .joined(separator: "|")
-    }
-
-    private var requiredExchangeRateCurrencies: [Asset.CurrencyType] {
-        [settings.baseCurrency] + settings.totalCurrencies + assets.compactMap(\.currency) + liabilities.compactMap(\.currency)
+    private var coordinator: PortfolioHistoryCoordinator {
+        PortfolioHistoryCoordinator(
+            assets: assets,
+            liabilities: liabilities,
+            netWorthSnapshots: netWorthSnapshots,
+            assetValueSnapshots: assetValueSnapshots,
+            settings: settings,
+            viewModel: viewModel,
+            modelContext: modelContext
+        )
     }
 
     var body: some View {
@@ -428,9 +329,9 @@ struct NetWorthView: View {
                     Button {
                         Task {
                             await viewModel.fetchExchangeRate(
-                                requiredCurrencies: requiredExchangeRateCurrencies
+                                requiredCurrencies: coordinator.requiredExchangeRateCurrencies
                             )
-                            recordPortfolioHistory()
+                            coordinator.recordPortfolioHistory()
                         }
                     } label: {
                         Label("Refresh Rates", systemImage: "arrow.clockwise")
@@ -439,58 +340,11 @@ struct NetWorthView: View {
                 }
             }
         }
-        .task {
-            await viewModel.refreshExchangeRateIfNeeded(
-                requiredCurrencies: requiredExchangeRateCurrencies
-            )
-            recordPortfolioHistory()
+        .coordinatePortfolioHistory(coordinator)
+        .task(id: "metalRates") {
+            await metalViewModel.refreshIfNeeded()
+            viewModel.enrichWithMetalRates(metalViewModel.metalRates)
         }
-        .onChange(of: assetSnapshotSignature) {
-            Task {
-                await viewModel.refreshExchangeRateIfNeeded(
-                    requiredCurrencies: requiredExchangeRateCurrencies
-                )
-                recordPortfolioHistory()
-            }
-        }
-        .onChange(of: liabilitySnapshotSignature) {
-            Task {
-                await viewModel.refreshExchangeRateIfNeeded(
-                    requiredCurrencies: requiredExchangeRateCurrencies
-                )
-                recordPortfolioHistory()
-            }
-        }
-        .onChange(of: settings.baseCurrency) {
-            Task {
-                await viewModel.refreshExchangeRateIfNeeded(
-                    requiredCurrencies: requiredExchangeRateCurrencies
-                )
-                recordPortfolioHistory()
-            }
-        }
-        .onChange(of: settings.totalCurrencies) {
-            Task {
-                await viewModel.refreshExchangeRateIfNeeded(
-                    requiredCurrencies: requiredExchangeRateCurrencies
-                )
-                recordPortfolioHistory()
-            }
-        }
-        .onChange(of: rateSnapshotSignature) {
-            recordPortfolioHistory()
-        }
-    }
-
-    private func recordPortfolioHistory() {
-        viewModel.recordPortfolioHistory(
-            assets: assets,
-            liabilities: liabilities,
-            baseCurrency: settings.baseCurrency,
-            netWorthSnapshots: netWorthSnapshots,
-            assetValueSnapshots: assetValueSnapshots,
-            modelContext: modelContext
-        )
     }
 }
 

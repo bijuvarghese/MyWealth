@@ -57,38 +57,47 @@ struct MyWealthApp: App {
 }
 
 private struct AppRootView: View {
+    @Environment(\.modelContext) private var modelContext
     @State private var settings = AppSettings()
 
     var body: some View {
-        if settings.onboardingStatus().isComplete {
-            TabView {
-                DashboardView(settings: settings)
-                    .tabItem {
-                        Label("Dashboard", systemImage: "chart.pie.fill")
-                    }
+        Group {
+            if settings.onboardingStatus().isComplete {
+                TabView {
+                    DashboardView(settings: settings)
+                        .tabItem {
+                            Label("Dashboard", systemImage: "chart.pie.fill")
+                        }
 
-                AssetListView(settings: settings)
-                    .tabItem {
-                        Label("Assets", systemImage: "list.bullet.rectangle")
-                    }
+                    AssetListView(settings: settings)
+                        .tabItem {
+                            Label("Assets", systemImage: "list.bullet.rectangle")
+                        }
 
-                NetWorthView(settings: settings)
-                    .tabItem {
-                        Label("Net Worth", systemImage: "chart.line.uptrend.xyaxis")
-                    }
+                    NetWorthView(settings: settings)
+                        .tabItem {
+                            Label("Net Worth", systemImage: "chart.line.uptrend.xyaxis")
+                        }
 
-                TransferRatesView(settings: settings)
-                    .tabItem {
-                        Label("Rates", systemImage: "arrow.left.arrow.right.circle.fill")
-                    }
+                    TransferRatesView(settings: settings)
+                        .tabItem {
+                            Label("Rates", systemImage: "arrow.left.arrow.right.circle.fill")
+                        }
 
-                SettingsView(settings: settings, showsDoneButton: false)
-                    .tabItem {
-                        Label("Settings", systemImage: "gearshape.fill")
-                    }
+                    SettingsView(settings: settings, showsDoneButton: false)
+                        .tabItem {
+                            Label("Settings", systemImage: "gearshape.fill")
+                        }
+                }
+            } else {
+                OnboardingView(settings: settings)
             }
-        } else {
-            OnboardingView(settings: settings)
+        }
+        .onAppear {
+            // One-time cleanup of duplicate snapshots created by the
+            // now-fixed double-recording bug. Safe to call on every launch —
+            // subsequent calls are instant no-ops once the flag is set.
+            HistorySanitizer.sanitizeOnceIfNeeded(modelContext: modelContext)
         }
     }
 }
