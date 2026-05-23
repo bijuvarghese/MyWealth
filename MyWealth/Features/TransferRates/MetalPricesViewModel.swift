@@ -25,6 +25,7 @@ struct MetalPriceRow: Identifiable {
 // MARK: - ViewModel
 
 @Observable
+@MainActor
 final class MetalPricesViewModel {
 
     private enum DefaultsKeys {
@@ -57,7 +58,6 @@ final class MetalPricesViewModel {
 
     // MARK: - Fetch
 
-    @MainActor
     func refreshIfNeeded() async {
         let startOfToday = Calendar.current.startOfDay(for: Date())
         if let last = lastUpdated, last >= startOfToday, !metalRates.isEmpty {
@@ -66,7 +66,6 @@ final class MetalPricesViewModel {
         await refresh()
     }
 
-    @MainActor
     func refresh() async {
         isLoading = true
         defer { isLoading = false }

@@ -215,6 +215,19 @@ final class DashboardViewModel: AssetOperations {
             }
     }
 
+    /// Merges metal-price rates (symbol → units-of-metal-per-USD) into `exchangeRates`
+    /// for any symbol not already provided by the forex API.
+    ///
+    /// Both APIs use the same USD-base convention, so the values are directly
+    /// compatible:  `exchangeRates["XAU"]` ≈ `metalRates["XAU"]` ≈ troy-oz-per-USD.
+    ///
+    /// Call this after both the forex and metal price fetches have settled.
+    func enrichWithMetalRates(_ metalRates: [String: Double]) {
+        for (symbol, rate) in metalRates where exchangeRates[symbol] == nil {
+            exchangeRates[symbol] = rate
+        }
+    }
+
     var rateStatus: RateStatusModel? {
         if isLoadingRate {
             return RateStatusModel(
@@ -492,7 +505,15 @@ final class DashboardViewModel: AssetOperations {
             return
         }
 
-        let latestSnapshot = netWorthSnapshots
+        // Same stale-@Query problem applies to net worth snapshots: fetch fresh.
+        let freshNetWorthSnapshots: [NetWorthSnapshot]
+        do {
+            freshNetWorthSnapshots = try modelContext.fetch(FetchDescriptor<NetWorthSnapshot>())
+        } catch {
+            freshNetWorthSnapshots = netWorthSnapshots
+        }
+
+        let latestSnapshot = freshNetWorthSnapshots
             .filter { $0.displayCurrencyCode == baseCurrency.rawValue }
             .max { $0.displayRecordedAt < $1.displayRecordedAt }
 
@@ -536,8 +557,22 @@ final class DashboardViewModel: AssetOperations {
         existingSnapshots: [AssetValueSnapshot],
         modelContext: ModelContext
     ) {
+        // Fetch snapshots directly from the model context rather than using the
+        // @Query-sourced `existingSnapshots` array. The @Query result is a
+        // snapshot of the last render cycle and does NOT include objects inserted
+        // earlier in the same run loop. Without this, two back-to-back calls to
+        // recordPortfolioHistory (e.g. triggered by both assetSnapshotSignature
+        // and rateSnapshotSignature changing together) both see the pre-insert
+        // state and record identical duplicate entries.
+        let freshSnapshots: [AssetValueSnapshot]
+        do {
+            freshSnapshots = try modelContext.fetch(FetchDescriptor<AssetValueSnapshot>())
+        } catch {
+            freshSnapshots = existingSnapshots
+        }
+
         let latestSnapshotsByAsset = Dictionary(
-            grouping: existingSnapshots,
+            grouping: freshSnapshots,
             by: \.displayAssetIdentifier
         ).compactMapValues { snapshots in
             snapshots.max { $0.displayRecordedAt < $1.displayRecordedAt }

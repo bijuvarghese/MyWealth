@@ -17,10 +17,11 @@ struct DashboardView: View {
     @Query private var netWorthSnapshots: [NetWorthSnapshot]
     @Query private var assetValueSnapshots: [AssetValueSnapshot]
     @Bindable var settings: AppSettings
-    
+
     @State private var showAddSheet = false
     @State private var hasAnimatedPortfolioChart = false
     @State private var viewModel = DashboardViewModel()
+    @State private var metalViewModel = MetalPricesViewModel()
 
     private var coordinator: PortfolioHistoryCoordinator {
         PortfolioHistoryCoordinator(
@@ -217,6 +218,10 @@ struct DashboardView: View {
             )
         }
         .coordinatePortfolioHistory(coordinator)
+        .task(id: "metalRates") {
+            await metalViewModel.refreshIfNeeded()
+            viewModel.enrichWithMetalRates(metalViewModel.metalRates)
+        }
     }
 }
 
@@ -229,6 +234,7 @@ struct NetWorthView: View {
     @Bindable var settings: AppSettings
 
     @State private var viewModel = DashboardViewModel()
+    @State private var metalViewModel = MetalPricesViewModel()
 
     private var coordinator: PortfolioHistoryCoordinator {
         PortfolioHistoryCoordinator(
@@ -335,6 +341,10 @@ struct NetWorthView: View {
             }
         }
         .coordinatePortfolioHistory(coordinator)
+        .task(id: "metalRates") {
+            await metalViewModel.refreshIfNeeded()
+            viewModel.enrichWithMetalRates(metalViewModel.metalRates)
+        }
     }
 }
 
