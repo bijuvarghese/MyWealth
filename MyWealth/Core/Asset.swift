@@ -10,6 +10,37 @@ import SwiftUI
 import SwiftData
 import Charts
 
+/// Unit the user chose when entering a precious-metal weight.
+/// `amount` on the asset is always stored in troy oz; this field lets the
+/// edit screen display the original unit back to the user.
+enum WeightUnit: String, Codable, CaseIterable, Identifiable {
+    case troyOz = "troy_oz"
+    case grams  = "grams"
+    case kg     = "kg"
+    case oz     = "oz"
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .troyOz: "troy oz"
+        case .grams:  "grams"
+        case .kg:     "kg"
+        case .oz:     "oz"
+        }
+    }
+
+    /// Number of troy oz in one unit of this type.
+    var troyOzPerUnit: Double {
+        switch self {
+        case .troyOz: 1.0
+        case .grams:  0.0321507
+        case .kg:     32.1507
+        case .oz:     0.911458
+        }
+    }
+}
+
 @Model
 final class Asset {
     var name: String?
@@ -18,14 +49,18 @@ final class Asset {
     var category: CategoryType?
     var lastUpdated: Date?
     var historyIdentifier: String?
-    
-    init(name: String, amount: Double, currency: CurrencyType, category: CategoryType, lastUpdated: Date? = Date()) {
+    /// Preferred display unit for precious-metal assets.
+    /// `amount` is always stored in troy oz regardless of this value.
+    var weightUnit: WeightUnit?
+
+    init(name: String, amount: Double, currency: CurrencyType, category: CategoryType, lastUpdated: Date? = Date(), weightUnit: WeightUnit? = nil) {
         self.name = name
         self.amount = amount
         self.currency = currency
         self.category = category
         self.lastUpdated = lastUpdated
         self.historyIdentifier = UUID().uuidString
+        self.weightUnit = weightUnit
     }
 
     var displayName: String {
@@ -221,7 +256,10 @@ final class Asset {
         case xcg = "XCG"
         case xdr = "XDR"
         case xof = "XOF"
+        case xpd = "XPD"
         case xpf = "XPF"
+        case xpt = "XPT"
+        case xrh = "XRH"
         case yer = "YER"
         case zar = "ZAR"
         case zmk = "ZMK"
@@ -239,23 +277,45 @@ final class Asset {
         case bank = "Bank Deposits"
         case mutualFunds = "Mutual Funds"
         case gold = "Gold"
+        case silver = "Silver"
+        case platinum = "Platinum"
+        case palladium = "Palladium"
+        case rhodium = "Rhodium"
         case cars = "Cars"
         case others = "Others"
-        
+
         var id: String { rawValue }
-        
+
         var icon: String {
             switch self {
-            case .stocks: "chart.line.uptrend.xyaxis"
+            case .stocks:    "chart.line.uptrend.xyaxis"
             case .realEstate: "house.fill"
-            case .crypto: "bitcoinsign.circle"
-            case .bank: "banknote"
+            case .crypto:    "bitcoinsign.circle"
+            case .bank:      "banknote"
             case .mutualFunds: "chart.pie"
-            case .gold: "rectangle.stack.fill"
-            case .cars: "car.fill"
-            case .others: "tray.full"
+            case .gold:      "rectangle.stack.fill"
+            case .silver:    "circle.fill"
+            case .platinum:  "seal.fill"
+            case .palladium: "hexagon.fill"
+            case .rhodium:   "diamond.fill"
+            case .cars:      "car.fill"
+            case .others:    "tray.full"
             }
         }
+
+        /// The precious-metal currency symbol this category represents, if any.
+        var metalCurrency: CurrencyType? {
+            switch self {
+            case .gold:      return .xau
+            case .silver:    return .xag
+            case .platinum:  return .xpt
+            case .palladium: return .xpd
+            case .rhodium:   return .xrh
+            default:         return nil
+            }
+        }
+
+        var isPreciousMetal: Bool { metalCurrency != nil }
     }
 }
 

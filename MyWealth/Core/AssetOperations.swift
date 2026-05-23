@@ -16,7 +16,7 @@ extension AssetOperations {
     func totalInUSD(_ assets: [Asset], exchangeRates: [String: Double]) -> Double? {
         convertedTotal(assets, to: .usd, exchangeRates: exchangeRates)
     }
-    
+
     func convertedTotal(_ assets: [Asset], to targetCurrency: Asset.CurrencyType, exchangeRates: [String: Double]) -> Double? {
         guard let targetRate = rate(for: targetCurrency, exchangeRates: exchangeRates) else {
             return nil
@@ -27,10 +27,14 @@ extension AssetOperations {
             guard
                 let sourceCurrency = asset.currency,
                 let amount = asset.amount,
+                amount > 0,
                 let sourceRate = rate(for: sourceCurrency, exchangeRates: exchangeRates),
                 sourceRate > 0
             else {
-                return nil
+                // Skip this asset rather than aborting the whole total.
+                // A missing rate (e.g. a metal not yet in the forex API) should
+                // not wipe out the rest of the portfolio calculation.
+                continue
             }
 
             totalInUSD += amount / sourceRate
@@ -49,10 +53,11 @@ extension AssetOperations {
             guard
                 let sourceCurrency = liability.currency,
                 let amount = liability.amount,
+                amount > 0,
                 let sourceRate = rate(for: sourceCurrency, exchangeRates: exchangeRates),
                 sourceRate > 0
             else {
-                return nil
+                continue
             }
 
             totalInUSD += amount / sourceRate

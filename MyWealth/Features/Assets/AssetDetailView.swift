@@ -12,6 +12,7 @@ struct AssetDetailView: View {
     @Bindable var settings: AppSettings
 
     @State private var viewModel = DashboardViewModel()
+    @State private var metalViewModel = MetalPricesViewModel()
     @State private var isShowingEditSheet = false
     @State private var isShowingDeleteConfirmation = false
 
@@ -137,6 +138,9 @@ struct AssetDetailView: View {
         .sheet(isPresented: $isShowingEditSheet) {
             AddorEditAssetView(asset: asset)
         }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            bottomActionBar
+        }
         .confirmationDialog(
             "Delete Asset?",
             isPresented: $isShowingDeleteConfirmation,
@@ -151,15 +155,23 @@ struct AssetDetailView: View {
             Text("This removes the asset from your current portfolio. Existing history snapshots are kept.")
         }
         .task {
-            await viewModel.refreshExchangeRateIfNeeded(
+            // Fetch forex and metal rates in parallel, then enrich the view model
+            // so metal-currency assets (XAU, XAG, XPT, XPD, XRH) are valued correctly.
+            async let forex: () = viewModel.refreshExchangeRateIfNeeded(
                 requiredCurrencies: requiredExchangeRateCurrencies
             )
+            async let metals: () = metalViewModel.refreshIfNeeded()
+            _ = await (forex, metals)
+            viewModel.enrichWithMetalRates(metalViewModel.metalRates)
         }
         .onChange(of: settings.baseCurrency) {
             Task {
-                await viewModel.refreshExchangeRateIfNeeded(
+                async let forex: () = viewModel.refreshExchangeRateIfNeeded(
                     requiredCurrencies: requiredExchangeRateCurrencies
                 )
+                async let metals: () = metalViewModel.refreshIfNeeded()
+                _ = await (forex, metals)
+                viewModel.enrichWithMetalRates(metalViewModel.metalRates)
             }
         }
     }
@@ -169,6 +181,45 @@ struct AssetDetailView: View {
             return nil
         }
         return amount / total
+    }
+
+    // MARK: - Bottom action bar
+
+    private var bottomActionBar: some View {
+        HStack(spacing: 12) {
+            Button {
+                isShowingEditSheet = true
+            } label: {
+                Label("Edit", systemImage: "pencil")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .strokeBorder(.accent.opacity(0.4), lineWidth: 1)
+                    )
+                    .foregroundStyle(.accent)
+            }
+
+            Button(role: .destructive) {
+                isShowingDeleteConfirmation = true
+            } label: {
+                Label("Delete", systemImage: "trash")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .strokeBorder(.red.opacity(0.4), lineWidth: 1)
+                    )
+                    .foregroundStyle(.red)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(.ultraThinMaterial)
     }
 }
 

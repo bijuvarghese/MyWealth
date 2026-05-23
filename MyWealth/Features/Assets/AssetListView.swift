@@ -11,6 +11,7 @@ struct AssetListView: View {
     @State private var showAddLiabilitySheet = false
     @State private var selectedAsset: Asset?
     @State private var selectedLiability: Liability?
+    @State private var metalViewModel = MetalPricesViewModel()
 
     var body: some View {
         NavigationStack {
@@ -43,6 +44,9 @@ struct AssetListView: View {
             .sheet(isPresented: $showAddSheet) {
                 AddorEditAssetView()
             }
+            .task {
+                await metalViewModel.refreshIfNeeded()
+            }
             .sheet(isPresented: $showAddLiabilitySheet) {
                 AddOrEditLiabilityView()
             }
@@ -73,7 +77,7 @@ struct AssetListView: View {
                             } label: {
                                 AssetListCard {
                                     HStack(spacing: 12) {
-                                        AssetRowView(asset: asset)
+                                        AssetRowView(asset: asset, metalRates: metalViewModel.metalRates)
 
                                         Image(systemName: "chevron.right")
                                             .font(.footnote.weight(.semibold))
