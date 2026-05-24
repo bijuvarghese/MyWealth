@@ -3,7 +3,6 @@ import SwiftUI
 struct TransferRateWidgetView: View {
     let rows: [TransferRateRow]
     let baseCurrency: Asset.CurrencyType
-    let lastUpdated: Date?
 
     var body: some View {
         if rows.isEmpty {
@@ -31,12 +30,7 @@ struct TransferRateWidgetView: View {
             Text("Transfer Rates")
                 .font(.headline)
                 .foregroundStyle(.primary)
-            Spacer()            
-            if let lastUpdated {
-                Text(lastUpdated, format: .relative(presentation: .numeric))
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            }
+            Spacer()
         }
     }
 

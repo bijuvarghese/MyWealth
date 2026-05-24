@@ -21,6 +21,7 @@ struct MyWealthApp: App {
             Liability.self,
             AssetValueSnapshot.self,
             NetWorthSnapshot.self,
+            PortfolioSnapshot.self,
         ])
         let modelConfiguration = ModelConfiguration(
             schema: schema,

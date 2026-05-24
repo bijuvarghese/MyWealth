@@ -50,8 +50,7 @@ struct TransferRatesView: View {
                         TransferRatesCard {
                             TransferRateWidgetView(
                                 rows: rows,
-                                baseCurrency: settings.baseCurrency,
-                                lastUpdated: viewModel.lastUpdated
+                                baseCurrency: settings.baseCurrency
                             )
                         }
                         .transferRatesListRow()
@@ -65,7 +64,12 @@ struct TransferRatesView: View {
                     }
 
                     // Metal prices
-                    Section {
+                    Section(footer: Group {
+                        if let metalsDate = metalViewModel.lastUpdated {
+                            PillLabel("Last updated: \(metalsDate.formatted(date: .abbreviated, time: .shortened))")
+                                .frame(maxWidth: .infinity)
+                        }
+                    }) {
                         TransferRatesCard {
                             MetalPriceWidgetView(
                                 groups: metalGroups,
@@ -127,6 +131,7 @@ struct TransferRatesView: View {
         }
     }
 }
+
 
 private struct TransferRatesCard<Content: View>: View {
     let content: Content

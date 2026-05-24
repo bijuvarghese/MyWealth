@@ -15,11 +15,15 @@ struct DashboardView: View {
     @Query private var assets: [Asset]
     @Query private var liabilities: [Liability]
     @Query private var netWorthSnapshots: [NetWorthSnapshot]
+    @Query private var portfolioSnapshots: [PortfolioSnapshot]
     @Query private var assetValueSnapshots: [AssetValueSnapshot]
     @Bindable var settings: AppSettings
 
     @State private var showAddSheet = false
+    @State private var showNetWorthHistory = false
     @State private var hasAnimatedPortfolioChart = false
+    @State private var hasAnimatedLiabilityChart = false
+    @State private var selectedCategory: Asset.CategoryType? = nil
     @State private var viewModel = DashboardViewModel()
     @State private var metalViewModel = MetalPricesViewModel()
 
@@ -103,12 +107,33 @@ struct DashboardView: View {
                                     ),
                                     currencyCode: settings.baseCurrency.rawValue,
                                     totalCurrencyCode: settings.baseCurrency.rawValue,
-                                    hasAnimatedEntrance: $hasAnimatedPortfolioChart
+                                    hasAnimatedEntrance: $hasAnimatedPortfolioChart,
+                                    onCategoryTap: { category in
+                                        selectedCategory = category
+                                    }
                                 )
                             }
                             .dashboardListRow()
                         }
                     }
+
+                    let liabilityAllocationRows = viewModel.liabilityAllocationRows(
+                        liabilities,
+                        targetCurrency: settings.baseCurrency
+                    )
+                    if !liabilityAllocationRows.isEmpty {
+                        Section(header: PillLabel("Liabilities")) {
+                            DashboardCard {
+                                LiabilityAllocationView(
+                                    rows: liabilityAllocationRows,
+                                    currencyCode: settings.baseCurrency.rawValue,
+                                    hasAnimatedEntrance: $hasAnimatedLiabilityChart
+                                )
+                            }
+                            .dashboardListRow()
+                        }
+                    }
+
                     Section {
                         DashboardCard {
                             VStack(spacing: 10) {
@@ -154,8 +179,7 @@ struct DashboardView: View {
                                     displayCurrencies: settings.totalCurrencies,
                                     limit: 3
                                 ),
-                                baseCurrency: settings.baseCurrency,
-                                lastUpdated: viewModel.lastUpdated
+                                baseCurrency: settings.baseCurrency
                             )
                         }
                         .dashboardListRow()
@@ -163,8 +187,12 @@ struct DashboardView: View {
 
                     Section(header: PillLabel("Trend")) {
                         DashboardCard {
-                            NetWorthTrendChartView(
-                                rows: viewModel.netWorthTrendRows(
+                            AssetVsLiabilityTrendChartView(
+                                portfolioRows: viewModel.portfolioTrendRows(
+                                    portfolioSnapshots,
+                                    baseCurrency: settings.baseCurrency
+                                ),
+                                netWorthRows: viewModel.netWorthTrendRows(
                                     netWorthSnapshots,
                                     baseCurrency: settings.baseCurrency
                                 ),
@@ -172,6 +200,24 @@ struct DashboardView: View {
                             )
                         }
                         .dashboardListRow()
+
+                        Button {
+                            showNetWorthHistory = true
+                        } label: {
+                            HStack {
+                                Text("View Full History")
+                                    .font(.subheadline)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                            }
+                            .foregroundStyle(.accent)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                        }
+                        .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 4, trailing: 0))
                     }
 
                     let historyRows = viewModel.recentAssetHistoryRows(assetValueSnapshots)
@@ -216,6 +262,12 @@ struct DashboardView: View {
                     AddorEditAssetView()
                 }
             )
+            .navigationDestination(item: $selectedCategory) { category in
+                CategoryDetailView(category: category, settings: settings)
+            }
+            .navigationDestination(isPresented: $showNetWorthHistory) {
+                NetWorthHistoryView(settings: settings)
+            }
         }
         .coordinatePortfolioHistory(coordinator)
         .task(id: "metalRates") {
@@ -230,11 +282,13 @@ struct NetWorthView: View {
     @Query private var assets: [Asset]
     @Query private var liabilities: [Liability]
     @Query private var netWorthSnapshots: [NetWorthSnapshot]
+    @Query private var portfolioSnapshots: [PortfolioSnapshot]
     @Query private var assetValueSnapshots: [AssetValueSnapshot]
     @Bindable var settings: AppSettings
 
     @State private var viewModel = DashboardViewModel()
     @State private var metalViewModel = MetalPricesViewModel()
+    @State private var showNetWorthHistory = false
 
     private var coordinator: PortfolioHistoryCoordinator {
         PortfolioHistoryCoordinator(
@@ -298,8 +352,12 @@ struct NetWorthView: View {
 
                         Section(header: PillLabel("Trend")) {
                             DashboardCard {
-                                NetWorthTrendChartView(
-                                    rows: viewModel.netWorthTrendRows(
+                                AssetVsLiabilityTrendChartView(
+                                    portfolioRows: viewModel.portfolioTrendRows(
+                                        portfolioSnapshots,
+                                        baseCurrency: settings.baseCurrency
+                                    ),
+                                    netWorthRows: viewModel.netWorthTrendRows(
                                         netWorthSnapshots,
                                         baseCurrency: settings.baseCurrency
                                     ),
@@ -307,6 +365,24 @@ struct NetWorthView: View {
                                 )
                             }
                             .dashboardListRow()
+
+                            Button {
+                                showNetWorthHistory = true
+                            } label: {
+                                HStack {
+                                    Text("View Full History")
+                                        .font(.subheadline)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption)
+                                        .foregroundStyle(.tertiary)
+                                }
+                                .foregroundStyle(.accent)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                            }
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 4, trailing: 0))
                         }
 
                         let historyRows = viewModel.recentAssetHistoryRows(assetValueSnapshots)
@@ -338,6 +414,9 @@ struct NetWorthView: View {
                     }
                     .disabled(viewModel.isLoadingRate)
                 }
+            }
+            .navigationDestination(isPresented: $showNetWorthHistory) {
+                NetWorthHistoryView(settings: settings)
             }
         }
         .coordinatePortfolioHistory(coordinator)
@@ -380,9 +459,12 @@ private extension View {
     }
 }
 
-private struct NetWorthTrendChartView: View {
-    let rows: [NetWorthTrendRow]
+private struct AssetVsLiabilityTrendChartView: View {
+    let portfolioRows: [PortfolioTrendRow]
+    let netWorthRows: [NetWorthTrendRow]
     let currencyCode: String
+
+    private var useSplitData: Bool { !portfolioRows.isEmpty }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -390,43 +472,108 @@ private struct NetWorthTrendChartView: View {
                 Text("Net Worth")
                     .font(.headline)
                 Spacer()
-                if let latest = rows.last {
+                if useSplitData, let latest = portfolioRows.last {
+                    Text(latest.assetTotal - latest.liabilityTotal,
+                         format: .currency(code: currencyCode))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                } else if let latest = netWorthRows.last {
                     Text(latest.amount, format: .currency(code: currencyCode))
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.secondary)
                 }
             }
 
-            Chart(rows) { row in
-                if rows.count == 1 {
-                    PointMark(
-                        x: .value("Date", row.recordedAt),
-                        y: .value("Net Worth", row.amount)
-                    )
-                    .symbolSize(70)
-                    .foregroundStyle(.blue)
-                } else {
-                    LineMark(
-                        x: .value("Date", row.recordedAt),
-                        y: .value("Net Worth", row.amount)
-                    )
-                    .interpolationMethod(.catmullRom)
-                    .foregroundStyle(.blue)
+            if useSplitData {
+                Chart {
+                    ForEach(portfolioRows) { row in
+                        LineMark(
+                            x: .value("Date", row.recordedAt),
+                            y: .value("Amount", row.assetTotal),
+                            series: .value("Series", "Assets")
+                        )
+                        .interpolationMethod(.catmullRom)
+                        .foregroundStyle(.green)
 
-                    AreaMark(
-                        x: .value("Date", row.recordedAt),
-                        y: .value("Net Worth", row.amount)
-                    )
-                    .interpolationMethod(.catmullRom)
-                    .foregroundStyle(.blue.opacity(0.12))
+                        AreaMark(
+                            x: .value("Date", row.recordedAt),
+                            y: .value("Amount", row.assetTotal),
+                            series: .value("Series", "Assets")
+                        )
+                        .interpolationMethod(.catmullRom)
+                        .foregroundStyle(.green.opacity(0.10))
+
+                        if portfolioRows.count == 1 {
+                            PointMark(
+                                x: .value("Date", row.recordedAt),
+                                y: .value("Amount", row.assetTotal)
+                            )
+                            .symbolSize(70)
+                            .foregroundStyle(.green)
+                        }
+
+                        LineMark(
+                            x: .value("Date", row.recordedAt),
+                            y: .value("Amount", row.liabilityTotal),
+                            series: .value("Series", "Liabilities")
+                        )
+                        .interpolationMethod(.catmullRom)
+                        .foregroundStyle(.red)
+
+                        AreaMark(
+                            x: .value("Date", row.recordedAt),
+                            y: .value("Amount", row.liabilityTotal),
+                            series: .value("Series", "Liabilities")
+                        )
+                        .interpolationMethod(.catmullRom)
+                        .foregroundStyle(.red.opacity(0.10))
+
+                        if portfolioRows.count == 1 {
+                            PointMark(
+                                x: .value("Date", row.recordedAt),
+                                y: .value("Amount", row.liabilityTotal)
+                            )
+                            .symbolSize(70)
+                            .foregroundStyle(.red)
+                        }
+                    }
                 }
-            }
-            .frame(height: 150)
-            .chartXAxis {
-                AxisMarks(values: .automatic(desiredCount: 4))
-            }
-            .chartYAxis {
-                AxisMarks(position: .leading)
+                .chartForegroundStyleScale([
+                    "Assets": Color.green,
+                    "Liabilities": Color.red
+                ])
+                .frame(height: 150)
+                .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
+                .chartYAxis { AxisMarks(position: .leading) }
+            } else {
+                // Fallback: single net-worth line for users with no PortfolioSnapshot history yet.
+                Chart(netWorthRows) { row in
+                    if netWorthRows.count == 1 {
+                        PointMark(
+                            x: .value("Date", row.recordedAt),
+                            y: .value("Net Worth", row.amount)
+                        )
+                        .symbolSize(70)
+                        .foregroundStyle(.blue)
+                    } else {
+                        LineMark(
+                            x: .value("Date", row.recordedAt),
+                            y: .value("Net Worth", row.amount)
+                        )
+                        .interpolationMethod(.catmullRom)
+                        .foregroundStyle(.blue)
+
+                        AreaMark(
+                            x: .value("Date", row.recordedAt),
+                            y: .value("Net Worth", row.amount)
+                        )
+                        .interpolationMethod(.catmullRom)
+                        .foregroundStyle(.blue.opacity(0.12))
+                    }
+                }
+                .frame(height: 150)
+                .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
+                .chartYAxis { AxisMarks(position: .leading) }
             }
         }
     }
@@ -503,7 +650,7 @@ private struct PortfolioInsightsView: View {
                 ForEach(rows) { row in
                     HStack(alignment: .top, spacing: 10) {
                         Image(systemName: row.systemImage)
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(sentimentColor(row.sentiment))
                             .frame(width: 22)
 
                         Text(row.message)
@@ -513,8 +660,19 @@ private struct PortfolioInsightsView: View {
 
                         Spacer(minLength: 0)
                     }
+                    .padding(.vertical, 4)
+                    .padding(.horizontal, 8)
+                    .background(sentimentColor(row.sentiment).opacity(0.07), in: RoundedRectangle(cornerRadius: 8))
                 }
             }
+        }
+    }
+
+    private func sentimentColor(_ sentiment: PortfolioInsightRow.Sentiment) -> Color {
+        switch sentiment {
+        case .positive: return .green
+        case .warning:  return .orange
+        case .neutral:  return .accent
         }
     }
 }
@@ -564,6 +722,7 @@ private struct PortfolioAllocationView: View {
     let currencyCode: String
     let totalCurrencyCode: String
     @Binding var hasAnimatedEntrance: Bool
+    var onCategoryTap: ((Asset.CategoryType) -> Void)? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -573,6 +732,85 @@ private struct PortfolioAllocationView: View {
 
                 Spacer()
             }
+
+            Chart(rows) { row in
+                SectorMark(
+                    angle: .value("Amount", row.amount * chartProgress),
+                    innerRadius: .ratio(0.62),
+                    angularInset: 1.5
+                )
+                .foregroundStyle(by: .value("Category", row.category.rawValue))
+            }
+            .frame(height: 180)
+            .chartLegend(position: .bottom, alignment: .leading)
+            .onAppear {
+                animateChart()
+            }
+
+            VStack(spacing: 8) {
+                ForEach(rows) { row in
+                    Button {
+                        onCategoryTap?(row.category)
+                    } label: {
+                        HStack(spacing: 10) {
+                            Image(systemName: row.category.icon)
+                                .frame(width: 22)
+                                .foregroundStyle(.secondary)
+                            Text(row.category.rawValue)
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            Text(row.percentage, format: .percent.precision(.fractionLength(0)))
+                                .foregroundStyle(.secondary)
+                            Text(row.amount, format: .currency(code: currencyCode))
+                                .font(.subheadline.weight(.semibold))
+                                .monospacedDigit()
+                                .foregroundStyle(.primary)
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                        }
+                        .font(.subheadline)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(onCategoryTap == nil)
+                }
+            }
+        }
+    }
+
+    private func animateChart() {
+        guard !hasAnimatedEntrance else {
+            chartProgress = 1
+            return
+        }
+
+        hasAnimatedEntrance = true
+        chartProgress = reduceMotion ? 1 : 0
+
+        guard !reduceMotion else {
+            return
+        }
+
+        DispatchQueue.main.async {
+            withAnimation(.easeOut(duration: 0.85)) {
+                chartProgress = 1
+            }
+        }
+    }
+}
+
+private struct LiabilityAllocationView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var chartProgress = 0.0
+
+    let rows: [LiabilityAllocationRow]
+    let currencyCode: String
+    @Binding var hasAnimatedEntrance: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Debt Breakdown")
+                .font(.headline)
 
             Chart(rows) { row in
                 SectorMark(
@@ -664,3 +902,4 @@ private struct AssetHistoryListView: View {
         }
     }
 }
+

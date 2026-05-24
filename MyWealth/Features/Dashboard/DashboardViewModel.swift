@@ -138,7 +138,53 @@ final class DashboardViewModel: AssetOperations {
             )
         }
     }
-    
+
+    func liabilityAllocationRows(
+        _ liabilities: [Liability],
+        targetCurrency: Asset.CurrencyType
+    ) -> [LiabilityAllocationRow] {
+        let dict = Dictionary(grouping: liabilities) { $0.displayCategory }
+        let totals = dict.map { category, group -> (Liability.CategoryType, Double) in
+            let total = group.reduce(0.0) { sum, liability in
+                sum + convertLiabilityAmount(liability, to: targetCurrency)
+            }
+            return (category, total)
+        }
+        .filter { $0.1 > 0 }
+        .sorted { $0.1 > $1.1 }
+
+        let grandTotal = totals.reduce(0) { $0 + $1.1 }
+        guard grandTotal > 0 else { return [] }
+
+        return totals.map { category, amount in
+            LiabilityAllocationRow(
+                category: category,
+                amount: amount,
+                percentage: amount / grandTotal
+            )
+        }
+    }
+
+    private func convertLiabilityAmount(_ liability: Liability, to targetCurrency: Asset.CurrencyType) -> Double {
+        let sourceCurrency = liability.displayCurrency
+        if sourceCurrency == targetCurrency { return liability.displayAmount }
+        let sourceRate: Double
+        if sourceCurrency == .usd {
+            sourceRate = 1
+        } else {
+            guard let r = exchangeRates[sourceCurrency.rawValue], r > 0 else { return 0 }
+            sourceRate = r
+        }
+        let targetRate: Double
+        if targetCurrency == .usd {
+            targetRate = 1
+        } else {
+            guard let r = exchangeRates[targetCurrency.rawValue], r > 0 else { return 0 }
+            targetRate = r
+        }
+        return (liability.displayAmount / sourceRate) * targetRate
+    }
+
     func totalsByCurrency(_ assets: [Asset]) -> [CurrencyTotal] {
         totalsByCurrency(assets, currencies: uniqueCurrencies(assets.compactMap(\.currency)))
     }
@@ -317,6 +363,27 @@ final class DashboardViewModel: AssetOperations {
         )
     }
 
+    func portfolioTrendRows(
+        _ snapshots: [PortfolioSnapshot],
+        baseCurrency: Asset.CurrencyType,
+        limit: Int = 30
+    ) -> [PortfolioTrendRow] {
+        snapshots
+            .filter { $0.displayCurrencyCode == baseCurrency.rawValue }
+            .sorted { $0.displayRecordedAt < $1.displayRecordedAt }
+            .suffix(limit)
+            .enumerated()
+            .map { offset, snapshot in
+                PortfolioTrendRow(
+                    id: "\(snapshot.persistentModelID)-\(offset)",
+                    recordedAt: snapshot.displayRecordedAt,
+                    assetTotal: snapshot.displayAssetTotal,
+                    liabilityTotal: snapshot.displayLiabilityTotal,
+                    currencyCode: snapshot.displayCurrencyCode
+                )
+            }
+    }
+
     func netWorthTrendRows(
         _ snapshots: [NetWorthSnapshot],
         baseCurrency: Asset.CurrencyType,
@@ -409,70 +476,163 @@ final class DashboardViewModel: AssetOperations {
         liabilities: [Liability],
         netWorthSnapshots: [NetWorthSnapshot],
         baseCurrency: Asset.CurrencyType,
-        limit: Int = 3
+        limit: Int = 5
     ) -> [PortfolioInsightRow] {
         var rows: [PortfolioInsightRow] = []
 
+        let assetTotal = convertedTotal(assets, to: baseCurrency, exchangeRates: exchangeRates)
+        let liabilityTotal = convertedLiabilityTotal(liabilities, to: baseCurrency, exchangeRates: exchangeRates)
+        let netWorth = assetTotal.flatMap { a in liabilityTotal.map { l in a - l } }
         let allocationRows = categoryAllocationRows(assets, targetCurrency: baseCurrency)
-        if let largestAllocation = allocationRows.first {
-            rows.append(
-                PortfolioInsightRow(
-                    systemImage: largestAllocation.category.icon,
-                    message: "\(Int((largestAllocation.percentage * 100).rounded()))% of your assets are in \(largestAllocation.category.rawValue)."
-                )
-            )
+
+        // 1. Net worth change since earliest snapshot
+        let sortedSnapshots = netWorthSnapshots
+            .filter { $0.displayCurrencyCode == baseCurrency.rawValue }
+            .sorted { $0.displayRecordedAt < $1.displayRecordedAt }
+        if let earliest = sortedSnapshots.first, let latest = sortedSnapshots.last,
+           earliest.persistentModelID != latest.persistentModelID,
+           abs(earliest.displayAmount) > 0.01 {
+            let change = latest.displayAmount - earliest.displayAmount
+            let pct = change / abs(earliest.displayAmount)
+            let isUp = change >= 0
+            let formatted = abs(pct).formatted(.percent.precision(.fractionLength(1)))
+            let days = Calendar.current.dateComponents([.day], from: earliest.displayRecordedAt, to: latest.displayRecordedAt).day ?? 0
+            let timeLabel = days < 30 ? "\(days)d" : days < 365 ? "\(days / 30)mo" : "\(days / 365)yr"
+            rows.append(PortfolioInsightRow(
+                systemImage: isUp ? "arrow.up.right.circle.fill" : "arrow.down.right.circle.fill",
+                message: "Net worth \(isUp ? "up" : "down") \(formatted) over the last \(timeLabel).",
+                sentiment: isUp ? .positive : .warning
+            ))
         }
 
-        if
-            let bankAllocation = allocationRows.first(where: { $0.category == .bank }),
-            bankAllocation.percentage > 0,
-            allocationRows.first?.category != .bank
-        {
-            rows.append(
-                PortfolioInsightRow(
-                    systemImage: Asset.CategoryType.bank.icon,
-                    message: "Cash and bank deposits make up \(Int((bankAllocation.percentage * 100).rounded()))% of your assets."
-                )
-            )
+        // 2. Debt-to-asset ratio with health label
+        if let a = assetTotal, let l = liabilityTotal, a > 0, l > 0 {
+            let ratio = l / a
+            let pct = Int((ratio * 100).rounded())
+            let (label, sentiment): (String, PortfolioInsightRow.Sentiment) = {
+                if ratio < 0.20 { return ("healthy", .positive) }
+                if ratio < 0.50 { return ("elevated", .neutral) }
+                return ("high", .warning)
+            }()
+            rows.append(PortfolioInsightRow(
+                systemImage: sentiment == .positive ? "checkmark.shield.fill" : "exclamationmark.triangle.fill",
+                message: "Debt-to-asset ratio is \(pct)% — \(label).",
+                sentiment: sentiment
+            ))
         }
 
-        if
-            let assetTotal = convertedTotal(assets, to: baseCurrency, exchangeRates: exchangeRates),
-            let liabilityTotal = convertedLiabilityTotal(liabilities, to: baseCurrency, exchangeRates: exchangeRates),
-            assetTotal > 0,
-            liabilityTotal > 0
-        {
-            let debtPercentage = Int(((liabilityTotal / assetTotal) * 100).rounded())
-            rows.append(
-                PortfolioInsightRow(
-                    systemImage: "minus.circle.fill",
-                    message: "Liabilities are \(debtPercentage)% of your asset value."
-                )
-            )
+        // 3. Concentration risk — single category > 60%
+        if let dominant = allocationRows.first, dominant.percentage > 0.60 {
+            rows.append(PortfolioInsightRow(
+                systemImage: "exclamationmark.circle.fill",
+                message: "\(Int((dominant.percentage * 100).rounded()))% of assets are in \(dominant.category.rawValue). Consider diversifying.",
+                sentiment: .warning
+            ))
+        } else if let largest = allocationRows.first {
+            // Non-concerning allocation summary
+            rows.append(PortfolioInsightRow(
+                systemImage: largest.category.icon,
+                message: "\(Int((largest.percentage * 100).rounded()))% of assets are in \(largest.category.rawValue).",
+                sentiment: .neutral
+            ))
         }
 
-        let trendRows = netWorthTrendRows(netWorthSnapshots, baseCurrency: baseCurrency, limit: 2)
-        if
-            let previous = trendRows.dropLast().last,
-            let latest = trendRows.last,
-            abs(latest.amount - previous.amount) >= 0.01
-        {
-            let direction = latest.amount >= previous.amount ? "increased" : "decreased"
-            rows.append(
-                PortfolioInsightRow(
-                    systemImage: latest.amount >= previous.amount ? "arrow.up.right.circle.fill" : "arrow.down.right.circle.fill",
-                    message: "Net worth \(direction) by \(abs(latest.amount - previous.amount).formatted(.currency(code: baseCurrency.rawValue))) since the last snapshot."
-                )
-            )
+        // 4. Asset count and diversification
+        let categoryCount = allocationRows.count
+        if categoryCount >= 4 {
+            rows.append(PortfolioInsightRow(
+                systemImage: "chart.pie.fill",
+                message: "Portfolio spans \(categoryCount) categories — well diversified.",
+                sentiment: .positive
+            ))
+        } else if categoryCount == 1, assets.count > 1 {
+            rows.append(PortfolioInsightRow(
+                systemImage: "chart.pie",
+                message: "All assets are in one category. Adding more categories reduces risk.",
+                sentiment: .warning
+            ))
         }
 
-        if rows.isEmpty, !assets.isEmpty || !liabilities.isEmpty {
-            rows.append(
-                PortfolioInsightRow(
-                    systemImage: "sparkles",
-                    message: "Add more history to unlock richer portfolio insights."
-                )
-            )
+        // 5. Stale asset warning — not updated in 60+ days
+        let staleThreshold: TimeInterval = 60 * 86400
+        let staleAssets = assets.filter { asset in
+            guard let updated = asset.lastUpdated else { return true }
+            return Date().timeIntervalSince(updated) > staleThreshold
+        }
+        if !staleAssets.isEmpty {
+            let names = staleAssets.prefix(2).map { $0.displayName.isEmpty ? "Unnamed" : $0.displayName }.joined(separator: ", ")
+            let suffix = staleAssets.count > 2 ? " and \(staleAssets.count - 2) more" : ""
+            rows.append(PortfolioInsightRow(
+                systemImage: "clock.badge.exclamationmark.fill",
+                message: "\(names)\(suffix) \(staleAssets.count == 1 ? "hasn't" : "haven't") been updated in 60+ days.",
+                sentiment: .warning
+            ))
+        }
+
+        // 6. Cash buffer check — bank < 5% with liabilities present
+        if let bankRow = allocationRows.first(where: { $0.category == .bank }),
+           !liabilities.isEmpty, bankRow.percentage < 0.05 {
+            rows.append(PortfolioInsightRow(
+                systemImage: "building.columns.fill",
+                message: "Cash & deposits are under 5% of assets. A small buffer helps cover liabilities.",
+                sentiment: .warning
+            ))
+        }
+
+        // 7. Net worth milestone crossing (positive round numbers)
+        let milestones: [Double] = [10_000, 25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000, 2_000_000, 5_000_000]
+        if let nw = netWorth, nw > 0, let previous = sortedSnapshots.dropLast().last {
+            for milestone in milestones {
+                if nw >= milestone && previous.displayAmount < milestone {
+                    let milestoneFormatted = milestone.formatted(.currency(code: baseCurrency.rawValue).precision(.fractionLength(0)))
+                    rows.append(PortfolioInsightRow(
+                        systemImage: "star.circle.fill",
+                        message: "Milestone reached! Net worth crossed \(milestoneFormatted).",
+                        sentiment: .positive
+                    ))
+                    break
+                }
+            }
+        }
+
+        // 8. Largest single asset
+        if let topAsset = assets.max(by: { ($0.displayAmount) < ($1.displayAmount) }),
+           let total = assetTotal, total > 0 {
+            let topConverted = convertedTotal([topAsset], to: baseCurrency, exchangeRates: exchangeRates) ?? 0
+            let share = topConverted / total
+            if share > 0.40 {
+                let name = topAsset.displayName.isEmpty ? "one asset" : topAsset.displayName
+                rows.append(PortfolioInsightRow(
+                    systemImage: "person.crop.circle.badge.exclamationmark",
+                    message: "\(Int((share * 100).rounded()))% of assets are in \(name) alone.",
+                    sentiment: share > 0.70 ? .warning : .neutral
+                ))
+            }
+        }
+
+        // 9. Precious metals exposure
+        let metalCategories: Set<Asset.CategoryType> = [.gold, .silver, .platinum, .palladium, .rhodium]
+        let hasMetal = allocationRows.contains(where: { metalCategories.contains($0.category) })
+        if hasMetal {
+            let totalMetalPct = allocationRows
+                .filter { metalCategories.contains($0.category) }
+                .reduce(0) { $0 + $1.percentage }
+            if totalMetalPct > 0.10 {
+                rows.append(PortfolioInsightRow(
+                    systemImage: "cube.fill",
+                    message: "\(Int((totalMetalPct * 100).rounded()))% of assets are in precious metals.",
+                    sentiment: .neutral
+                ))
+            }
+        }
+
+        // 10. Fallback
+        if rows.isEmpty {
+            rows.append(PortfolioInsightRow(
+                systemImage: "sparkles",
+                message: "Add assets or update values to unlock portfolio insights.",
+                sentiment: .neutral
+            ))
         }
 
         return Array(rows.prefix(limit))
@@ -517,16 +677,58 @@ final class DashboardViewModel: AssetOperations {
             .filter { $0.displayCurrencyCode == baseCurrency.rawValue }
             .max { $0.displayRecordedAt < $1.displayRecordedAt }
 
-        guard shouldRecordNetWorthSnapshot(netWorth, after: latestSnapshot) else {
-            return
+        if shouldRecordNetWorthSnapshot(netWorth, after: latestSnapshot) {
+            modelContext.insert(
+                NetWorthSnapshot(
+                    amount: netWorth,
+                    currencyCode: baseCurrency.rawValue
+                )
+            )
         }
 
-        modelContext.insert(
-            NetWorthSnapshot(
-                amount: netWorth,
-                currencyCode: baseCurrency.rawValue
-            )
+        // Record PortfolioSnapshot for the assets-vs-liabilities trend chart.
+        recordPortfolioSnapshot(
+            assets: assets,
+            liabilities: liabilities,
+            baseCurrency: baseCurrency,
+            modelContext: modelContext
         )
+    }
+
+    private func recordPortfolioSnapshot(
+        assets: [Asset],
+        liabilities: [Liability],
+        baseCurrency: Asset.CurrencyType,
+        modelContext: ModelContext
+    ) {
+        guard
+            let assetTotal = convertedTotal(assets, to: baseCurrency, exchangeRates: exchangeRates),
+            let liabilityTotal = convertedLiabilityTotal(liabilities, to: baseCurrency, exchangeRates: exchangeRates)
+        else { return }
+
+        let freshPortfolioSnapshots: [PortfolioSnapshot]
+        do {
+            freshPortfolioSnapshots = try modelContext.fetch(FetchDescriptor<PortfolioSnapshot>())
+        } catch {
+            freshPortfolioSnapshots = []
+        }
+
+        let latest = freshPortfolioSnapshots
+            .filter { $0.displayCurrencyCode == baseCurrency.rawValue }
+            .max { $0.displayRecordedAt < $1.displayRecordedAt }
+
+        let hasChanged = latest.map {
+            abs($0.displayAssetTotal - assetTotal) >= 0.01 ||
+            abs($0.displayLiabilityTotal - liabilityTotal) >= 0.01
+        } ?? true
+
+        guard hasChanged else { return }
+
+        modelContext.insert(PortfolioSnapshot(
+            assetTotal: assetTotal,
+            liabilityTotal: liabilityTotal,
+            currencyCode: baseCurrency.rawValue
+        ))
     }
 
     private func transferRate(
@@ -651,10 +853,26 @@ struct CategoryAllocationRow: Identifiable {
     var id: String { category.rawValue }
 }
 
+struct LiabilityAllocationRow: Identifiable {
+    let category: Liability.CategoryType
+    let amount: Double
+    let percentage: Double
+
+    var id: String { category.rawValue }
+}
+
 struct NetWorthTrendRow: Identifiable {
     let id: String
     let recordedAt: Date
     let amount: Double
+    let currencyCode: String
+}
+
+struct PortfolioTrendRow: Identifiable {
+    let id: String
+    let recordedAt: Date
+    let assetTotal: Double
+    let liabilityTotal: Double
     let currencyCode: String
 }
 
@@ -668,8 +886,11 @@ struct AssetHistoryRow: Identifiable {
 }
 
 struct PortfolioInsightRow: Identifiable {
+    enum Sentiment { case positive, neutral, warning }
+
     let systemImage: String
     let message: String
+    var sentiment: Sentiment = .neutral
 
     var id: String { "\(systemImage)-\(message)" }
 }
