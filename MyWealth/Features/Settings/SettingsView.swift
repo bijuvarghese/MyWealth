@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import CloudKit
+import UniformTypeIdentifiers
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -8,6 +9,13 @@ struct SettingsView: View {
     @State private var navigationPath: [SettingsRoute] = []
     @State private var isConfirmingCleanup = false
     @State private var cleanupResultMessage: String? = nil
+    // Export
+    @State private var exportURL: URL? = nil
+    @State private var exportError: String? = nil
+    // Import
+    @State private var isImporting = false
+    @State private var importResultMessage: String? = nil
+    @State private var importError: String? = nil
     @Bindable var settings: AppSettings
     var showsDoneButton = true
 
@@ -77,8 +85,18 @@ struct SettingsView: View {
 
             Section("Data") {
                 cleanupButton
+                exportButton
+                importButton
             }
         }
+        .dataPortabilityModifiers(
+            exportURL: $exportURL,
+            exportError: $exportError,
+            isImporting: $isImporting,
+            importResultMessage: $importResultMessage,
+            importError: $importError,
+            modelContext: modelContext
+        )
         .cleanupAlerts(
             isConfirming: $isConfirmingCleanup,
             resultMessage: $cleanupResultMessage,
@@ -158,8 +176,20 @@ struct SettingsView: View {
                 }
                 Section {
                     SettingsCard {
-                        cleanupButton
-                            .buttonStyle(.plain)
+                        VStack(spacing: 0) {
+                            cleanupButton
+                                .buttonStyle(.plain)
+                            Divider()
+                                .padding(.leading, 44)
+                                .padding(.vertical, 10)
+                            exportButton
+                                .buttonStyle(.plain)
+                            Divider()
+                                .padding(.leading, 44)
+                                .padding(.vertical, 10)
+                            importButton
+                                .buttonStyle(.plain)
+                        }
                     }
                     .settingsListRow()
                 }
@@ -191,7 +221,45 @@ struct SettingsView: View {
             resultMessage: $cleanupResultMessage,
             onConfirm: runCleanup
         )
+        .dataPortabilityModifiers(
+            exportURL: $exportURL,
+            exportError: $exportError,
+            isImporting: $isImporting,
+            importResultMessage: $importResultMessage,
+            importError: $importError,
+            modelContext: modelContext
+        )
     }
+    // MARK: - Export / Import
+
+    private var exportButton: some View {
+        Button {
+            do {
+                exportURL = try DataExporter.buildExportURL(context: modelContext)
+            } catch {
+                exportError = error.localizedDescription
+            }
+        } label: {
+            SettingsRow(
+                title: "Export Data",
+                subtitle: "Save a backup of all your data",
+                systemImage: "square.and.arrow.up"
+            )
+        }
+    }
+
+    private var importButton: some View {
+        Button {
+            isImporting = true
+        } label: {
+            SettingsRow(
+                title: "Import Data",
+                subtitle: "Restore from a backup file",
+                systemImage: "square.and.arrow.down"
+            )
+        }
+    }
+
     // MARK: - History cleanup
 
     private var cleanupButton: some View {
@@ -402,6 +470,73 @@ private struct SettingsValueRow: View {
 }
 
 private extension View {
+    /// Attaches the share sheet (export), file importer (import), and result alerts.
+    func dataPortabilityModifiers(
+        exportURL: Binding<URL?>,
+        exportError: Binding<String?>,
+        isImporting: Binding<Bool>,
+        importResultMessage: Binding<String?>,
+        importError: Binding<String?>,
+        modelContext: ModelContext
+    ) -> some View {
+        self
+            // Export: standard iOS share sheet via UIActivityViewController.
+            .sheet(isPresented: Binding(
+                get: { exportURL.wrappedValue != nil },
+                set: { if !$0 { exportURL.wrappedValue = nil } }
+            )) {
+                if let url = exportURL.wrappedValue {
+                    ActivityView(url: url)
+                        .ignoresSafeArea()
+                }
+            }
+            // Import: file picker — decode directly from the security-scoped URL.
+            .fileImporter(
+                isPresented: isImporting,
+                allowedContentTypes: [.myWealthBackup, .json]
+            ) { result in
+                Task { @MainActor in
+                    switch result {
+                    case .success(let url):
+                        do {
+                            guard url.startAccessingSecurityScopedResource() else { return }
+                            defer { url.stopAccessingSecurityScopedResource() }
+                            let summary = try DataImporter.importFromURL(url, into: modelContext)
+                            importResultMessage.wrappedValue = summary.description
+                        } catch {
+                            importError.wrappedValue = error.localizedDescription
+                        }
+                    case .failure(let error):
+                        importError.wrappedValue = error.localizedDescription
+                    }
+                }
+            }
+            .alert("Export Failed", isPresented: Binding(
+                get: { exportError.wrappedValue != nil },
+                set: { if !$0 { exportError.wrappedValue = nil } }
+            )) {
+                Button("OK") { exportError.wrappedValue = nil }
+            } message: {
+                Text(exportError.wrappedValue ?? "")
+            }
+            .alert("Import Complete", isPresented: Binding(
+                get: { importResultMessage.wrappedValue != nil },
+                set: { if !$0 { importResultMessage.wrappedValue = nil } }
+            )) {
+                Button("OK") { importResultMessage.wrappedValue = nil }
+            } message: {
+                Text(importResultMessage.wrappedValue ?? "")
+            }
+            .alert("Import Failed", isPresented: Binding(
+                get: { importError.wrappedValue != nil },
+                set: { if !$0 { importError.wrappedValue = nil } }
+            )) {
+                Button("OK") { importError.wrappedValue = nil }
+            } message: {
+                Text(importError.wrappedValue ?? "")
+            }
+    }
+
     func settingsListRow() -> some View {
         listRowBackground(Color.clear)
             .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))

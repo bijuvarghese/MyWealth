@@ -9,6 +9,15 @@ import Observation
 ///   Target → Signing & Capabilities → add iCloud → check CloudKit + Key-value storage.
 enum CloudKitSyncManager {
 
+    /// Explicit store URL that matches SwiftData's default path.
+    /// The earlier error log confirmed CloudKit uses Library/Application Support/default.store,
+    /// so we pin every non-CloudKit config to the same file to guarantee they share one store.
+    /// (groupContainer: .automatic was removed because no App Group entitlement exists —
+    /// without one its resolution is undefined and it may silently create a separate SQLite file.)
+    static var localStoreURL: URL {
+        URL.applicationSupportDirectory.appending(path: "default.store")
+    }
+
     static func makeContainer(syncEnabled: Bool, isRunningTests: Bool) throws -> ModelContainer {
         let schema = Schema([
             Asset.self,
@@ -30,11 +39,7 @@ enum CloudKitSyncManager {
             // The Simulator has no real CloudKit access, so fall back to local storage there
             // while still allowing the sync toggle UI to be exercised during development.
             #if targetEnvironment(simulator)
-            let config = ModelConfiguration(
-                schema: schema,
-                isStoredInMemoryOnly: false,
-                groupContainer: .automatic
-            )
+            let config = ModelConfiguration(schema: schema, url: localStoreURL)
             #else
             let config = ModelConfiguration(
                 schema: schema,
@@ -44,12 +49,9 @@ enum CloudKitSyncManager {
             #endif
             return try ModelContainer(for: schema, configurations: [config])
         } else {
-            // Local-only store (existing behaviour).
-            let config = ModelConfiguration(
-                schema: schema,
-                isStoredInMemoryOnly: false,
-                groupContainer: .automatic
-            )
+            // Local-only: explicit URL so this config and the CloudKit-backed config
+            // always read/write the same SQLite file — switching sync on/off is seamless.
+            let config = ModelConfiguration(schema: schema, url: localStoreURL)
             return try ModelContainer(for: schema, configurations: [config])
         }
     }
@@ -67,6 +69,9 @@ final class ContainerHolder {
     /// Changes every time the container is swapped. Use as `.id(holder.rebuildId)`
     /// on the root content view to trigger a full subtree rebuild.
     private(set) var rebuildId: UUID = UUID()
+    /// Set to true when CloudKit detects the iCloud account changed mid-session.
+    /// The UI can observe this to show an informative banner.
+    private(set) var iCloudAccountChanged: Bool = false
 
     init(isRunningTests: Bool) {
         let syncEnabled = UserDefaults.standard.bool(forKey: "settings.iCloudSyncEnabled")
@@ -75,9 +80,28 @@ final class ContainerHolder {
                 syncEnabled: syncEnabled,
                 isRunningTests: isRunningTests
             )
+            let storeURL = container.configurations.first?.url.absoluteString ?? "unknown"
+            print("[MyWealth] SwiftData store URL: \(storeURL)")
+            print("[MyWealth] iCloud sync enabled: \(syncEnabled)")
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
         }
+        // Selector-based registration: no token is returned, so there is nothing
+        // to store and no deinit / nonisolated(unsafe) dance is needed.
+        // ContainerHolder is a long-lived singleton, so not removing the observer
+        // is safe — it will simply be collected with the process.
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(onAccountChange),
+            name: .NSUbiquityIdentityDidChange,
+            object: nil
+        )
+    }
+
+    /// Resets the account-changed flag after the banner has been shown.
+    @MainActor
+    func clearAccountChangedFlag() {
+        iCloudAccountChanged = false
     }
 
     /// Swaps to a new container with the given sync setting.
@@ -94,6 +118,27 @@ final class ContainerHolder {
         } catch {
             // If the switch fails, revert the preference so the toggle stays consistent.
             UserDefaults.standard.set(!enabled, forKey: "settings.iCloudSyncEnabled")
+        }
+    }
+
+    // MARK: - iCloud Account Change Handling
+
+    /// Called by NotificationCenter when the iCloud account changes.
+    /// Hops to the main actor before touching any @Observable state.
+    @objc private func onAccountChange() {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            iCloudAccountChanged = true
+            let syncEnabled = UserDefaults.standard.bool(forKey: "settings.iCloudSyncEnabled")
+            do {
+                container = try CloudKitSyncManager.makeContainer(
+                    syncEnabled: syncEnabled,
+                    isRunningTests: false
+                )
+                rebuildId = UUID()
+            } catch {
+                UserDefaults.standard.set(false, forKey: "settings.iCloudSyncEnabled")
+            }
         }
     }
 }
