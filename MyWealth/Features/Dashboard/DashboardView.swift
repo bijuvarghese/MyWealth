@@ -735,12 +735,15 @@ private struct PortfolioAllocationView: View {
 
             Chart(rows) { row in
                 SectorMark(
-                    angle: .value("Amount", row.amount * chartProgress),
+                    angle: .value("Amount", row.amount),
                     innerRadius: .ratio(0.62),
                     angularInset: 1.5
                 )
                 .foregroundStyle(by: .value("Category", row.category.rawValue))
             }
+            // Animate with opacity so chart data is always real (never zero-angle
+            // sectors), preventing a Swift Charts internal Int(NaN) crash.
+            .opacity(chartProgress)
             .frame(height: 180)
             .chartLegend(position: .bottom, alignment: .leading)
             .onAppear {
@@ -814,12 +817,13 @@ private struct LiabilityAllocationView: View {
 
             Chart(rows) { row in
                 SectorMark(
-                    angle: .value("Amount", row.amount * chartProgress),
+                    angle: .value("Amount", row.amount),
                     innerRadius: .ratio(0.62),
                     angularInset: 1.5
                 )
                 .foregroundStyle(by: .value("Category", row.category.rawValue))
             }
+            .opacity(chartProgress)
             .frame(height: 180)
             .chartLegend(position: .bottom, alignment: .leading)
             .onAppear {

@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import CloudKit
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -68,6 +69,10 @@ struct SettingsView: View {
                 NavigationLink(value: SettingsRoute.displayCurrencies) {
                     displayCurrenciesContent
                 }
+            }
+
+            Section("iCloud") {
+                ICloudSyncRow(settings: settings)
             }
 
             Section("Data") {
@@ -161,6 +166,13 @@ struct SettingsView: View {
 
                 Section {
                     SettingsCard {
+                        ICloudSyncRow(settings: settings)
+                    }
+                    .settingsListRow()
+                }
+
+                Section {
+                    SettingsCard {
                         SettingsValueRow(
                             title: "App Version",
                             value: AppInfo.fullVersion,
@@ -236,6 +248,59 @@ struct SettingsView: View {
             Text(settings.totalCurrencies.map(\.rawValue).joined(separator: ", "))
                 .foregroundStyle(.primary)
         }
+    }
+}
+
+// MARK: - iCloud Sync Row
+
+private struct ICloudSyncRow: View {
+    @Bindable var settings: AppSettings
+    @State private var iCloudAvailable: Bool = false
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "icloud.fill")
+                .font(.body.weight(.semibold))
+                .foregroundStyle(iCloudAvailable ? .accent : .secondary)
+                .frame(width: 32, height: 32)
+                .background(
+                    (iCloudAvailable ? Color.accent : Color.secondary).opacity(0.12),
+                    in: RoundedRectangle(cornerRadius: 8, style: .continuous)
+                )
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Sync with iCloud")
+                    .font(.body.weight(.medium))
+                    .foregroundStyle(.primary)
+                Text(iCloudAvailable
+                     ? "Back up and sync across your devices."
+                     : "Sign in to iCloud in Settings to enable.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer(minLength: 8)
+
+            Toggle("", isOn: $settings.iCloudSyncEnabled)
+                .labelsHidden()
+                .tint(.accent)
+                .disabled(!iCloudAvailable)
+        }
+        .frame(minHeight: 40)
+        .task { await checkICloudAvailability() }
+    }
+
+    private func checkICloudAvailability() async {
+        #if targetEnvironment(simulator)
+        iCloudAvailable = true
+        #else
+        do {
+            let status = try await CKContainer.default().accountStatus()
+            iCloudAvailable = (status == .available)
+        } catch {
+            iCloudAvailable = false
+        }
+        #endif
     }
 }
 

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct OnboardingView: View {
     @Bindable var settings: AppSettings
+    @Environment(ContainerHolder.self) private var containerHolder
 
     @State private var currentStep: OnboardingStep = .baseCurrency
     @State private var baseCurrency: Asset.CurrencyType = .usd
@@ -9,6 +10,7 @@ struct OnboardingView: View {
     @State private var remindersEnabled = false
     @State private var reminderType: ReminderType = .reviewPortfolio
     @State private var reminderFrequency: ReminderFrequency = .weekly
+    @State private var iCloudSyncEnabled = false
     @State private var didLoadInitialValues = false
 
     var body: some View {
@@ -33,6 +35,8 @@ struct OnboardingView: View {
                             reminderType: $reminderType,
                             reminderFrequency: $reminderFrequency
                         )
+                    case .iCloudSync:
+                        OnboardingICloudStepView(iCloudSyncEnabled: $iCloudSyncEnabled)
                     }
                 }
             }
@@ -77,7 +81,7 @@ struct OnboardingView: View {
         Button {
             handlePrimaryAction()
         } label: {
-            Text(currentStep == .reminders ? "Finish Setup" : "Continue")
+            Text(currentStep == .iCloudSync ? "Finish Setup" : "Continue")
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
@@ -95,7 +99,7 @@ struct OnboardingView: View {
 
         case .displayCurrencies:
             currentStep = .reminders
-            
+
         case .reminders:
             if remindersEnabled {
                 ReminderManager.shared.enableReminders(
@@ -105,7 +109,14 @@ struct OnboardingView: View {
             } else {
                 ReminderManager.shared.disableReminders()
             }
-            
+            currentStep = .iCloudSync
+
+        case .iCloudSync:
+            // Apply iCloud sync preference before completing onboarding.
+            settings.iCloudSyncEnabled = iCloudSyncEnabled
+            if iCloudSyncEnabled {
+                containerHolder.switchSync(enabled: true)
+            }
             settings.completeOnboarding(
                 baseCurrency: baseCurrency,
                 displayCurrencies: displayCurrencies

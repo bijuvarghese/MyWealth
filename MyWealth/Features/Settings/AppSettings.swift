@@ -10,11 +10,14 @@ final class AppSettings {
         static let baseCurrency = "settings.baseCurrency"
         static let usesCompactCurrencyTotals = "settings.usesCompactCurrencyTotals"
         static let hasCompletedOnboarding = "settings.hasCompletedOnboarding"
+        static let iCloudSyncEnabled = "settings.iCloudSyncEnabled"
+        static let hasSeenICloudOnboarding = "settings.hasSeenICloudOnboarding"
     }
 
     private let userDefaults: UserDefaults
     @ObservationIgnored private let hasMadeReminderChoice: () -> Bool
     private var hasCompletedCurrencyOnboarding: Bool
+    private var hasSeenICloudOnboarding: Bool
 
     var baseCurrency: Asset.CurrencyType {
         didSet {
@@ -31,6 +34,12 @@ final class AppSettings {
     var usesCompactCurrencyTotals: Bool {
         didSet {
             persistUsesCompactCurrencyTotals()
+        }
+    }
+
+    var iCloudSyncEnabled: Bool {
+        didSet {
+            userDefaults.set(iCloudSyncEnabled, forKey: DefaultsKeys.iCloudSyncEnabled)
         }
     }
 
@@ -58,9 +67,14 @@ final class AppSettings {
         let savedCurrencies = savedCodes.compactMap(Asset.CurrencyType.init(rawValue:))
         self.totalCurrencies = savedCurrencies.isEmpty ? [.usd, .inr] : savedCurrencies
         self.usesCompactCurrencyTotals = userDefaults.bool(forKey: DefaultsKeys.usesCompactCurrencyTotals)
+        self.iCloudSyncEnabled = userDefaults.bool(forKey: DefaultsKeys.iCloudSyncEnabled)
 
         let hasSavedCurrencySettings = savedBaseCode != nil || !savedCodes.isEmpty
         self.hasCompletedCurrencyOnboarding = userDefaults.bool(forKey: DefaultsKeys.hasCompletedOnboarding) || hasSavedCurrencySettings
+        // Only true once the user has explicitly gone through the iCloud onboarding step.
+        // Existing users who upgrade will have this absent from UserDefaults (defaults to false),
+        // so they'll be shown the step — jumping directly to it since their other steps are done.
+        self.hasSeenICloudOnboarding = userDefaults.bool(forKey: DefaultsKeys.hasSeenICloudOnboarding)
     }
 
     func setBaseCurrency(_ currency: Asset.CurrencyType) {
@@ -85,7 +99,9 @@ final class AppSettings {
         self.baseCurrency = baseCurrency
         self.totalCurrencies = normalizedDisplayCurrencies(displayCurrencies, including: baseCurrency)
         self.hasCompletedCurrencyOnboarding = true
+        self.hasSeenICloudOnboarding = true
         persistOnboardingStatus()
+        userDefaults.set(true, forKey: DefaultsKeys.hasSeenICloudOnboarding)
     }
 
     func firstMissingOnboardingStep() -> OnboardingStep {
@@ -119,6 +135,10 @@ final class AppSettings {
 
         if !hasMadeReminderChoice {
             missingSteps.insert(.reminders)
+        }
+
+        if !hasSeenICloudOnboarding {
+            missingSteps.insert(.iCloudSync)
         }
 
         return missingSteps

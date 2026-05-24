@@ -506,9 +506,9 @@ final class DashboardViewModel: AssetOperations {
         }
 
         // 2. Debt-to-asset ratio with health label
-        if let a = assetTotal, let l = liabilityTotal, a > 0, l > 0 {
+        if let a = assetTotal, let l = liabilityTotal, a > 0, l > 0, a.isFinite, l.isFinite {
             let ratio = l / a
-            let pct = Int((ratio * 100).rounded())
+            let pct = safePercentInt(ratio)
             let (label, sentiment): (String, PortfolioInsightRow.Sentiment) = {
                 if ratio < 0.20 { return ("healthy", .positive) }
                 if ratio < 0.50 { return ("elevated", .neutral) }
@@ -525,14 +525,14 @@ final class DashboardViewModel: AssetOperations {
         if let dominant = allocationRows.first, dominant.percentage > 0.60 {
             rows.append(PortfolioInsightRow(
                 systemImage: "exclamationmark.circle.fill",
-                message: "\(Int((dominant.percentage * 100).rounded()))% of assets are in \(dominant.category.rawValue). Consider diversifying.",
+                message: "\(safePercentInt(dominant.percentage))% of assets are in \(dominant.category.rawValue). Consider diversifying.",
                 sentiment: .warning
             ))
         } else if let largest = allocationRows.first {
             // Non-concerning allocation summary
             rows.append(PortfolioInsightRow(
                 systemImage: largest.category.icon,
-                message: "\(Int((largest.percentage * 100).rounded()))% of assets are in \(largest.category.rawValue).",
+                message: "\(safePercentInt(largest.percentage))% of assets are in \(largest.category.rawValue).",
                 sentiment: .neutral
             ))
         }
@@ -604,7 +604,7 @@ final class DashboardViewModel: AssetOperations {
                 let name = topAsset.displayName.isEmpty ? "one asset" : topAsset.displayName
                 rows.append(PortfolioInsightRow(
                     systemImage: "person.crop.circle.badge.exclamationmark",
-                    message: "\(Int((share * 100).rounded()))% of assets are in \(name) alone.",
+                    message: "\(safePercentInt(share))% of assets are in \(name) alone.",
                     sentiment: share > 0.70 ? .warning : .neutral
                 ))
             }
@@ -620,7 +620,7 @@ final class DashboardViewModel: AssetOperations {
             if totalMetalPct > 0.10 {
                 rows.append(PortfolioInsightRow(
                     systemImage: "cube.fill",
-                    message: "\(Int((totalMetalPct * 100).rounded()))% of assets are in precious metals.",
+                    message: "\(safePercentInt(totalMetalPct))% of assets are in precious metals.",
                     sentiment: .neutral
                 ))
             }
@@ -636,6 +636,16 @@ final class DashboardViewModel: AssetOperations {
         }
 
         return Array(rows.prefix(limit))
+    }
+
+    // Safely converts a 0…1 ratio to an integer percentage, returning 0 if the
+    // input is NaN or infinite. Prevents an Int(Double) trap when upstream
+    // math (e.g. division by a missing/zero exchange rate) yields a non-finite
+    // value.
+    private func safePercentInt(_ ratio: Double) -> Int {
+        let scaled = ratio * 100
+        guard scaled.isFinite else { return 0 }
+        return Int(scaled.rounded())
     }
 
     func recordPortfolioHistory(

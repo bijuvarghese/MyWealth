@@ -4,6 +4,7 @@ enum OnboardingStep: Int, CaseIterable {
     case baseCurrency
     case displayCurrencies
     case reminders
+    case iCloudSync
 
     var title: String {
         switch self {
@@ -13,6 +14,8 @@ enum OnboardingStep: Int, CaseIterable {
             "Choose Display Currencies"
         case .reminders:
             "Set Up Reminders"
+        case .iCloudSync:
+            "Back Up to iCloud"
         }
     }
 }
