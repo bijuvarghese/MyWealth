@@ -458,3 +458,29 @@ final class NetWorthSnapshot {
         recordedAt ?? .distantPast
     }
 }
+
+@Model
+final class PortfolioSnapshot {
+    var assetTotal: Double? = nil
+    var liabilityTotal: Double? = nil
+    var currencyCode: String? = nil
+    var recordedAt: Date? = nil
+
+    init(
+        assetTotal: Double,
+        liabilityTotal: Double,
+        currencyCode: String,
+        recordedAt: Date = Date()
+    ) {
+        self.assetTotal = assetTotal
+        self.liabilityTotal = liabilityTotal
+        self.currencyCode = currencyCode
+        self.recordedAt = recordedAt
+    }
+
+    var displayAssetTotal: Double { assetTotal ?? 0 }
+    var displayLiabilityTotal: Double { liabilityTotal ?? 0 }
+    var displayNetWorth: Double { displayAssetTotal - displayLiabilityTotal }
+    var displayCurrencyCode: String { currencyCode ?? "" }
+    var displayRecordedAt: Date { recordedAt ?? .distantPast }
+}

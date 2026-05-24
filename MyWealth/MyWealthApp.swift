@@ -11,29 +11,11 @@ import UserNotifications
 
 @main
 struct MyWealthApp: App {
+    @State private var containerHolder = ContainerHolder(isRunningTests: Self.isRunningTests)
+
     init() {
         UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
     }
-
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Asset.self,
-            Liability.self,
-            AssetValueSnapshot.self,
-            NetWorthSnapshot.self,
-        ])
-        let modelConfiguration = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: Self.isRunningTests,
-            groupContainer: ModelConfiguration.GroupContainer.automatic
-        )
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
 
     private static var isRunningTests: Bool {
         let environment = ProcessInfo.processInfo.environment
@@ -51,14 +33,23 @@ struct MyWealthApp: App {
         WindowGroup {
             AppRootView()
                 .setupReminderModule()
+                // Inject the holder so child views can trigger a container switch.
+                .environment(containerHolder)
+                // The modelContainer and .id are applied here so that when
+                // rebuildId changes the entire content tree re-mounts with the
+                // new container — no app restart needed.
+                .modelContainer(containerHolder.container)
+                .id(containerHolder.rebuildId)
         }
-        .modelContainer(sharedModelContainer)
     }
 }
 
 private struct AppRootView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(ContainerHolder.self) private var containerHolder
     @State private var settings = AppSettings()
+
+    private let iCloudSync = ICloudSettingsSync.shared
 
     var body: some View {
         Group {
@@ -98,6 +89,38 @@ private struct AppRootView: View {
             // now-fixed double-recording bug. Safe to call on every launch —
             // subsequent calls are instant no-ops once the flag is set.
             HistorySanitizer.sanitizeOnceIfNeeded(modelContext: modelContext)
+
+            // Pull iCloud settings on launch, then keep listening for remote changes.
+            if settings.iCloudSyncEnabled {
+                iCloudSync.pull(into: settings)
+                iCloudSync.startObserving {
+                    Task { @MainActor in
+                        iCloudSync.pull(into: settings)
+                    }
+                }
+            }
+        }
+        // When the toggle changes, hot-swap the container immediately.
+        .onChange(of: settings.iCloudSyncEnabled) { _, newValue in
+            containerHolder.switchSync(enabled: newValue)
+            // Start or stop KV sync accordingly.
+            if newValue {
+                iCloudSync.pull(into: settings)
+                iCloudSync.startObserving {
+                    Task { @MainActor in iCloudSync.pull(into: settings) }
+                }
+            } else {
+                iCloudSync.stopObserving()
+            }
+        }
+        .onChange(of: settings.baseCurrency) {
+            if settings.iCloudSyncEnabled { iCloudSync.push(settings: settings) }
+        }
+        .onChange(of: settings.totalCurrencies) {
+            if settings.iCloudSyncEnabled { iCloudSync.push(settings: settings) }
+        }
+        .onChange(of: settings.usesCompactCurrencyTotals) {
+            if settings.iCloudSyncEnabled { iCloudSync.push(settings: settings) }
         }
     }
 }
