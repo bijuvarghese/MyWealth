@@ -107,9 +107,9 @@ struct MyWealthTests {
             baseCurrency: .usd
         )
 
-        #expect(rows.map(\.message).contains("70% of your assets are in Real Estate."))
-        #expect(rows.map(\.message).contains("Cash and bank deposits make up 30% of your assets."))
-        #expect(rows.map(\.message).contains("Liabilities are 25% of your asset value."))
+        #expect(rows.map(\.message).contains("Debt-to-asset ratio is 25% — elevated."))
+        #expect(rows.map(\.message).contains("70% of assets are in Real Estate. Consider diversifying."))
+        #expect(rows.map(\.message).contains("70% of assets are in House alone."))
     }
 
     @MainActor
@@ -129,7 +129,7 @@ struct MyWealthTests {
             baseCurrency: .usd
         )
 
-        #expect(rows.first?.message == "Net worth increased by $250.00 since the last snapshot.")
+        #expect(rows.first?.message == "Net worth up 25.0% over the last 0d.")
     }
 
     @MainActor
@@ -141,7 +141,7 @@ struct MyWealthTests {
         )
 
         #expect(settings.hasCompletedOnboarding.isComplete == false)
-        #expect(settings.hasCompletedOnboarding.missingSteps == [.baseCurrency, .displayCurrencies])
+        #expect(settings.hasCompletedOnboarding.missingSteps == [.baseCurrency, .displayCurrencies, .iCloudSync])
 
         settings.completeOnboarding(
             baseCurrency: .eur,

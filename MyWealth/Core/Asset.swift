@@ -316,6 +316,11 @@ final class Asset {
         }
 
         var isPreciousMetal: Bool { metalCurrency != nil }
+
+        /// True for asset categories whose value doesn't update automatically
+        /// (no live market price feed), so users may want to log value milestones
+        /// manually over time (e.g. property re-appraisals, car trade-in estimates).
+        var supportsManualValueHistory: Bool { !isPreciousMetal }
     }
 }
 
@@ -392,6 +397,11 @@ final class AssetValueSnapshot {
     var currencyCode: String? = nil
     var categoryName: String? = nil
     var recordedAt: Date? = nil
+    /// True when this snapshot was manually entered by the user (e.g. a re-appraisal).
+    /// Automatically recorded snapshots leave this nil / false.
+    var isManual: Bool? = false
+    /// Optional user note for manual entries (e.g. "Re-appraised by XYZ Valuers").
+    var note: String? = nil
 
     init(
         assetIdentifier: String,
@@ -399,7 +409,9 @@ final class AssetValueSnapshot {
         amount: Double,
         currencyCode: String,
         categoryName: String,
-        recordedAt: Date = Date()
+        recordedAt: Date = Date(),
+        isManual: Bool = false,
+        note: String? = nil
     ) {
         self.assetIdentifier = assetIdentifier
         self.assetName = assetName
@@ -407,6 +419,8 @@ final class AssetValueSnapshot {
         self.currencyCode = currencyCode
         self.categoryName = categoryName
         self.recordedAt = recordedAt
+        self.isManual = isManual
+        self.note = note
     }
 
     var displayAssetIdentifier: String {

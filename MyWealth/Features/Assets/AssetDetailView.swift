@@ -15,6 +15,7 @@ struct AssetDetailView: View {
     @State private var metalViewModel = MetalPricesViewModel()
     @State private var isShowingEditSheet = false
     @State private var isShowingDeleteConfirmation = false
+    @State private var isShowingManualValueEntry = false
 
     private var assetTitle: String {
         asset.displayName.isEmpty ? "Unnamed Asset" : asset.displayName
@@ -83,8 +84,7 @@ struct AssetDetailView: View {
                         AssetValueSummaryView(
                             asset: asset,
                             convertedAmount: convertedAssetAmount,
-                            baseCurrency: settings.baseCurrency,
-                            lastUpdated: asset.lastUpdated
+                            baseCurrency: settings.baseCurrency
                         )
                     }
                     .assetDetailListRow()
@@ -106,7 +106,11 @@ struct AssetDetailView: View {
 
                 Section(header: PillLabel("History")) {
                     AssetDetailCard {
-                        AssetDetailHistoryView(rows: historyRows)
+                        AssetDetailHistoryView(
+                            rows: historyRows,
+                            showLogButton: asset.displayCategory.supportsManualValueHistory,
+                            onLogValue: { isShowingManualValueEntry = true }
+                        )
                     }
                     .assetDetailListRow()
                 }
@@ -125,6 +129,14 @@ struct AssetDetailView: View {
                         Label("Edit Asset", systemImage: "pencil")
                     }
 
+                    if asset.displayCategory.supportsManualValueHistory {
+                        Button {
+                            isShowingManualValueEntry = true
+                        } label: {
+                            Label("Log Value", systemImage: "plus.circle")
+                        }
+                    }
+
                     Button(role: .destructive) {
                         isShowingDeleteConfirmation = true
                     } label: {
@@ -137,6 +149,9 @@ struct AssetDetailView: View {
         }
         .sheet(isPresented: $isShowingEditSheet) {
             AddorEditAssetView(asset: asset)
+        }
+        .sheet(isPresented: $isShowingManualValueEntry) {
+            ManualValueEntryView(asset: asset)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             bottomActionBar
@@ -202,6 +217,23 @@ struct AssetDetailView: View {
                     .foregroundStyle(.accent)
             }
 
+            if asset.displayCategory.supportsManualValueHistory {
+                Button {
+                    isShowingManualValueEntry = true
+                } label: {
+                    Label("Log Value", systemImage: "plus.circle")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .strokeBorder(.green.opacity(0.5), lineWidth: 1)
+                        )
+                        .foregroundStyle(.green)
+                }
+            }
+
             Button(role: .destructive) {
                 isShowingDeleteConfirmation = true
             } label: {
@@ -253,7 +285,6 @@ private struct AssetValueSummaryView: View {
     let asset: Asset
     let convertedAmount: Double?
     let baseCurrency: Asset.CurrencyType
-    let lastUpdated: Date?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -271,11 +302,6 @@ private struct AssetValueSummaryView: View {
                 title: "Currency",
                 value: Text(asset.displayCurrency.displayText)
             )
-
-            metricRow(
-                title: "Last Updated",
-                value: lastUpdatedText
-            )
         }
     }
 
@@ -286,14 +312,6 @@ private struct AssetValueSummaryView: View {
         } else {
             Text("Unavailable")
                 .foregroundStyle(.secondary)
-        }
-    }
-
-    private var lastUpdatedText: Text {
-        if let lastUpdated {
-            Text(lastUpdated, format: .dateTime.month(.abbreviated).day().year().hour().minute())
-        } else {
-            Text("Not recorded")
         }
     }
 
@@ -368,6 +386,8 @@ private struct AssetAllocationSummaryView: View {
 
 private struct AssetDetailHistoryView: View {
     let rows: [AssetHistoryRow]
+    var showLogButton: Bool = false
+    var onLogValue: () -> Void = {}
 
     private var chartRows: [AssetHistoryRow] {
         rows.sorted { $0.recordedAt < $1.recordedAt }
@@ -379,9 +399,29 @@ private struct AssetDetailHistoryView: View {
                 ContentUnavailableView(
                     "No History Yet",
                     systemImage: "clock.arrow.circlepath",
-                    description: Text("Value changes will appear here after this asset is updated.")
+                    description: Text(
+                        showLogButton
+                            ? "Tap \"Log Value\" to record your first valuation."
+                            : "Value changes will appear here after this asset is updated."
+                    )
                 )
                 .frame(maxWidth: .infinity)
+
+                if showLogButton {
+                    Button(action: onLogValue) {
+                        Label("Log Value", systemImage: "plus.circle")
+                            .font(.subheadline.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(.green.opacity(0.10), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .strokeBorder(.green.opacity(0.4), lineWidth: 1)
+                            )
+                            .foregroundStyle(.green)
+                    }
+                    .buttonStyle(.plain)
+                }
             } else {
                 Chart(chartRows) { row in
                     if chartRows.count == 1 {
@@ -417,24 +457,68 @@ private struct AssetDetailHistoryView: View {
 
                 VStack(spacing: 10) {
                     ForEach(rows.prefix(6)) { row in
-                        HStack(alignment: .firstTextBaseline, spacing: 10) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(row.recordedAt, format: .dateTime.month(.abbreviated).day().hour().minute())
-                                    .font(.subheadline.weight(.medium))
-                                Text(row.categoryName)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-
-                            Spacer()
-
-                            Text(row.amount, format: .currency(code: row.currencyCode.isEmpty ? "USD" : row.currencyCode))
-                                .font(.subheadline.weight(.semibold))
-                                .monospacedDigit()
-                        }
+                        AssetHistoryRowView(row: row)
                     }
                 }
+
+                if showLogButton {
+                    Button(action: onLogValue) {
+                        Label("Log Value", systemImage: "plus.circle")
+                            .font(.subheadline.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(.green.opacity(0.10), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .strokeBorder(.green.opacity(0.4), lineWidth: 1)
+                            )
+                            .foregroundStyle(.green)
+                    }
+                    .buttonStyle(.plain)
+                }
             }
+        }
+    }
+}
+
+private struct AssetHistoryRowView: View {
+    let row: AssetHistoryRow
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 4) {
+                    if row.isManual {
+                        Image(systemName: "pencil.circle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.green)
+                    }
+                    // Manual entries show date-only (user picked a day, not a time).
+                    // Auto entries show date + time for precision.
+                    if row.isManual {
+                        Text(row.recordedAt, format: .dateTime.month(.abbreviated).day().year())
+                            .font(.subheadline.weight(.medium))
+                    } else {
+                        Text(row.recordedAt, format: .dateTime.month(.abbreviated).day().hour().minute())
+                            .font(.subheadline.weight(.medium))
+                    }
+                }
+                Text(row.isManual ? "Manual entry" : row.categoryName)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if let note = row.note, !note.isEmpty {
+                    Text(note)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                }
+            }
+
+            Spacer()
+
+            Text(row.amount, format: .currency(code: row.currencyCode.isEmpty ? "USD" : row.currencyCode))
+                .font(.subheadline.weight(.semibold))
+                .monospacedDigit()
         }
     }
 }
