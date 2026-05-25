@@ -89,7 +89,6 @@ struct OnboardingDisplayCurrencyPickerView: View {
             }
         } else {
             selections.append(currency)
-            selections.sort { $0.rawValue < $1.rawValue }
         }
     }
 }

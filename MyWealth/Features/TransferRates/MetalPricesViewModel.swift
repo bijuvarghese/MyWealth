@@ -59,8 +59,7 @@ final class MetalPricesViewModel {
     // MARK: - Fetch
 
     func refreshIfNeeded() async {
-        let startOfToday = Calendar.current.startOfDay(for: Date())
-        if let last = lastUpdated, last >= startOfToday, !metalRates.isEmpty {
+        guard !isLoading else {
             return
         }
         await refresh()
@@ -72,12 +71,12 @@ final class MetalPricesViewModel {
         do {
             let response = try await metalPriceService.fetchLatestMetalPrices()
             let rates = response.rates ?? [:]
-            let now = Date()
+            let lastUpdatedAt = response.cacheUpdatedAt ?? response.providerUpdatedAt ?? Date()
             metalRates = rates
-            lastUpdated = now
+            lastUpdated = lastUpdatedAt
             errorMessage = nil
             userDefaults.set(rates, forKey: DefaultsKeys.rates)
-            userDefaults.set(now.timeIntervalSince1970, forKey: DefaultsKeys.lastUpdated)
+            userDefaults.set(lastUpdatedAt.timeIntervalSince1970, forKey: DefaultsKeys.lastUpdated)
         } catch {
             errorMessage = "Unable to refresh metal prices. Showing the last saved prices."
         }

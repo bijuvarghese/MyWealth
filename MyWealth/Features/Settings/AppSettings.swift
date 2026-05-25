@@ -61,11 +61,14 @@ final class AppSettings {
         self.hasMadeReminderChoice = hasMadeReminderChoice
 
         let savedBaseCode = userDefaults.string(forKey: DefaultsKeys.baseCurrency)
-        self.baseCurrency = savedBaseCode.flatMap(Asset.CurrencyType.init(rawValue:)) ?? .usd
+        let restoredBaseCurrency = savedBaseCode.flatMap(Asset.CurrencyType.init(rawValue:)) ?? .usd
+        self.baseCurrency = restoredBaseCurrency
 
         let savedCodes = userDefaults.stringArray(forKey: DefaultsKeys.totalCurrencies) ?? []
         let savedCurrencies = savedCodes.compactMap(Asset.CurrencyType.init(rawValue:))
-        self.totalCurrencies = savedCurrencies.isEmpty ? [.usd, .inr] : savedCurrencies
+        self.totalCurrencies = savedCurrencies.isEmpty
+            ? [.usd, .inr]
+            : AppSettings.normalizedDisplayCurrencies(savedCurrencies, including: restoredBaseCurrency)
         self.usesCompactCurrencyTotals = userDefaults.bool(forKey: DefaultsKeys.usesCompactCurrencyTotals)
         self.iCloudSyncEnabled = userDefaults.bool(forKey: DefaultsKeys.iCloudSyncEnabled)
 
@@ -85,19 +88,40 @@ final class AppSettings {
     }
 
     func toggleTotalCurrency(_ currency: Asset.CurrencyType) {
+        guard currency != .none else {
+            return
+        }
+
         if totalCurrencies.contains(currency) {
-            if totalCurrencies.count > 1 {
+            if totalCurrencies.count > 1 && currency != baseCurrency {
                 totalCurrencies.removeAll { $0 == currency }
             }
         } else {
             totalCurrencies.append(currency)
-            totalCurrencies.sort { $0.rawValue < $1.rawValue }
         }
+    }
+
+    func moveTotalCurrencies(fromOffsets source: IndexSet, toOffset destination: Int) {
+        var reorderedCurrencies = totalCurrencies
+        let movingCurrencies = source
+            .sorted()
+            .map { reorderedCurrencies[$0] }
+
+        for index in source.sorted(by: >) {
+            reorderedCurrencies.remove(at: index)
+        }
+
+        let removedBeforeDestination = source.filter { $0 < destination }.count
+        let adjustedDestination = destination - removedBeforeDestination
+        let insertionIndex = min(max(adjustedDestination, 0), reorderedCurrencies.count)
+
+        reorderedCurrencies.insert(contentsOf: movingCurrencies, at: insertionIndex)
+        totalCurrencies = Self.normalizedDisplayCurrencies(reorderedCurrencies, including: baseCurrency)
     }
 
     func completeOnboarding(baseCurrency: Asset.CurrencyType, displayCurrencies: [Asset.CurrencyType]) {
         self.baseCurrency = baseCurrency
-        self.totalCurrencies = normalizedDisplayCurrencies(displayCurrencies, including: baseCurrency)
+        self.totalCurrencies = Self.normalizedDisplayCurrencies(displayCurrencies, including: baseCurrency)
         self.hasCompletedCurrencyOnboarding = true
         self.hasSeenICloudOnboarding = true
         persistOnboardingStatus()
@@ -144,7 +168,7 @@ final class AppSettings {
         return missingSteps
     }
 
-    private func normalizedDisplayCurrencies(
+    private static func normalizedDisplayCurrencies(
         _ currencies: [Asset.CurrencyType],
         including baseCurrency: Asset.CurrencyType
     ) -> [Asset.CurrencyType] {

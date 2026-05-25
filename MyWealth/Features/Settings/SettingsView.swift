@@ -705,6 +705,30 @@ private struct TotalCurrencySelectionView: View {
     var body: some View {
         List {
             if searchText.isEmpty {
+                Section {
+                    NavigationLink {
+                        DisplayCurrencyArrangementView(
+                            currencies: $settings.totalCurrencies,
+                            requiredCurrency: settings.baseCurrency
+                        )
+                    } label: {
+                        HStack(spacing: 12) {
+                            Label("Arrange Selected", systemImage: "arrow.up.arrow.down")
+                                .foregroundStyle(.primary)
+
+                            Spacer(minLength: 8)
+
+                            Text(selectedCurrencySummary)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.75)
+                        }
+                    }
+                }
+            }
+
+            if searchText.isEmpty {
                 Section("Common") {
                     ForEach(commonCurrencies) { currency in
                         currencyButton(for: currency)
@@ -725,28 +749,15 @@ private struct TotalCurrencySelectionView: View {
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
     }
 
+    private var selectedCurrencySummary: String {
+        settings.totalCurrencies.map(\.rawValue).joined(separator: ", ")
+    }
+
     private func currencyButton(for currency: Asset.CurrencyType) -> some View {
         Button {
             settings.toggleTotalCurrency(currency)
         } label: {
-            HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(currency.rawValue)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                    Text(currency.name)
-                        .font(.caption)
-                        .foregroundStyle(.gray)
-                }
-
-                Spacer()
-
-                if settings.totalCurrencies.contains(currency) {
-                    Image(systemName: "checkmark")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(.accent)
-                }
-            }
+            CurrencyRowView(currency: currency, isSelected: settings.totalCurrencies.contains(currency))
         }
     }
 }

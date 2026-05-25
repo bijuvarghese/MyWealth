@@ -55,15 +55,7 @@ final class DashboardViewModel: AssetOperations {
     
     @MainActor
     func refreshExchangeRateIfNeeded(requiredCurrencies: [Asset.CurrencyType] = []) async {
-        let now = Date()
-        let startOfToday = Calendar.current.startOfDay(for: now)
-        let hasRequiredRates = missingRequiredRateCodes(
-            in: exchangeRates,
-            requiredCurrencies: requiredCurrencies
-        ).isEmpty
-
-        if let last = lastUpdated, last >= startOfToday, hasRequiredRates {
-            // Already refreshed sometime today
+        guard !isLoadingRate else {
             return
         }
         await fetchExchangeRate(requiredCurrencies: requiredCurrencies)
@@ -80,14 +72,14 @@ final class DashboardViewModel: AssetOperations {
                 requiredCurrencies: requiredCurrencies
             )
 
-            let now = Date()
+            let lastUpdatedAt = decoded.cacheUpdatedAt ?? decoded.providerUpdatedAt ?? Date()
             exchangeRates = rates
             exchangeRate = rates["INR"] ?? exchangeRate
-            lastUpdated = now
+            lastUpdated = lastUpdatedAt
             rateErrorMessage = missingRateCodes.isEmpty
                 ? nil
                 : "Exchange rates are missing \(missingRateCodes.joined(separator: ", ")). Totals may be incomplete."
-            persistRates(rates, inrRate: exchangeRate, at: now)
+            persistRates(rates, inrRate: exchangeRate, at: lastUpdatedAt)
         } catch {
             rateErrorMessage = "Unable to refresh exchange rates. Showing the last saved rates."
             print("Warning: Error fetching rate:", error.localizedDescription)
@@ -939,4 +931,13 @@ struct RateResponse: Codable {
     let rates: [String: Double]?
     let success: Bool?
     let timestamp: Int?
+    let cacheTimestamp: Int?
+
+    var providerUpdatedAt: Date? {
+        timestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) }
+    }
+
+    var cacheUpdatedAt: Date? {
+        cacheTimestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) }
+    }
 }

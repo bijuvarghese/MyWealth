@@ -221,6 +221,26 @@ private struct OnboardingDisplayCurrencyStepView: View {
                 }
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+
+                NavigationLink {
+                    DisplayCurrencyArrangementView(
+                        currencies: $displayCurrencies,
+                        requiredCurrency: baseCurrency
+                    )
+                } label: {
+                    LabeledContent("Arrange Selected") {
+                        Text(displayCurrencies.map(\.rawValue).joined(separator: ", "))
+                            .foregroundStyle(.primary)
+                    }
+                }
+                .padding(12)
+                .background {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                }
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             } header: {
                 VStack(alignment: .leading, spacing: 12) {
                     Label("Track Wealth Across Global Currencies", systemImage: "globe")
