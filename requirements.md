@@ -1,14 +1,14 @@
 # My Wealth - Requirements
 
-Last updated: May 22, 2026
+Last updated: May 25, 2026
 
-This document defines the current product requirements for the My Wealth iOS app and its exchange-rate proxy. It reflects the current app state: onboarding, local asset and liability tracking, multi-currency net worth, exchange-rate caching, portfolio history, reminders, and the Firebase rate proxy.
+This document defines the current product requirements for the My Wealth iOS app and its exchange-rate proxy. It reflects the current app state: onboarding, local asset and liability tracking, multi-currency net worth, display-currency ordering, exchange-rate caching, portfolio history, widgets, iCloud sync, backup import/export, reminders, and the Firebase rate proxy.
 
 ## Product Overview
 
-My Wealth is a SwiftUI iOS app for tracking personal net worth across currencies. Users can configure preferred currencies, add and maintain assets and liabilities, view converted portfolio totals, monitor transfer rates, review portfolio insights and history, and rely on cached exchange-rate data fetched through a Firebase proxy.
+My Wealth is a SwiftUI iOS app for tracking personal net worth across currencies. Users can configure preferred currencies, arrange display-currency priority, add and maintain assets and liabilities, view converted portfolio totals, monitor transfer rates, review portfolio insights and history, see widget summaries, and rely on cached exchange-rate data fetched through a Firebase proxy.
 
-User financial data is currently local to the device. The app does not provide cloud sync, account aggregation, bank connections, or remote user accounts.
+User financial data is stored locally by default. Users may opt into iCloud-backed backup and sync through their personal iCloud account. The app does not provide account aggregation, bank connections, or remote app-managed user accounts.
 
 ## Current App Structure
 
@@ -16,8 +16,10 @@ User financial data is currently local to the device. The app does not provide c
 - Returning users open into a tab-based app experience.
 - The main tabs are Dashboard, Assets, Net Worth, Rates, and Settings.
 - Assets, liabilities, asset value snapshots, and net worth snapshots are stored with SwiftData.
-- Onboarding state, currency settings, exchange-rate cache data, and reminder preferences are stored with UserDefaults.
+- Onboarding state, currency settings, exchange-rate cache data, iCloud sync state, and reminder preferences are stored with UserDefaults.
+- Optional CloudKit/iCloud sync can back up and synchronize the SwiftData store.
 - Exchange rates are fetched through a Firebase HTTPS Cloud Function, not directly from the external provider.
+- Widget snapshots are written to an App Group UserDefaults suite and read by the WidgetKit extension.
 
 ## Functional Requirements
 
@@ -35,6 +37,9 @@ User financial data is currently local to the device. The app does not provide c
 - **FR1.10**: Users must be able to update reminder preferences from the Settings tab after onboarding.
 - **FR1.11**: Settings must allow users to toggle compact formatting for large currency totals.
 - **FR1.12**: Settings must display app version information.
+- **FR1.13**: Onboarding must include an iCloud sync step that users can enable or skip.
+- **FR1.14**: Settings must allow users to enable or disable iCloud sync when iCloud is available.
+- **FR1.15**: Settings must provide backup export, backup import, and history cleanup actions.
 
 ### 2. Currency Selection
 
@@ -44,6 +49,8 @@ User financial data is currently local to the device. The app does not provide c
 - **FR2.4**: Currency pickers must group non-common currencies alphabetically by currency code.
 - **FR2.5**: Selected currencies must display both the ISO-style code and human-readable currency name.
 - **FR2.6**: Currency preference changes must trigger exchange-rate refresh checks when selected currencies require unavailable rates.
+- **FR2.7**: Users must be able to arrange selected display currencies so higher-priority currencies appear first in totals, rates, and widgets.
+- **FR2.8**: Currency arrangement must preserve the base currency and avoid duplicate display-currency entries.
 
 ### 3. Asset Management
 
@@ -81,6 +88,7 @@ User financial data is currently local to the device. The app does not provide c
 - **FR5.5**: The Net Worth tab must display converted net worth totals, exchange-rate status, net worth trend, and recent asset history.
 - **FR5.6**: The Rates tab must display exchange-rate information between the base currency and selected display currencies, with refresh support and rate status messaging.
 - **FR5.7**: The Settings tab must allow users to update currency preferences, reminder preferences, compact total formatting, and view app version information.
+- **FR5.8**: The Settings tab must expose data cleanup, backup export, backup import, and iCloud sync controls.
 
 ### 6. Dashboard, Assets, and Net Worth Views
 
@@ -98,6 +106,7 @@ User financial data is currently local to the device. The app does not provide c
 - **FR6.12**: Allocation charts must group assets by category and use the configured base currency for converted category totals.
 - **FR6.13**: Net worth trend charts must use recorded `NetWorthSnapshot` data for the active base currency.
 - **FR6.14**: Recent history must use recorded `AssetValueSnapshot` data and display the most recent asset value changes first.
+- **FR6.15**: Converted totals and transfer-rate previews must respect the user-arranged display-currency order.
 
 ### 7. Exchange Rates and Conversion
 
@@ -156,14 +165,27 @@ User financial data is currently local to the device. The app does not provide c
 - **FR10.7**: Reminder preferences must persist locally using UserDefaults.
 - **FR10.8**: Compact total formatting preference must persist locally using UserDefaults.
 - **FR10.9**: The app must restore persisted assets, liabilities, snapshots, settings, and reminder preferences across launches.
+- **FR10.10**: Users must be able to export a backup containing assets, liabilities, asset value snapshots, and net worth snapshots.
+- **FR10.11**: Users must be able to import a valid backup and restore the exported app data.
+- **FR10.12**: When iCloud sync is enabled, the SwiftData store must use the user's personal iCloud account for backup and sync.
+- **FR10.13**: Lightweight settings sync must push and pull supported settings through iCloud key-value storage when iCloud sync is enabled.
+
+### 11. Widgets
+
+- **FR11.1**: The app must include a WidgetKit extension for home screen and lock screen net worth summaries.
+- **FR11.2**: The main app must write widget snapshots to the shared App Group `group.com.bv.MyWealth`.
+- **FR11.3**: Widget snapshots must include net worth, asset total, liability total, base currency, selected secondary currency totals, and last-updated time.
+- **FR11.4**: Widget secondary currency totals must follow the user-arranged display-currency order and omit the base currency.
+- **FR11.5**: The widget extension must show placeholder or empty-state content when no app snapshot is available yet.
+- **FR11.6**: The main app must request WidgetKit timeline reloads after writing updated widget data.
 
 ## Non-Functional Requirements
 
 ### 1. Platform and Tooling
 
-- **NFR1.1**: The app must target iOS 17.0 or later.
+- **NFR1.1**: The app must target iOS 26.1 or later.
 - **NFR1.2**: The app must be built with SwiftUI, SwiftData, Observation, Charts, UserNotifications, and async/await.
-- **NFR1.3**: The project must remain compatible with Swift 5.10 or later.
+- **NFR1.3**: The project must remain compatible with Swift 6.0 or later.
 - **NFR1.4**: The project must remain compatible with Xcode 26.1 or later.
 
 ### 2. Usability
@@ -192,12 +214,13 @@ User financial data is currently local to the device. The app does not provide c
 - **NFR4.5**: Notification scheduling must not produce concurrency warnings or data races.
 - **NFR4.6**: Conversion and insight calculations must handle empty asset and liability collections without crashing.
 - **NFR4.7**: Snapshot recording must avoid duplicate rows for insignificant value changes.
+- **NFR4.8**: Widget data writes must fail gracefully if the App Group container is unavailable.
 
 ### 5. Security and Privacy
 
 - **NFR5.1**: Third-party API keys must be stored in Firebase Secret Manager, not in iOS source code or app bundles.
 - **NFR5.2**: The Firebase function must avoid returning provider secrets to the client.
-- **NFR5.3**: User asset, liability, and snapshot data must stay local to the device unless a future sync feature explicitly changes that requirement.
+- **NFR5.3**: User asset, liability, and snapshot data must stay local to the device unless the user enables iCloud sync.
 - **NFR5.4**: Public privacy content must accurately describe data handling for the deployed app.
 - **NFR5.5**: The app must not expose exchange-rate provider credentials through logs, UI, source control, or app configuration.
 
@@ -209,6 +232,8 @@ User financial data is currently local to the device. The app does not provide c
 - **NFR6.4**: The exchange-rate provider must remain replaceable without changing tab UI code.
 - **NFR6.5**: UserDefaults-backed settings must be injectable or otherwise testable without polluting real user defaults.
 - **NFR6.6**: Reminder scheduling should remain isolated behind reminder manager, scheduler, and preference store types.
+- **NFR6.7**: Widget snapshot writing and reading should remain isolated behind shared widget data-store helpers.
+- **NFR6.8**: Data import/export should remain isolated from SwiftUI views behind dedicated data portability helpers.
 
 ## Current Scope Notes
 
@@ -217,7 +242,30 @@ User financial data is currently local to the device. The app does not provide c
 - The Assets tab is the primary record-management surface for both assets and liabilities.
 - The Net Worth tab provides a focused converted net worth and trend view.
 - The Rates tab displays transfer-rate rows for configured display currencies relative to the selected base currency.
-- The app records portfolio history but does not yet prune old snapshot records. Snapshot retention is documented separately as a planned enhancement in `docs/snapshot-retention-enhancement.md`.
+- Home and lock screen widgets display net worth summaries from the most recent app-written snapshot.
+- iCloud sync and backup import/export are available from onboarding and Settings.
+- The app records portfolio history but does not yet prune old snapshot records.
 - Trend charts currently use recent snapshots; user-selectable time ranges are future scope.
 - Asset-specific detail/history screens are future scope; tapping a record currently opens its edit form.
-- CSV export/import, iCloud sync, biometric app lock, rate alerts, and allocation targets are future scope.
+- CSV import/export, biometric app lock, rate alerts, and allocation targets are future scope.
+
+## Planned Enhancements
+
+### Snapshot Retention
+
+The app records portfolio history using persistent SwiftData models for asset value snapshots and net worth snapshots. Duplicate cleanup exists for older data, but old snapshots can still accumulate over time because long-term retention pruning is not yet implemented.
+
+Recommended retention defaults:
+
+- Keep the latest 30 `NetWorthSnapshot` records per currency.
+- Keep the latest 100 `AssetValueSnapshot` records per asset.
+- Delete older records after new snapshots are inserted.
+
+Acceptance criteria for this enhancement:
+
+- The dashboard continues to record asset and net worth history as it does today.
+- Old net worth snapshots are pruned beyond the per-currency limit.
+- Old asset value snapshots are pruned beyond the per-asset limit.
+- Snapshot pruning does not delete current `Asset` records.
+- Snapshot pruning does not delete recent history needed by the dashboard.
+- Unit tests cover retention behavior for both snapshot models.
