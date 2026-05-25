@@ -159,6 +159,44 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func displayCurrencyOrderCanBeRearrangedAndPersisted() async throws {
+        let defaults = try makeIsolatedDefaults()
+        let settings = AppSettings(
+            userDefaults: defaults,
+            hasMadeReminderChoice: { true }
+        )
+
+        settings.completeOnboarding(
+            baseCurrency: .usd,
+            displayCurrencies: [.eur, .inr, .gbp]
+        )
+
+        settings.moveTotalCurrencies(fromOffsets: IndexSet(integer: 3), toOffset: 1)
+
+        let restoredSettings = AppSettings(
+            userDefaults: defaults,
+            hasMadeReminderChoice: { true }
+        )
+
+        #expect(settings.totalCurrencies == [.usd, .gbp, .eur, .inr])
+        #expect(restoredSettings.totalCurrencies == [.usd, .gbp, .eur, .inr])
+    }
+
+    @MainActor
+    @Test func displayCurrencyTogglePreservesPriorityOrderAndBaseCurrency() async throws {
+        let defaults = try makeIsolatedDefaults()
+        let settings = AppSettings(
+            userDefaults: defaults,
+            hasMadeReminderChoice: { true }
+        )
+
+        settings.toggleTotalCurrency(.eur)
+        settings.toggleTotalCurrency(.usd)
+
+        #expect(settings.totalCurrencies == [.usd, .inr, .eur])
+    }
+
+    @MainActor
     @Test func transferRateRowsConvertFromBaseCurrencyToDisplayCurrencies() async throws {
         let viewModel = DashboardViewModel(autoRefreshRate: false)
         viewModel.exchangeRates = [

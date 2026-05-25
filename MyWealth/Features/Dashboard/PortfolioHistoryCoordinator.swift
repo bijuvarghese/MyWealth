@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import WidgetKit
 
 struct PortfolioHistoryCoordinator {
     let assets: [Asset]
@@ -66,6 +67,40 @@ struct PortfolioHistoryCoordinator {
             modelContext: modelContext
         )
     }
+
+    /// Computes the current net worth and writes it to the shared App Group
+    /// container so home-screen and lock-screen widgets stay up to date.
+    func writeWidgetSnapshot() {
+        let rates = viewModel.exchangeRates
+        let base = settings.baseCurrency
+
+        guard
+            let netWorth = viewModel.netWorthTotal(assets, liabilities: liabilities, to: base, exchangeRates: rates),
+            let assetTotal = viewModel.convertedTotal(assets, to: base, exchangeRates: rates),
+            let liabilityTotal = viewModel.convertedLiabilityTotal(liabilities, to: base, exchangeRates: rates)
+        else { return }
+
+        // Build secondary-currency totals for the medium widget (skip base currency).
+        let currencyTotals: [WidgetSnapshot.CurrencyEntry] = settings.totalCurrencies
+            .filter { $0 != base && $0 != .none }
+            .compactMap { currency in
+                guard let amount = viewModel.netWorthTotal(
+                    assets,
+                    liabilities: liabilities,
+                    to: currency,
+                    exchangeRates: rates
+                ) else { return nil }
+                return WidgetSnapshot.CurrencyEntry(code: currency.rawValue, amount: amount)
+            }
+
+        WidgetDataWriter.write(
+            netWorth: netWorth,
+            assetTotal: assetTotal,
+            liabilityTotal: liabilityTotal,
+            baseCurrency: base.rawValue,
+            currencyTotals: currencyTotals
+        )
+    }
 }
 
 struct PortfolioHistoryCoordinationModifier: ViewModifier {
@@ -78,6 +113,7 @@ struct PortfolioHistoryCoordinationModifier: ViewModifier {
                     requiredCurrencies: coordinator.requiredExchangeRateCurrencies
                 )
                 coordinator.recordPortfolioHistory()
+                coordinator.writeWidgetSnapshot()
             }
             .onChange(of: coordinator.assetSnapshotSignature) {
                 Task {
@@ -85,6 +121,7 @@ struct PortfolioHistoryCoordinationModifier: ViewModifier {
                         requiredCurrencies: coordinator.requiredExchangeRateCurrencies
                     )
                     coordinator.recordPortfolioHistory()
+                    coordinator.writeWidgetSnapshot()
                 }
             }
             .onChange(of: coordinator.liabilitySnapshotSignature) {
@@ -93,6 +130,7 @@ struct PortfolioHistoryCoordinationModifier: ViewModifier {
                         requiredCurrencies: coordinator.requiredExchangeRateCurrencies
                     )
                     coordinator.recordPortfolioHistory()
+                    coordinator.writeWidgetSnapshot()
                 }
             }
             .onChange(of: coordinator.settings.baseCurrency) {
@@ -101,6 +139,7 @@ struct PortfolioHistoryCoordinationModifier: ViewModifier {
                         requiredCurrencies: coordinator.requiredExchangeRateCurrencies
                     )
                     coordinator.recordPortfolioHistory()
+                    coordinator.writeWidgetSnapshot()
                 }
             }
             .onChange(of: coordinator.settings.totalCurrencies) {
@@ -109,10 +148,12 @@ struct PortfolioHistoryCoordinationModifier: ViewModifier {
                         requiredCurrencies: coordinator.requiredExchangeRateCurrencies
                     )
                     coordinator.recordPortfolioHistory()
+                    coordinator.writeWidgetSnapshot()
                 }
             }
             .onChange(of: coordinator.rateSnapshotSignature) {
                 coordinator.recordPortfolioHistory()
+                coordinator.writeWidgetSnapshot()
             }
     }
 }
