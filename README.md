@@ -108,6 +108,17 @@ The iOS app reads `ExchangeRateProxyURL` from `MyWealth/Info.plist`, which is cu
 
 After deployment, `refreshExchangeRateCache` keeps the server cache warm automatically. If the cache entity does not exist yet, the public `latestExchangeRate` endpoint will fetch and create it once, then future user requests will read from Datastore.
 
+### Cache Freshness Check
+
+For automation or manual health checks, run:
+
+```sh
+./scripts/check-cache-freshness.sh
+```
+
+The script checks both the exchange-rate and metal-price Firebase endpoints by default, reads each `cacheTimestamp` from the JSON response, and exits non-zero if either cache is older than 8 hours. Use `--exchange-only` or `--metal-only` for a single-endpoint check, `--threshold-hours N` to change the freshness window, or `--url URL` together with a single-endpoint option to override the endpoint.
+If the automation sets `SLACK_WEBHOOK_URL`, the script also posts the full run summary to Slack after every run.
+
 ## Local Development
 
 Open `MyWealth.xcodeproj` in Xcode, select the `MyWealth` scheme, and run the app on an iOS simulator or device.
