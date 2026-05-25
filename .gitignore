@@ -5,6 +5,7 @@ functions/.env.*
 functions/.secret.local
 firebase-debug.log
 firebase-debug.*.log
+.firebase/
 
 # GCP / Firebase service account keys — never commit these
 *service-account*.json
