@@ -1,0 +1,13 @@
+{
+  "name": "cache-check-service",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Cloud Run service for triggering the MyWealth cache freshness check",
+  "main": "server.js",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}

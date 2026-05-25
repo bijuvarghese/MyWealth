@@ -119,6 +119,38 @@ For automation or manual health checks, run:
 The script checks both the exchange-rate and metal-price Firebase endpoints by default, reads each `cacheTimestamp` from the JSON response, and exits non-zero if either cache is older than 8 hours. Use `--exchange-only` or `--metal-only` for a single-endpoint check, `--threshold-hours N` to change the freshness window, or `--url URL` together with a single-endpoint option to override the endpoint.
 If the automation sets `SLACK_WEBHOOK_URL`, the script also posts the full run summary to Slack after every run.
 
+### Cloud Run Trigger
+
+If you want to trigger the cache check remotely from your phone, deploy the included Cloud Run service:
+
+```sh
+RUN_CHECK_TOKEN="choose-a-long-random-token" \
+SLACK_WEBHOOK_URL="https://hooks.slack.com/services/..." \
+./scripts/deploy-cache-check-cloud-run.sh
+```
+
+The deploy script builds and deploys `mywealth-cache-check` to Cloud Run in project `mywealth-api-router` and sets the token and Slack webhook as environment variables.
+
+After deployment:
+
+```sh
+curl -X POST "https://YOUR_CLOUD_RUN_URL/run" \
+  -H "Authorization: Bearer YOUR_RUN_CHECK_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+The service exposes:
+
+- `GET /healthz` for a simple health check
+- `POST /run` to execute the cache check, return a JSON report, and optionally post to Slack
+
+Optional `POST /run` JSON body fields:
+
+- `thresholdHours`: override the default 8-hour staleness threshold
+- `only`: `"exchange"` or `"metal"` to check a single endpoint
+- `slack`: `false` to skip Slack delivery for that run
+
 ## Local Development
 
 Open `MyWealth.xcodeproj` in Xcode, select the `MyWealth` scheme, and run the app on an iOS simulator or device.

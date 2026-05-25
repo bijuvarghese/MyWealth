@@ -299,7 +299,12 @@ final class DashboardViewModel: AssetOperations {
             )
         }
 
-        return nil
+        // Happy path — always show a freshness indicator so the banner is visible.
+        return RateStatusModel(
+            systemImage: "checkmark.circle",
+            message: "Updated \(lastUpdated.formatted(.relative(presentation: .numeric)))",
+            style: .neutral
+        )
     }
 
     func transferRateRows(

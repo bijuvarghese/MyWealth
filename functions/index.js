@@ -391,7 +391,7 @@ async function refreshCachedMetalPrices(reason) {
 exports.refreshMetalPriceCache = onSchedule(
   {
     region: REGION,
-    schedule: "0 0,12 * * *",
+    schedule: "0 0,8,16 * * *",
     timeZone: "Etc/UTC",
     secrets: [metalPriceApiKey],
     maxInstances: 1,

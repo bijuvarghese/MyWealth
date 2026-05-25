@@ -49,7 +49,7 @@ struct TransferRatesView: View {
                                 if let rateStatus = viewModel.rateStatus {
                                     Divider()
                                     RateStatusBannerView(status: rateStatus)
-                                        .transferRatesListRow()
+                                        .frame(height: 24)
                                 }
                             }
                         }
@@ -68,7 +68,7 @@ struct TransferRatesView: View {
                                 if let metalStatus = metalViewModel.statusBanner {
                                     Divider()
                                     RateStatusBannerView(status: metalStatus)
-                                        .transferRatesListRow()
+                                        .frame(height: 24)
                                 }
                             }
                         }
