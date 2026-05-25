@@ -256,7 +256,8 @@ struct MyWealthTests {
                 date: "2026-05-20",
                 rates: ["EUR": 0.5, "INR": 80],
                 success: true,
-                timestamp: 1_779_264_000
+                timestamp: 1_779_264_000,
+                cacheTimestamp: 1_779_300_000
             )
         )
         let viewModel = DashboardViewModel(
@@ -278,7 +279,65 @@ struct MyWealthTests {
         #expect(viewModel.exchangeRates["EUR"] == 0.5)
         #expect(restoredViewModel.exchangeRate == 80)
         #expect(restoredViewModel.exchangeRates["INR"] == 80)
+        #expect(viewModel.lastUpdated == Date(timeIntervalSince1970: 1_779_300_000))
+        #expect(restoredViewModel.lastUpdated == Date(timeIntervalSince1970: 1_779_300_000))
         #expect(viewModel.rateErrorMessage == nil)
+    }
+
+    @MainActor
+    @Test func exchangeRateRefreshIfNeededCallsCachedBackendEvenWhenUpdatedToday() async throws {
+        let defaults = try makeIsolatedDefaults()
+        defaults.set(["EUR": 0.5, "USD": 1], forKey: "exchangeRate.rates")
+        defaults.set(Date().timeIntervalSince1970, forKey: "exchangeRate.lastUpdated")
+        let service = StubExchangeRateService(
+            response: RateResponse(
+                base: "USD",
+                date: "2026-05-24",
+                rates: ["EUR": 0.6, "INR": 83],
+                success: true,
+                timestamp: 1_779_609_600,
+                cacheTimestamp: 1_779_620_000
+            )
+        )
+        let viewModel = DashboardViewModel(
+            autoRefreshRate: false,
+            userDefaults: defaults,
+            exchangeRateService: service
+        )
+
+        await viewModel.refreshExchangeRateIfNeeded(requiredCurrencies: [.eur])
+
+        #expect(service.fetchCount == 1)
+        #expect(viewModel.exchangeRates["EUR"] == 0.6)
+        #expect(viewModel.exchangeRates["INR"] == 83)
+        #expect(viewModel.lastUpdated == Date(timeIntervalSince1970: 1_779_620_000))
+    }
+
+    @MainActor
+    @Test func metalPriceRefreshIfNeededCallsCachedBackendEvenWhenUpdatedToday() async throws {
+        let defaults = try makeIsolatedDefaults()
+        defaults.set(["XAU": 0.0004], forKey: "metalPrice.rates")
+        defaults.set(Date().timeIntervalSince1970, forKey: "metalPrice.lastUpdated")
+        let service = StubMetalPriceService(
+            response: RateResponse(
+                base: "USD",
+                date: "2026-05-24",
+                rates: ["XAU": 0.0005],
+                success: true,
+                timestamp: 1_779_609_600,
+                cacheTimestamp: 1_779_620_000
+            )
+        )
+        let viewModel = MetalPricesViewModel(
+            userDefaults: defaults,
+            metalPriceService: service
+        )
+
+        await viewModel.refreshIfNeeded()
+
+        #expect(service.fetchCount == 1)
+        #expect(viewModel.metalRates["XAU"] == 0.0005)
+        #expect(viewModel.lastUpdated == Date(timeIntervalSince1970: 1_779_620_000))
     }
 
     @MainActor
@@ -290,7 +349,8 @@ struct MyWealthTests {
                 date: "2026-05-20",
                 rates: ["EUR": 0.5],
                 success: true,
-                timestamp: 1_779_264_000
+                timestamp: 1_779_264_000,
+                cacheTimestamp: nil
             )
         )
         let viewModel = DashboardViewModel(
@@ -316,7 +376,8 @@ struct MyWealthTests {
                 date: "2026-05-20",
                 rates: ["EUR": 0.5],
                 success: true,
-                timestamp: 1_779_264_000
+                timestamp: 1_779_264_000,
+                cacheTimestamp: nil
             )
         )
         let viewModel = DashboardViewModel(
@@ -747,11 +808,31 @@ struct MyWealthTests {
         var lastReminderDate: Date?
     }
 
-    private struct StubExchangeRateService: ExchangeRateFetching {
+    private final class StubExchangeRateService: ExchangeRateFetching {
         let response: RateResponse
+        private(set) var fetchCount = 0
+
+        init(response: RateResponse) {
+            self.response = response
+        }
 
         func fetchLatestExchangeRates() async throws -> RateResponse {
-            response
+            fetchCount += 1
+            return response
+        }
+    }
+
+    private final class StubMetalPriceService: MetalPriceFetching {
+        let response: RateResponse
+        private(set) var fetchCount = 0
+
+        init(response: RateResponse) {
+            self.response = response
+        }
+
+        func fetchLatestMetalPrices() async throws -> RateResponse {
+            fetchCount += 1
+            return response
         }
     }
 

@@ -251,6 +251,70 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 
 ## Planned Enhancements
 
+### MyWealth 3.2+ Suggested Features
+
+These feature ideas build on the existing portfolio history, liability tracking, data portability, and iOS platform foundations. They are not current shipped behavior.
+
+#### Net Worth Goals
+
+Let users set a target net worth, such as `₹1 Cr by Dec 2027`, and show progress toward that target.
+
+Potential requirements:
+
+- Users can create, edit, and remove one active net worth goal.
+- Goals include a target amount, target currency, and target date.
+- The Dashboard or Net Worth tab shows a progress ring against the active goal.
+- The app estimates time-to-goal from historical net worth snapshots when enough history exists.
+- The estimate falls back gracefully when there is not enough history or growth is flat/negative.
+
+#### Debt Payoff Insights
+
+Extend liabilities with optional payment assumptions so the app can show payoff guidance.
+
+Potential requirements:
+
+- Users can enter monthly payment amount, interest rate, and payment start date for each liability.
+- Liability detail views show estimated payoff date and total interest paid.
+- The app displays a simple amortization curve for liabilities with enough payoff data.
+- Calculations handle zero-interest debt, missing payment assumptions, and payments that are too small to amortize the balance.
+- Payoff insights complement the liability breakdown without blocking basic liability tracking.
+
+#### Manual Value History for Non-Market Assets
+
+Let users log dated value updates for assets that do not have live market prices, such as real estate, cars, and personal property.
+
+Potential requirements:
+
+- Users can add a value update with amount, currency, date, and optional note.
+- Asset detail views show manual value history chronologically.
+- Trend charts can use dated manual values instead of only the latest entered amount.
+- The app preserves the existing asset snapshot behavior for edits while allowing intentional historical entries.
+- Manual value history supports asset categories where market pricing is unavailable or impractical.
+
+#### Export and Share
+
+Add polished, shareable exports on top of the existing backup/restore flow.
+
+Potential requirements:
+
+- Users can export the current portfolio snapshot as PDF.
+- Users can export portfolio tables as CSV for advisors, tax preparation, or personal records.
+- Exported snapshots include assets, liabilities, totals, base currency, selected display currencies, and generated-at date.
+- Users can share a private net worth card as a stylized image without exposing unnecessary account details.
+- Export actions clearly distinguish shareable reports from full backup/restore files.
+
+#### Siri Shortcuts and Spotlight
+
+Use App Intents and Spotlight to make common portfolio lookups feel native on iOS.
+
+Potential requirements:
+
+- Users can ask Siri for current net worth.
+- App Shortcuts can expose quick actions such as opening Dashboard, adding an asset, or viewing rates.
+- Spotlight can surface asset names and open matching records in the app.
+- Search indexing respects privacy expectations and avoids exposing sensitive values in public previews unless explicitly enabled.
+- Shortcut responses use the user's base currency and current compact-format preference.
+
 ### Snapshot Retention
 
 The app records portfolio history using persistent SwiftData models for asset value snapshots and net worth snapshots. Duplicate cleanup exists for older data, but old snapshots can still accumulate over time because long-term retention pruning is not yet implemented.

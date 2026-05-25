@@ -112,6 +112,17 @@ function normalizeExchangeRatePayload(payload) {
   };
 }
 
+function withCacheTimestamp(payload, refreshedAt) {
+  const refreshedDate = refreshedAt instanceof Date ? refreshedAt : new Date(refreshedAt);
+  const cacheTimestamp = Number.isNaN(refreshedDate.getTime())
+    ? Math.floor(Date.now() / 1000)
+    : Math.floor(refreshedDate.getTime() / 1000);
+  return {
+    ...payload,
+    cacheTimestamp,
+  };
+}
+
 async function fetchLatestExchangeRatePayload() {
   const apiKey = exchangeRatesApiKey.value();
   const url = new URL("https://api.apilayer.com/exchangerates_data/latest");
@@ -136,7 +147,7 @@ async function fetchLatestExchangeRatePayload() {
   return normalizeExchangeRatePayload(payload);
 }
 
-async function writeExchangeRateCache(payload) {
+async function writeExchangeRateCache(payload, refreshedAt = new Date()) {
   await datastore.save({
     key: cacheKey(),
     data: [
@@ -159,7 +170,7 @@ async function writeExchangeRateCache(payload) {
       },
       {
         name: "refreshedAt",
-        value: new Date(),
+        value: refreshedAt,
       },
     ],
   });
@@ -173,20 +184,21 @@ async function readCachedExchangeRatePayload() {
 
   const payload = JSON.parse(entity.payload);
   return validateExchangeRatePayload(payload)
-    ? normalizeExchangeRatePayload(payload)
+    ? withCacheTimestamp(normalizeExchangeRatePayload(payload), entity.refreshedAt)
     : null;
 }
 
 async function refreshCachedExchangeRates(reason) {
   const payload = await fetchLatestExchangeRatePayload();
-  await writeExchangeRateCache(payload);
+  const refreshedAt = new Date();
+  await writeExchangeRateCache(payload, refreshedAt);
   logger.info("Exchange rate cache refreshed", {
     reason,
     base: payload.base ?? EXCHANGE_RATE_BASE,
     rateCount: Object.keys(payload.rates ?? {}).length,
     providerDate: payload.date ?? null,
   });
-  return payload;
+  return withCacheTimestamp(payload, refreshedAt);
 }
 
 exports.refreshExchangeRateCache = onSchedule(
@@ -310,6 +322,17 @@ function normalizeMetalPricePayload(payload) {
   };
 }
 
+function withMetalCacheTimestamp(payload, refreshedAt) {
+  const refreshedDate = refreshedAt instanceof Date ? refreshedAt : new Date(refreshedAt);
+  const cacheTimestamp = Number.isNaN(refreshedDate.getTime())
+    ? Math.floor(Date.now() / 1000)
+    : Math.floor(refreshedDate.getTime() / 1000);
+  return {
+    ...payload,
+    cacheTimestamp,
+  };
+}
+
 // Symbols to request from the API. Energy commodities (BRENT, WTI,
 // NATURALGAS, GASOLINE) require a paid plan and are excluded.
 // Specialty/rare metals are also omitted — requesting unavailable symbols
@@ -343,7 +366,7 @@ async function fetchLatestMetalPricePayload() {
   return normalizeMetalPricePayload(payload);
 }
 
-async function writeMetalPriceCache(payload) {
+async function writeMetalPriceCache(payload, refreshedAt = new Date()) {
   await datastore.save({
     key: metalCacheKey(),
     data: [
@@ -362,7 +385,7 @@ async function writeMetalPriceCache(payload) {
       },
       {
         name: "refreshedAt",
-        value: new Date(),
+        value: refreshedAt,
       },
     ],
   });
@@ -376,20 +399,21 @@ async function readCachedMetalPricePayload() {
 
   const payload = JSON.parse(entity.payload);
   return validateMetalPricePayload(payload)
-    ? normalizeMetalPricePayload(payload)
+    ? withMetalCacheTimestamp(normalizeMetalPricePayload(payload), entity.refreshedAt)
     : null;
 }
 
 async function refreshCachedMetalPrices(reason) {
   const payload = await fetchLatestMetalPricePayload();
-  await writeMetalPriceCache(payload);
+  const refreshedAt = new Date();
+  await writeMetalPriceCache(payload, refreshedAt);
   logger.info("Metal price cache refreshed", {
     reason,
     base: payload.base ?? METAL_PRICE_BASE,
     metalCount: Object.keys(payload.rates ?? {}).length,
     providerTimestamp: payload.timestamp ?? null,
   });
-  return payload;
+  return withMetalCacheTimestamp(payload, refreshedAt);
 }
 
 exports.refreshMetalPriceCache = onSchedule(
