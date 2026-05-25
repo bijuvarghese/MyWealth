@@ -70,7 +70,13 @@ enum HistorySanitizer {
         for snapshots in groups.values {
             var previous: AssetValueSnapshot? = nil
             for snapshot in snapshots {
-                if let prev = previous,
+                // Never deduplicate user-authored manual entries; they represent
+                // deliberate valuations on a chosen date, even if the amount
+                // matches the preceding snapshot.
+                let isManual = snapshot.isManual ?? false
+                if !isManual,
+                   let prev = previous,
+                   !(prev.isManual ?? false),
                    abs(prev.displayAmount - snapshot.displayAmount) < 0.01 {
                     modelContext.delete(snapshot)
                     removed += 1

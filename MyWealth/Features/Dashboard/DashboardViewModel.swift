@@ -425,7 +425,9 @@ final class DashboardViewModel: AssetOperations {
                     amount: snapshot.displayAmount,
                     currencyCode: snapshot.displayCurrencyCode,
                     categoryName: snapshot.displayCategoryName,
-                    recordedAt: snapshot.displayRecordedAt
+                    recordedAt: snapshot.displayRecordedAt,
+                    isManual: snapshot.isManual ?? false,
+                    note: snapshot.note
                 )
             }
     }
@@ -458,9 +460,34 @@ final class DashboardViewModel: AssetOperations {
                     amount: snapshot.displayAmount,
                     currencyCode: snapshot.displayCurrencyCode,
                     categoryName: snapshot.displayCategoryName,
-                    recordedAt: snapshot.displayRecordedAt
+                    recordedAt: snapshot.displayRecordedAt,
+                    isManual: snapshot.isManual ?? false,
+                    note: snapshot.note
                 )
             }
+    }
+
+    /// Inserts a user-authored `AssetValueSnapshot` for a non-market asset.
+    /// Unlike automatic snapshots, manual entries always persist regardless of
+    /// whether the amount has changed, and carry the user-supplied date and note.
+    func logManualValueEntry(
+        for asset: Asset,
+        amount: Double,
+        date: Date,
+        note: String?,
+        modelContext: ModelContext
+    ) {
+        let snapshot = AssetValueSnapshot(
+            assetIdentifier: asset.stableHistoryIdentifier,
+            assetName: asset.displayName,
+            amount: amount,
+            currencyCode: asset.displayCurrency.rawValue,
+            categoryName: asset.displayCategory.rawValue,
+            recordedAt: date,
+            isManual: true,
+            note: note
+        )
+        modelContext.insert(snapshot)
     }
 
     func portfolioInsightRows(
@@ -885,6 +912,8 @@ struct AssetHistoryRow: Identifiable {
     let currencyCode: String
     let categoryName: String
     let recordedAt: Date
+    var isManual: Bool = false
+    var note: String? = nil
 }
 
 struct PortfolioInsightRow: Identifiable {

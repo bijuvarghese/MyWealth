@@ -270,34 +270,13 @@ const METAL_PRICE_CACHE_KIND = "MetalPriceCache";
 const METAL_PRICE_CACHE_NAME = "latest";
 const METAL_PRICE_BASE = "USD";
 
-// Symbols supported by metalpriceapi.com.
-// Adjust this list to match your subscription tier.
+// Symbols supported by the current MetalpriceAPI subscription.
 const SUPPORTED_METALS = [
   // Precious metals (per troy oz)
-  "XAU",        // Gold
   "XAG",        // Silver
-  "XPT",        // Platinum
+  "XAU",        // Gold
   "XPD",        // Palladium
-  "XRH",        // Rhodium
-
-  // Base metals
-  "XCU",        // Copper
-  "ALU",        // Aluminum
-  "NI",         // Nickel
-  "ZNC",        // Zinc
-  "XPB",        // Lead
-  "XSN",        // Tin
-  "IRON",       // Iron Ore
-  "XCO",        // Cobalt
-
-  // Specialty / rare metals
-  "XLI",        // Lithium
-  "XMO",        // Molybdenum
-  "XND",        // Neodymium
-  "XGA",        // Gallium
-  "XIN",        // Indium
-  "XTE",        // Tellurium
-  "XU",         // Uranium
+  "XPT",        // Platinum
 ];
 const supportedMetalSet = new Set(SUPPORTED_METALS);
 
@@ -333,16 +312,9 @@ function withMetalCacheTimestamp(payload, refreshedAt) {
   };
 }
 
-// Symbols to request from the API. Energy commodities (BRENT, WTI,
-// NATURALGAS, GASOLINE) require a paid plan and are excluded.
-// Specialty/rare metals are also omitted — requesting unavailable symbols
-// causes the whole response to fail with success:false.
-const FETCH_CURRENCIES = [
-  // Precious metals
-  "XAU", "XAG", "XPT", "XPD", "XRH",
-  // Base metals
-  "XCU", "ALU", "NI", "ZNC", "XPB", "XSN", "IRON", "XCO",
-];
+// Request only symbols supported by the current provider plan. Unsupported
+// symbols cause the provider to return success:false for the whole request.
+const FETCH_CURRENCIES = SUPPORTED_METALS;
 
 async function fetchLatestMetalPricePayload() {
   const apiKey = metalPriceApiKey.value();

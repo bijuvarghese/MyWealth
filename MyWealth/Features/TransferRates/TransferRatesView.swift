@@ -39,53 +39,42 @@ struct TransferRatesView: View {
 
                 List {
                     // Transfer rates
-                    Section(footer: FooterView(
-                        model: viewModel.getFooterData(
-                            assets,
-                            liabilities: liabilities,
-                            baseCurrency: settings.baseCurrency,
-                            displayCurrencies: settings.totalCurrencies
-                        )
-                    )) {
+                    Section {
                         TransferRatesCard {
-                            TransferRateWidgetView(
-                                rows: rows,
-                                baseCurrency: settings.baseCurrency
-                            )
+                            VStack(spacing: 8) {
+                                TransferRateWidgetView(
+                                    rows: rows,
+                                    baseCurrency: settings.baseCurrency
+                                )
+                                if let rateStatus = viewModel.rateStatus {
+                                    Divider()
+                                    RateStatusBannerView(status: rateStatus)
+                                        .transferRatesListRow()
+                                }
+                            }
                         }
                         .transferRatesListRow()
-                    }
-
-                    if let rateStatus = viewModel.rateStatus {
-                        Section {
-                            RateStatusBannerView(status: rateStatus)
-                                .transferRatesListRow()
-                        }
                     }
 
                     // Metal prices
-                    Section(footer: Group {
-                        if let metalsDate = metalViewModel.lastUpdated {
-                            PillLabel("Last updated: \(metalsDate.formatted(date: .abbreviated, time: .shortened))")
-                                .frame(maxWidth: .infinity)
-                        }
-                    }) {
+                    Section {
                         TransferRatesCard {
-                            MetalPriceWidgetView(
-                                groups: metalGroups,
-                                isLoading: metalViewModel.isLoading,
-                                lastUpdated: metalViewModel.lastUpdated
-                            )
+                            VStack(spacing: 8) {
+                                MetalPriceWidgetView(
+                                    groups: metalGroups,
+                                    isLoading: metalViewModel.isLoading,
+                                    lastUpdated: metalViewModel.lastUpdated
+                                )
+                                if let metalStatus = metalViewModel.statusBanner {
+                                    Divider()
+                                    RateStatusBannerView(status: metalStatus)
+                                        .transferRatesListRow()
+                                }
+                            }
                         }
                         .transferRatesListRow()
                     }
 
-                    if let metalStatus = metalViewModel.statusBanner {
-                        Section {
-                            RateStatusBannerView(status: metalStatus)
-                                .transferRatesListRow()
-                        }
-                    }
                 }
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
