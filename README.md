@@ -8,6 +8,10 @@
 [![Issues](https://img.shields.io/github/issues/bijuvarghese/MyWealth)](https://github.com/bijuvarghese/MyWealth/issues)
 # My Wealth
 
+[![iOS CI](https://github.com/bijuvarghese/MyWealth/actions/workflows/ios-ci.yml/badge.svg?branch=main)](https://github.com/bijuvarghese/MyWealth/actions/workflows/ios-ci.yml)
+[![Functions CI](https://github.com/bijuvarghese/MyWealth/actions/workflows/functions-ci.yml/badge.svg?branch=main)](https://github.com/bijuvarghese/MyWealth/actions/workflows/functions-ci.yml)
+[![Cache Monitor](https://github.com/bijuvarghese/MyWealth/actions/workflows/cache-monitor.yml/badge.svg?branch=main)](https://github.com/bijuvarghese/MyWealth/actions/workflows/cache-monitor.yml)
+
 My Wealth is a SwiftUI iOS app for tracking personal net worth across currencies. It supports manual asset and liability tracking, converted net worth totals, transfer-rate monitoring, portfolio insights, snapshot-based history, home and lock screen widgets, iCloud sync, backup import/export, and configurable portfolio reminders.
 
 User financial data is stored locally by default, with optional iCloud backup and sync controlled by the user. Exchange rates are fetched through a Firebase HTTPS Cloud Function so the external provider API key is never shipped in the app bundle.
