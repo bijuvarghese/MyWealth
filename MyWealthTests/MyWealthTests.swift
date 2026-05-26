@@ -238,7 +238,10 @@ struct MyWealthTests {
 
     @MainActor
     @Test func rateStatusShowsMissingRefreshAndErrors() async throws {
-        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        let viewModel = DashboardViewModel(
+            autoRefreshRate: false,
+            userDefaults: try makeIsolatedDefaults()
+        )
 
         #expect(viewModel.rateStatus?.message == "Exchange rates have not been refreshed yet.")
 
@@ -692,6 +695,70 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func chatGPTAnalysisExportAnonymizesHoldingsAndIncludesAnalysisContext() async throws {
+        let defaults = try makeIsolatedDefaults()
+        let settings = AppSettings(
+            userDefaults: defaults,
+            hasMadeReminderChoice: { true }
+        )
+        settings.completeOnboarding(
+            baseCurrency: .usd,
+            displayCurrencies: [.eur]
+        )
+        let modelContext = try makeInMemoryModelContext()
+        let asset = Asset(
+            name: "Secret Condo",
+            amount: 1_000,
+            currency: .usd,
+            category: .realEstate
+        )
+        let liability = Liability(
+            name: "Private Mortgage",
+            amount: 250,
+            currency: .usd,
+            category: .mortgage
+        )
+        modelContext.insert(asset)
+        modelContext.insert(liability)
+        modelContext.insert(PortfolioSnapshot(
+            assetTotal: 1_000,
+            liabilityTotal: 250,
+            currencyCode: "USD"
+        ))
+        try modelContext.save()
+
+        let url = try ChatGPTAnalysisExporter.buildAnalysisURL(
+            context: modelContext,
+            settings: settings,
+            exchangeRates: ["USD": 1, "EUR": 0.5],
+            exchangeRatesLastUpdated: Date(timeIntervalSince1970: 1_779_300_000)
+        )
+        let markdown = try String(contentsOf: url, encoding: .utf8)
+        let payload = try ChatGPTAnalysisExporter.buildPayload(
+            context: modelContext,
+            settings: settings,
+            exchangeRates: ["USD": 1, "EUR": 0.5],
+            exchangeRatesLastUpdated: Date(timeIntervalSince1970: 1_779_300_000)
+        )
+
+        #expect(url.lastPathComponent == "Wealth-Map-ChatGPT-Analysis.md")
+        #expect(markdown.contains("comfort score"))
+        #expect(markdown.contains("analysisCurrencies"))
+        #expect(markdown.contains("Asset 1"))
+        #expect(markdown.contains("Liability 1"))
+        #expect(markdown.contains("Real Estate"))
+        #expect(markdown.contains("\"netWorth\" : 750"))
+        #expect(payload.analysisCurrencies.map(\.code) == ["USD", "EUR"])
+        #expect(payload.analysisCurrencies.first { $0.code == "USD" }?.convertedNetWorth == 750)
+        #expect(payload.analysisCurrencies.first { $0.code == "EUR" }?.convertedNetWorth == 375)
+        #expect(payload.analysisCurrencies.allSatisfy { !$0.countries.isEmpty })
+        #expect(!markdown.contains("Secret Condo"))
+        #expect(!markdown.contains("Private Mortgage"))
+        #expect(!markdown.contains(asset.stableHistoryIdentifier))
+        #expect(!markdown.contains(liability.historyIdentifier ?? ""))
+    }
+
+    @MainActor
     @Test func onboardingCompletionRequiresReminderChoice() async throws {
         let defaults = try makeIsolatedDefaults()
         let settings = AppSettings(
@@ -794,6 +861,7 @@ struct MyWealthTests {
             Liability.self,
             AssetValueSnapshot.self,
             NetWorthSnapshot.self,
+            PortfolioSnapshot.self,
         ])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: schema, configurations: [configuration])

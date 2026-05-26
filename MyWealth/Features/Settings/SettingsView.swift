@@ -11,6 +11,9 @@ struct SettingsView: View {
     @State private var cleanupResultMessage: String? = nil
     // Export
     @State private var exportURL: URL? = nil
+    @State private var chatGPTExportURL: URL? = nil
+    @State private var isGeneratingChatGPTExport = false
+    @State private var chatGPTExportProgressMessage = "Preparing ChatGPT report..."
     @State private var exportError: String? = nil
     // Import
     @State private var isImporting = false
@@ -41,6 +44,11 @@ struct SettingsView: View {
                     BaseCurrencySelectionView(settings: settings)
                 case .displayCurrencies:
                     TotalCurrencySelectionView(settings: settings)
+                }
+            }
+            .overlay {
+                if isGeneratingChatGPTExport {
+                    ChatGPTExportProgressOverlay(message: chatGPTExportProgressMessage)
                 }
             }
         }
@@ -85,12 +93,15 @@ struct SettingsView: View {
 
             Section("Data") {
                 cleanupButton
+                chatGPTAnalysisButton
                 exportButton
                 importButton
             }
         }
         .dataPortabilityModifiers(
             exportURL: $exportURL,
+            chatGPTExportURL: $chatGPTExportURL,
+            isPreparingChatGPTExport: $isGeneratingChatGPTExport,
             exportError: $exportError,
             isImporting: $isImporting,
             importResultMessage: $importResultMessage,
@@ -182,6 +193,11 @@ struct SettingsView: View {
                             Divider()
                                 .padding(.leading, 44)
                                 .padding(.vertical, 10)
+                            chatGPTAnalysisButton
+                                .buttonStyle(.plain)
+                            Divider()
+                                .padding(.leading, 44)
+                                .padding(.vertical, 10)
                             exportButton
                                 .buttonStyle(.plain)
                             Divider()
@@ -223,6 +239,8 @@ struct SettingsView: View {
         )
         .dataPortabilityModifiers(
             exportURL: $exportURL,
+            chatGPTExportURL: $chatGPTExportURL,
+            isPreparingChatGPTExport: $isGeneratingChatGPTExport,
             exportError: $exportError,
             isImporting: $isImporting,
             importResultMessage: $importResultMessage,
@@ -248,6 +266,50 @@ struct SettingsView: View {
         }
     }
 
+    private var chatGPTAnalysisButton: some View {
+        Button {
+            guard !isGeneratingChatGPTExport else { return }
+            chatGPTExportProgressMessage = "Preparing ChatGPT report..."
+            isGeneratingChatGPTExport = true
+
+            Task { @MainActor in
+                await Task.yield()
+                try? await Task.sleep(nanoseconds: 450_000_000)
+
+                do {
+                    let rateViewModel = DashboardViewModel(autoRefreshRate: false)
+                    let metalViewModel = MetalPricesViewModel()
+                    rateViewModel.enrichWithMetalRates(metalViewModel.metalRates)
+
+                    let url = try ChatGPTAnalysisExporter.buildAnalysisURL(
+                        context: modelContext,
+                        settings: settings,
+                        exchangeRates: rateViewModel.exchangeRates,
+                        exchangeRatesLastUpdated: latestDate(
+                            rateViewModel.lastUpdated,
+                            metalViewModel.lastUpdated
+                        )
+                    )
+                    chatGPTExportProgressMessage = "Opening share sheet..."
+                    chatGPTExportURL = url
+                } catch {
+                    isGeneratingChatGPTExport = false
+                    exportError = error.localizedDescription
+                }
+            }
+        } label: {
+            SettingsRow(
+                title: "Analyze with ChatGPT",
+                subtitle: isGeneratingChatGPTExport
+                    ? chatGPTExportProgressMessage
+                    : "Share a sanitized portfolio snapshot",
+                systemImage: "sparkles",
+                showsProgress: isGeneratingChatGPTExport
+            )
+        }
+        .disabled(isGeneratingChatGPTExport)
+    }
+
     private var importButton: some View {
         Button {
             isImporting = true
@@ -257,6 +319,19 @@ struct SettingsView: View {
                 subtitle: "Restore from a backup file",
                 systemImage: "square.and.arrow.down"
             )
+        }
+    }
+
+    private func latestDate(_ lhs: Date?, _ rhs: Date?) -> Date? {
+        switch (lhs, rhs) {
+        case (.some(let lhs), .some(let rhs)):
+            return max(lhs, rhs)
+        case (.some(let lhs), .none):
+            return lhs
+        case (.none, .some(let rhs)):
+            return rhs
+        case (.none, .none):
+            return nil
         }
     }
 
@@ -378,6 +453,30 @@ private enum SettingsRoute: Hashable {
     case displayCurrencies
 }
 
+private struct ChatGPTExportProgressOverlay: View {
+    let message: String
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.18)
+                .ignoresSafeArea()
+
+            VStack(spacing: 14) {
+                ProgressView()
+                    .controlSize(.large)
+                Text(message)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+            }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 22)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .shadow(color: .black.opacity(0.14), radius: 18, x: 0, y: 10)
+        }
+        .transition(.opacity)
+    }
+}
+
 private struct SettingsCard<Content: View>: View {
     let content: Content
 
@@ -403,6 +502,7 @@ private struct SettingsRow: View {
     var subtitle: String?
     let systemImage: String
     var showsDisclosureIndicator = false
+    var showsProgress = false
 
     var body: some View {
         HStack(spacing: 12) {
@@ -426,7 +526,10 @@ private struct SettingsRow: View {
 
             Spacer(minLength: 8)
 
-            if showsDisclosureIndicator {
+            if showsProgress {
+                ProgressView()
+                    .controlSize(.small)
+            } else if showsDisclosureIndicator {
                 Image(systemName: "chevron.right")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(.tertiary)
@@ -473,6 +576,8 @@ private extension View {
     /// Attaches the share sheet (export), file importer (import), and result alerts.
     func dataPortabilityModifiers(
         exportURL: Binding<URL?>,
+        chatGPTExportURL: Binding<URL?>,
+        isPreparingChatGPTExport: Binding<Bool>,
         exportError: Binding<String?>,
         isImporting: Binding<Bool>,
         importResultMessage: Binding<String?>,
@@ -486,6 +591,21 @@ private extension View {
                 set: { if !$0 { exportURL.wrappedValue = nil } }
             )) {
                 if let url = exportURL.wrappedValue {
+                    ActivityView(url: url)
+                        .ignoresSafeArea()
+                }
+            }
+            // ChatGPT analysis: sanitized Markdown snapshot shared through iOS.
+            .sheet(isPresented: Binding(
+                get: { chatGPTExportURL.wrappedValue != nil },
+                set: {
+                    if !$0 {
+                        chatGPTExportURL.wrappedValue = nil
+                        isPreparingChatGPTExport.wrappedValue = false
+                    }
+                }
+            )) {
+                if let url = chatGPTExportURL.wrappedValue {
                     ActivityView(url: url)
                         .ignoresSafeArea()
                 }
