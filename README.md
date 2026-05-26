@@ -1,3 +1,4 @@
+[![Latest Release](https://img.shields.io/github/v/release/bijuvarghese/MyWealth?label=latest%20release)](https://github.com/bijuvarghese/MyWealth/releases/latest)
 # My Wealth
 
 My Wealth is a SwiftUI iOS app for tracking personal net worth across currencies. It supports manual asset and liability tracking, converted net worth totals, transfer-rate monitoring, portfolio insights, snapshot-based history, home and lock screen widgets, iCloud sync, backup import/export, and configurable portfolio reminders.
