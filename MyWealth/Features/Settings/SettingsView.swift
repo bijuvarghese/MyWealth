@@ -14,6 +14,9 @@ struct SettingsView: View {
     @State private var chatGPTExportURL: URL? = nil
     @State private var isGeneratingChatGPTExport = false
     @State private var chatGPTExportProgressMessage = "Preparing ChatGPT report..."
+    @State private var isAnalyzingWithChatGPT = false
+    @State private var chatGPTAnalysisResult: ChatGPTInAppAnalysisResult? = nil
+    @State private var chatGPTAnalysisProgressMessage = "Analyzing portfolio..."
     @State private var exportError: String? = nil
     // Import
     @State private var isImporting = false
@@ -47,9 +50,16 @@ struct SettingsView: View {
                 }
             }
             .overlay {
-                if isGeneratingChatGPTExport {
-                    ChatGPTExportProgressOverlay(message: chatGPTExportProgressMessage)
+                if isGeneratingChatGPTExport || isAnalyzingWithChatGPT {
+                    ChatGPTExportProgressOverlay(
+                        message: isAnalyzingWithChatGPT
+                            ? chatGPTAnalysisProgressMessage
+                            : chatGPTExportProgressMessage
+                    )
                 }
+            }
+            .sheet(item: $chatGPTAnalysisResult) { result in
+                ChatGPTAnalysisResultView(result: result)
             }
         }
     }
@@ -94,6 +104,7 @@ struct SettingsView: View {
             Section("Data") {
                 cleanupButton
                 chatGPTAnalysisButton
+                inAppChatGPTAnalysisButton
                 exportButton
                 importButton
             }
@@ -194,6 +205,11 @@ struct SettingsView: View {
                                 .padding(.leading, 44)
                                 .padding(.vertical, 10)
                             chatGPTAnalysisButton
+                                .buttonStyle(.plain)
+                            Divider()
+                                .padding(.leading, 44)
+                                .padding(.vertical, 10)
+                            inAppChatGPTAnalysisButton
                                 .buttonStyle(.plain)
                             Divider()
                                 .padding(.leading, 44)
@@ -310,6 +326,40 @@ struct SettingsView: View {
         .disabled(isGeneratingChatGPTExport)
     }
 
+    private var inAppChatGPTAnalysisButton: some View {
+        Button {
+            guard !isAnalyzingWithChatGPT else { return }
+            chatGPTAnalysisProgressMessage = "Analyzing portfolio..."
+            isAnalyzingWithChatGPT = true
+
+            Task { @MainActor in
+                do {
+                    let payload = try buildChatGPTAnalysisPayload()
+                    let response = try await FirebaseChatGPTAnalysisService.shared.analyze(payload)
+                    isAnalyzingWithChatGPT = false
+                    chatGPTAnalysisResult = ChatGPTInAppAnalysisResult(
+                        analysis: response.analysis ?? "",
+                        model: response.model,
+                        responseId: response.responseId
+                    )
+                } catch {
+                    isAnalyzingWithChatGPT = false
+                    exportError = error.localizedDescription
+                }
+            }
+        } label: {
+            SettingsRow(
+                title: "Analyze In App",
+                subtitle: isAnalyzingWithChatGPT
+                    ? chatGPTAnalysisProgressMessage
+                    : "Get AI insights inside Wealth Map",
+                systemImage: "brain.head.profile",
+                showsProgress: isAnalyzingWithChatGPT
+            )
+        }
+        .disabled(isAnalyzingWithChatGPT)
+    }
+
     private var importButton: some View {
         Button {
             isImporting = true
@@ -333,6 +383,22 @@ struct SettingsView: View {
         case (.none, .none):
             return nil
         }
+    }
+
+    private func buildChatGPTAnalysisPayload() throws -> ChatGPTAnalysisExportPayload {
+        let rateViewModel = DashboardViewModel(autoRefreshRate: false)
+        let metalViewModel = MetalPricesViewModel()
+        rateViewModel.enrichWithMetalRates(metalViewModel.metalRates)
+
+        return try ChatGPTAnalysisExporter.buildPayload(
+            context: modelContext,
+            settings: settings,
+            exchangeRates: rateViewModel.exchangeRates,
+            exchangeRatesLastUpdated: latestDate(
+                rateViewModel.lastUpdated,
+                metalViewModel.lastUpdated
+            )
+        )
     }
 
     // MARK: - History cleanup
@@ -451,6 +517,54 @@ private enum SettingsRoute: Hashable {
     case reminders
     case baseCurrency
     case displayCurrencies
+}
+
+private struct ChatGPTInAppAnalysisResult: Identifiable {
+    let id = UUID()
+    let analysis: String
+    let model: String?
+    let responseId: String?
+}
+
+private struct ChatGPTAnalysisResultView: View {
+    @Environment(\.dismiss) private var dismiss
+    let result: ChatGPTInAppAnalysisResult
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    if let model = result.model {
+                        Label(model, systemImage: "sparkles")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Text(LocalizedStringKey(result.analysis))
+                        .font(.body)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    if let responseId = result.responseId {
+                        Text("Response ID: \(responseId)")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                            .textSelection(.enabled)
+                    }
+                }
+                .padding(20)
+            }
+            .navigationTitle("AI Analysis")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
 }
 
 private struct ChatGPTExportProgressOverlay: View {

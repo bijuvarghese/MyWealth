@@ -6,6 +6,7 @@ const { Datastore } = require("@google-cloud/datastore");
 
 const exchangeRatesApiKey = defineSecret("EXCHANGE_RATES_API_KEY");
 const metalPriceApiKey = defineSecret("METAL_PRICE_API_KEY");
+const openAIApiKey = defineSecret("OPENAI_API_KEY");
 const REGION = "us-central1";
 const EXCHANGE_RATE_CACHE_KIND = "ExchangeRateCache";
 const EXCHANGE_RATE_CACHE_NAME = "latest";
@@ -13,6 +14,10 @@ const EXCHANGE_RATE_BASE = "USD";
 const CLIENT_CACHE_SECONDS = 300;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 60;
+const MAX_AI_REQUESTS_PER_WINDOW = 8;
+const MAX_ANALYSIS_PAYLOAD_BYTES = 150_000;
+const OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses";
+const OPENAI_ANALYSIS_MODEL = "gpt-5-mini";
 const SUPPORTED_SYMBOLS = [
   "AED", "AFN", "ALL", "AMD", "ANG", "AOA", "ARS", "AUD", "AWG", "AZN",
   "BAM", "BBD", "BDT", "BGN", "BHD", "BIF", "BMD", "BND", "BOB", "BRL",
@@ -60,6 +65,10 @@ function clientIdentifier(request) {
 }
 
 function isRateLimited(identifier, now) {
+  return isRateLimitedFor(identifier, now, MAX_REQUESTS_PER_WINDOW);
+}
+
+function isRateLimitedFor(identifier, now, maxRequests) {
   pruneExpiredRequestCounts(now);
 
   const current = requestCountsByClient.get(identifier);
@@ -73,15 +82,61 @@ function isRateLimited(identifier, now) {
   }
 
   current.count += 1;
-  return current.count > MAX_REQUESTS_PER_WINDOW;
+  return current.count > maxRequests;
 }
 
 function sanitizeProviderError(payload) {
   return {
     code: payload?.error?.code ?? payload?.code ?? null,
     type: payload?.error?.type ?? payload?.type ?? null,
+    message: payload?.error?.message ?? payload?.message ?? null,
+    param: payload?.error?.param ?? null,
     success: payload?.success,
   };
+}
+
+function providerErrorDescription(payload) {
+  const providerError = sanitizeProviderError(payload);
+  return providerError.code
+    || providerError.type
+    || providerError.message
+    || "provider_error";
+}
+
+function outputTextFromOpenAIResponse(payload) {
+  if (typeof payload?.output_text === "string") {
+    return payload.output_text;
+  }
+
+  const output = Array.isArray(payload?.output) ? payload.output : [];
+  return output
+    .flatMap((item) => Array.isArray(item?.content) ? item.content : [])
+    .filter((content) => content?.type === "output_text" && typeof content.text === "string")
+    .map((content) => content.text)
+    .join("\n\n")
+    .trim();
+}
+
+function validateAnalysisPayload(payload) {
+  return payload
+    && typeof payload === "object"
+    && payload.product === "Wealth Map"
+    && typeof payload.analysisPrompt === "string"
+    && Array.isArray(payload.analysisCurrencies)
+    && payload.currentSummary
+    && typeof payload.currentSummary === "object";
+}
+
+function analysisInstructions() {
+  return [
+    "You are Wealth Map's in-app AI analysis assistant.",
+    "Analyze only the sanitized portfolio snapshot provided by the app.",
+    "Return clear Markdown with sections for: Summary, Country Comfort Scores, Currency Exposure, Relocation Feasibility, Retirement Sustainability, Risks, and Follow-up Questions.",
+    "For every analysis currency, estimate comfort scores for the countries or regions listed in that currency object.",
+    "Explain assumptions behind each score, especially cost of living, tax, healthcare, housing, inflation, exchange-rate risk, and visa or residency constraints.",
+    "Do not claim certainty. If data is missing, say what is missing and give a cautious range.",
+    "Do not provide personalized financial, tax, immigration, legal, or investment advice. Frame the output as educational planning analysis."
+  ].join("\n");
 }
 
 function cacheKey() {
@@ -259,6 +314,110 @@ exports.latestExchangeRate = onRequest(
       response.status(500).json({
         success: false,
         error: "Exchange rate cache is unavailable",
+      });
+    }
+  }
+);
+
+// ─── ChatGPT Portfolio Analysis ──────────────────────────────────────────────
+
+exports.analyzeWealthMap = onRequest(
+  {
+    region: REGION,
+    secrets: [openAIApiKey],
+    cors: false,
+    maxInstances: 2,
+    timeoutSeconds: 120,
+  },
+  async (request, response) => {
+    response.set("X-Content-Type-Options", "nosniff");
+    response.set("Cache-Control", "no-store");
+
+    if (request.method !== "POST") {
+      response.set("Allow", "POST");
+      response.status(405).json({ success: false, error: "Method not allowed" });
+      return;
+    }
+
+    const now = Date.now();
+    const client = `ai:${clientIdentifier(request)}`;
+    if (isRateLimitedFor(client, now, MAX_AI_REQUESTS_PER_WINDOW)) {
+      response.set("Retry-After", String(RATE_LIMIT_WINDOW_MS / 1000));
+      response.status(429).json({ success: false, error: "Too many analysis requests" });
+      return;
+    }
+
+    const rawBody = Buffer.isBuffer(request.rawBody) ? request.rawBody : Buffer.from("");
+    if (rawBody.length > MAX_ANALYSIS_PAYLOAD_BYTES) {
+      response.status(413).json({ success: false, error: "Analysis payload is too large" });
+      return;
+    }
+
+    const payload = request.body;
+    if (!validateAnalysisPayload(payload)) {
+      response.status(400).json({ success: false, error: "Invalid Wealth Map analysis payload" });
+      return;
+    }
+
+    try {
+      const openAIResponse = await fetch(OPENAI_RESPONSES_URL, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${openAIApiKey.value()}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: OPENAI_ANALYSIS_MODEL,
+          instructions: analysisInstructions(),
+          input: JSON.stringify(payload),
+          reasoning: { effort: "medium" },
+        }),
+      });
+
+      const openAIText = await openAIResponse.text();
+      let openAIPayload;
+      try {
+        openAIPayload = JSON.parse(openAIText);
+      } catch {
+        openAIPayload = { message: openAIText.slice(0, 300) };
+      }
+
+      if (!openAIResponse.ok) {
+        const providerError = sanitizeProviderError(openAIPayload);
+        logger.error("OpenAI analysis request failed", {
+          status: openAIResponse.status,
+          providerError,
+        });
+        response.status(502).json({
+          success: false,
+          error: `AI analysis is unavailable: ${providerErrorDescription(openAIPayload)}`,
+        });
+        return;
+      }
+
+      const analysis = outputTextFromOpenAIResponse(openAIPayload);
+      if (!analysis) {
+        logger.error("OpenAI analysis response did not include text output");
+        response.status(502).json({
+          success: false,
+          error: "AI analysis returned an empty response",
+        });
+        return;
+      }
+
+      response.status(200).json({
+        success: true,
+        model: openAIPayload.model ?? OPENAI_ANALYSIS_MODEL,
+        responseId: openAIPayload.id ?? null,
+        analysis,
+      });
+    } catch (error) {
+      logger.error("Unable to analyze Wealth Map snapshot", {
+        message: error instanceof Error ? error.message : String(error),
+      });
+      response.status(500).json({
+        success: false,
+        error: "AI analysis failed",
       });
     }
   }

@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>ChatGPTAnalysisProxyURL</key>
+	<string>https://us-central1-mywealth-api-router.cloudfunctions.net/analyzeWealthMap</string>
 	<key>ExchangeRateProxyURL</key>
 	<string>https://us-central1-mywealth-api-router.cloudfunctions.net/latestExchangeRate</string>
 	<key>MetalPriceProxyURL</key>
