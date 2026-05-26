@@ -40,5 +40,5 @@ jobs:
           xcodebuild test \
             -project MyWealth.xcodeproj \
             -scheme MyWealth \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
-            -skipTesting:MyWealthWidgetExtension
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest' \
+            -only-testing:MyWealthTests
