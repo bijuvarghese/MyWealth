@@ -1,0 +1,44 @@
+name: iOS CI
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/ios-ci.yml"
+      - "MyWealth/**"
+      - "MyWealthTests/**"
+      - "MyWealthWidget/**"
+      - "MyWealth.xcodeproj/**"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/ios-ci.yml"
+      - "MyWealth/**"
+      - "MyWealthTests/**"
+      - "MyWealthWidget/**"
+      - "MyWealth.xcodeproj/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ios-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: macos-26
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Build and test app
+        run: |
+          xcodebuild test \
+            -project MyWealth.xcodeproj \
+            -scheme MyWealth \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
+            -skipTesting:MyWealthWidgetExtension

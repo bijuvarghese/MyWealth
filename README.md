@@ -159,6 +159,16 @@ Optional `POST /run` JSON body fields:
 - `only`: `"exchange"` or `"metal"` to check a single endpoint
 - `slack`: `false` to skip Slack delivery for that run
 
+## GitHub Actions
+
+This repository now includes three baseline workflows under `.github/workflows`:
+
+- `ios-ci.yml` to build and test the iOS app on pull requests, pushes to `main`, and manual runs
+- `functions-ci.yml` to validate the Firebase functions package when backend files change
+- `cache-monitor.yml` to run the cache freshness check on a schedule or via manual dispatch
+
+To enable Slack delivery from `cache-monitor.yml`, add a repository secret named `SLACK_WEBHOOK_URL`.
+
 ## Local Development
 
 Open `MyWealth.xcodeproj` in Xcode, select the `MyWealth` scheme, and run the app on an iOS simulator or device.

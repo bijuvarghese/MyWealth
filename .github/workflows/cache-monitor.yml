@@ -1,0 +1,67 @@
+name: Cache Monitor
+
+on:
+  schedule:
+    - cron: "10 0,8,16 * * *"
+  workflow_dispatch:
+    inputs:
+      threshold_hours:
+        description: "Override the staleness threshold in hours"
+        required: false
+        default: "8"
+      target:
+        description: "Endpoint target to check"
+        required: false
+        default: "both"
+        type: choice
+        options:
+          - both
+          - exchange
+          - metal
+
+concurrency:
+  group: cache-monitor
+  cancel-in-progress: false
+
+jobs:
+  run-cache-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Determine cache-check arguments
+        id: args
+        shell: bash
+        run: |
+          threshold="${{ inputs.threshold_hours || '8' }}"
+          target="${{ inputs.target || 'both' }}"
+
+          args=(--threshold-hours "$threshold")
+
+          if [[ "$target" == "exchange" ]]; then
+            args+=(--exchange-only)
+          elif [[ "$target" == "metal" ]]; then
+            args+=(--metal-only)
+          fi
+
+          {
+            echo "args<<EOF"
+            printf '%s\n' "${args[@]}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Run cache freshness check
+        shell: bash
+        run: |
+          mapfile -t args <<< "${{ steps.args.outputs.args }}"
+          bash ./scripts/check-cache-freshness.sh "${args[@]}"
