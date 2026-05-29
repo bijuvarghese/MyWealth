@@ -22,7 +22,11 @@ struct AssetDetailView: View {
     }
 
     private var requiredExchangeRateCurrencies: [Asset.CurrencyType] {
-        [settings.baseCurrency] + settings.totalCurrencies + allAssets.compactMap(\.currency)
+        [settings.baseCurrency] + settings.totalCurrencies + calculationAssets.compactMap(\.currency) + [asset.currency].compactMap { $0 }
+    }
+
+    private var calculationAssets: [Asset] {
+        settings.portfolioCalculationAssets(from: allAssets)
     }
 
     private var historyRows: [AssetHistoryRow] {
@@ -43,14 +47,14 @@ struct AssetDetailView: View {
 
     private var convertedPortfolioAmount: Double? {
         viewModel.convertedTotal(
-            allAssets,
+            calculationAssets,
             to: settings.baseCurrency,
             exchangeRates: viewModel.exchangeRates
         )
     }
 
     private var convertedCategoryAmount: Double? {
-        let categoryAssets = allAssets.filter { $0.displayCategory == asset.displayCategory }
+        let categoryAssets = calculationAssets.filter { $0.displayCategory == asset.displayCategory }
         return viewModel.convertedTotal(
             categoryAssets,
             to: settings.baseCurrency,
@@ -59,11 +63,17 @@ struct AssetDetailView: View {
     }
 
     private var portfolioShare: Double? {
-        share(of: convertedAssetAmount, in: convertedPortfolioAmount)
+        guard asset.participatesInPortfolioCalculations || settings.includeIgnoredAssetsInPortfolio else {
+            return nil
+        }
+        return share(of: convertedAssetAmount, in: convertedPortfolioAmount)
     }
 
     private var categoryShare: Double? {
-        share(of: convertedAssetAmount, in: convertedCategoryAmount)
+        guard asset.participatesInPortfolioCalculations || settings.includeIgnoredAssetsInPortfolio else {
+            return nil
+        }
+        return share(of: convertedAssetAmount, in: convertedCategoryAmount)
     }
 
     var body: some View {
@@ -274,6 +284,12 @@ private struct AssetDetailHeaderView: View {
                 Text(asset.displayCategory.rawValue)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+
+                if !asset.participatesInPortfolioCalculations {
+                    Label("Marked ignored", systemImage: "eye.slash.fill")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.orange)
+                }
             }
 
             Spacer(minLength: 0)

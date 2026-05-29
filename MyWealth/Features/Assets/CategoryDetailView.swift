@@ -22,9 +22,13 @@ struct CategoryDetailView: View {
             .sorted { $0.displayName < $1.displayName }
     }
 
+    private var calculationCategoryAssets: [Asset] {
+        settings.portfolioCalculationAssets(from: categoryAssets)
+    }
+
     private var categoryTotal: Double? {
         viewModel.convertedTotal(
-            categoryAssets,
+            calculationCategoryAssets,
             to: settings.baseCurrency,
             exchangeRates: viewModel.exchangeRates
         )

@@ -25,6 +25,7 @@ struct AssetExport: Codable, Sendable {
     let lastUpdated: Date
     let historyIdentifier: String
     let weightUnit: String?
+    let isIncludedInPortfolio: Bool?
 }
 
 struct LiabilityExport: Codable, Sendable {
@@ -88,7 +89,8 @@ enum DataExporter {
                     category: $0.category?.rawValue ?? "",
                     lastUpdated: $0.lastUpdated ?? Date(),
                     historyIdentifier: $0.historyIdentifier ?? UUID().uuidString,
-                    weightUnit: $0.weightUnit?.rawValue
+                    weightUnit: $0.weightUnit?.rawValue,
+                    isIncludedInPortfolio: $0.participatesInPortfolioCalculations
                 )
             },
             liabilities: liabilities.map {
@@ -188,7 +190,8 @@ enum DataImporter {
                 currency: Asset.CurrencyType(rawValue: a.currency) ?? .none,
                 category: Asset.CategoryType(rawValue: a.category) ?? .others,
                 lastUpdated: a.lastUpdated,
-                weightUnit: a.weightUnit.flatMap(WeightUnit.init(rawValue:))
+                weightUnit: a.weightUnit.flatMap(WeightUnit.init(rawValue:)),
+                isIncludedInPortfolio: a.isIncludedInPortfolio ?? true
             )
             asset.historyIdentifier = a.historyIdentifier
             context.insert(asset)

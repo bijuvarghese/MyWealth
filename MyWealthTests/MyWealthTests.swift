@@ -197,6 +197,29 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func ignoredAssetsAreExcludedUnlessSettingsIncludeThem() async throws {
+        let defaults = try makeIsolatedDefaults()
+        let settings = AppSettings(
+            userDefaults: defaults,
+            hasMadeReminderChoice: { true }
+        )
+        let included = Asset(name: "Cash", amount: 100, currency: .usd, category: .bank)
+        let ignored = Asset(
+            name: "Side Account",
+            amount: 50,
+            currency: .usd,
+            category: .bank,
+            isIncludedInPortfolio: false
+        )
+
+        #expect(settings.portfolioCalculationAssets(from: [included, ignored]).map(\.displayName) == ["Cash"])
+
+        settings.includeIgnoredAssetsInPortfolio = true
+
+        #expect(settings.portfolioCalculationAssets(from: [included, ignored]).map(\.displayName) == ["Cash", "Side Account"])
+    }
+
+    @MainActor
     @Test func transferRateRowsConvertFromBaseCurrencyToDisplayCurrencies() async throws {
         let viewModel = DashboardViewModel(autoRefreshRate: false)
         viewModel.exchangeRates = [

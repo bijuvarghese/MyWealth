@@ -123,8 +123,9 @@ enum ChatGPTAnalysisExporter {
 
         let baseCurrency = settings.baseCurrency
         let displayCurrencies = settings.totalCurrencies
+        let calculationAssets = settings.portfolioCalculationAssets(from: assets)
         let assetTotal = viewModel.convertedTotal(
-            assets,
+            calculationAssets,
             to: baseCurrency,
             exchangeRates: viewModel.exchangeRates
         )
@@ -134,7 +135,7 @@ enum ChatGPTAnalysisExporter {
             exchangeRates: viewModel.exchangeRates
         )
         let netWorth = viewModel.netWorthTotal(
-            assets,
+            calculationAssets,
             liabilities: liabilities,
             to: baseCurrency,
             exchangeRates: viewModel.exchangeRates
@@ -149,7 +150,7 @@ enum ChatGPTAnalysisExporter {
             displayCurrencies: displayCurrencies.map(\.rawValue),
             analysisCurrencies: analysisCurrencies(
                 currencies: displayCurrencies,
-                assets: assets,
+                assets: calculationAssets,
                 liabilities: liabilities,
                 viewModel: viewModel
             ),
@@ -159,15 +160,15 @@ enum ChatGPTAnalysisExporter {
                 liabilityTotal: liabilityTotal,
                 netWorth: netWorth,
                 totalsByCurrency: viewModel.totalsByCurrency(
-                    assets,
+                    calculationAssets,
                     liabilities: liabilities,
                     baseCurrency: baseCurrency,
                     displayCurrencies: displayCurrencies
                 )
                 .map { ChatGPTCurrencyTotal(currency: $0.currency.rawValue, amount: $0.amount) }
             ),
-            currencyExposure: currencyExposure(assets: assets, liabilities: liabilities),
-            categoryAllocation: viewModel.categoryAllocationRows(assets, targetCurrency: baseCurrency)
+            currencyExposure: currencyExposure(assets: calculationAssets, liabilities: liabilities),
+            categoryAllocation: viewModel.categoryAllocationRows(calculationAssets, targetCurrency: baseCurrency)
                 .map {
                     ChatGPTAllocation(
                         name: $0.category.rawValue,
@@ -185,7 +186,7 @@ enum ChatGPTAnalysisExporter {
                         currency: baseCurrency.rawValue
                     )
                 },
-            assets: sanitizedAssets(assets),
+            assets: sanitizedAssets(calculationAssets),
             liabilities: sanitizedLiabilities(liabilities),
             portfolioHistory: viewModel.portfolioTrendRows(portfolioSnapshots, baseCurrency: baseCurrency)
                 .map {

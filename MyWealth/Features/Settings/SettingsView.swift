@@ -88,6 +88,8 @@ struct SettingsView: View {
             Section("Totals") {
                 Toggle("Compact Amounts", isOn: $settings.usesCompactCurrencyTotals)
                     .tint(.accentColor)
+                Toggle("Include Ignored Assets", isOn: $settings.includeIgnoredAssetsInPortfolio)
+                    .tint(.accentColor)
                 NavigationLink(value: SettingsRoute.baseCurrency) {
                     baseCurrencyContent
                 }
@@ -162,6 +164,19 @@ struct SettingsView: View {
                                 .padding(.leading, 44)
                                 .padding(.vertical, 10)
 
+                            Toggle(isOn: $settings.includeIgnoredAssetsInPortfolio) {
+                                SettingsRow(
+                                    title: "Include Ignored Assets",
+                                    subtitle: "Count ignored assets in portfolio totals",
+                                    systemImage: "eye.slash"
+                                )
+                            }
+                            .tint(.accent)
+
+                            Divider()
+                                .padding(.leading, 44)
+                                .padding(.vertical, 10)
+
                             Button {
                                 navigationPath.append(.baseCurrency)
                             } label: {
@@ -183,8 +198,10 @@ struct SettingsView: View {
                                 navigationPath.append(.displayCurrencies)
                             } label: {
                                 SettingsValueRow(
-                                    title: "View Net Worth In",
-                                    value: currencySummary,
+                                    title: "Display Currencies",
+                                    value: displayCurrencyPrimaryValue,
+                                    secondaryValue: displayCurrencyMoreValue,
+                                    subtitle: "Choose currencies shown in totals and widgets",
                                     systemImage: "list.bullet.rectangle.fill"
                                 )
                                 .contentShape(Rectangle())
@@ -414,18 +431,22 @@ struct SettingsView: View {
         }
     }
 
-    private var currencySummary: String {
-        let currencies = settings.totalCurrencies.map(\.rawValue)
+    private var interestedDisplayCurrencies: [Asset.CurrencyType] {
+        settings.totalCurrencies.filter { $0 != settings.baseCurrency }
+    }
 
-        if currencies.count <= 1 {
-            return currencies.joined(separator: ", ")
-        } else {
-            if let first = currencies.first {
-                return "\(first) +\(currencies.count - 1) more"
-            } else {
-                return ""
-            }
+    private var displayCurrencyPrimaryValue: String {
+        interestedDisplayCurrencies.first?.rawValue ?? "None"
+    }
+
+    private var displayCurrencyMoreValue: String? {
+        let remainingCount = interestedDisplayCurrencies.dropFirst().count
+
+        if remainingCount > 0 {
+            return "+\(remainingCount) more"
         }
+
+        return nil
     }
     
     private var baseCurrencyContent: some View {
@@ -624,6 +645,7 @@ private struct SettingsRow: View {
 private struct SettingsValueRow: View {
     let title: String
     let value: String
+    var secondaryValue: String? = nil
     var subtitle: String?
     let systemImage: String
     var hidesDisclosureIndicator: Bool = false
@@ -639,11 +661,21 @@ private struct SettingsValueRow: View {
             Spacer(minLength: 8)
 
             HStack(spacing: 8) {
-                Text(value)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.75)
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text(value)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+
+                    if let secondaryValue {
+                        Text(secondaryValue)
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(.tertiary)
+                            .lineLimit(1)
+                    }
+                }
+
                 if !hidesDisclosureIndicator {
                     Image(systemName: "chevron.right")
                         .font(.footnote.weight(.semibold))

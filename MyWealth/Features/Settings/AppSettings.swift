@@ -9,6 +9,7 @@ final class AppSettings {
         static let totalCurrencies = "settings.totalCurrencies"
         static let baseCurrency = "settings.baseCurrency"
         static let usesCompactCurrencyTotals = "settings.usesCompactCurrencyTotals"
+        static let includeIgnoredAssetsInPortfolio = "settings.includeIgnoredAssetsInPortfolio"
         static let hasCompletedOnboarding = "settings.hasCompletedOnboarding"
         static let iCloudSyncEnabled = "settings.iCloudSyncEnabled"
         static let hasSeenICloudOnboarding = "settings.hasSeenICloudOnboarding"
@@ -34,6 +35,12 @@ final class AppSettings {
     var usesCompactCurrencyTotals: Bool {
         didSet {
             persistUsesCompactCurrencyTotals()
+        }
+    }
+
+    var includeIgnoredAssetsInPortfolio: Bool {
+        didSet {
+            userDefaults.set(includeIgnoredAssetsInPortfolio, forKey: DefaultsKeys.includeIgnoredAssetsInPortfolio)
         }
     }
 
@@ -70,6 +77,7 @@ final class AppSettings {
             ? [.usd, .inr]
             : AppSettings.normalizedDisplayCurrencies(savedCurrencies, including: restoredBaseCurrency)
         self.usesCompactCurrencyTotals = userDefaults.bool(forKey: DefaultsKeys.usesCompactCurrencyTotals)
+        self.includeIgnoredAssetsInPortfolio = userDefaults.bool(forKey: DefaultsKeys.includeIgnoredAssetsInPortfolio)
         self.iCloudSyncEnabled = userDefaults.bool(forKey: DefaultsKeys.iCloudSyncEnabled)
 
         let hasSavedCurrencySettings = savedBaseCode != nil || !savedCodes.isEmpty
@@ -143,6 +151,12 @@ final class AppSettings {
 
     private func persistUsesCompactCurrencyTotals() {
         userDefaults.set(usesCompactCurrencyTotals, forKey: DefaultsKeys.usesCompactCurrencyTotals)
+    }
+
+    func portfolioCalculationAssets(from assets: [Asset]) -> [Asset] {
+        includeIgnoredAssetsInPortfolio
+            ? assets
+            : assets.filter(\.participatesInPortfolioCalculations)
     }
 
     private func persistOnboardingStatus() {

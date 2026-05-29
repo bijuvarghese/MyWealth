@@ -49,11 +49,20 @@ final class Asset {
     var category: CategoryType?
     var lastUpdated: Date?
     var historyIdentifier: String?
+    var isIncludedInPortfolio: Bool?
     /// Preferred display unit for precious-metal assets.
     /// `amount` is always stored in troy oz regardless of this value.
     var weightUnit: WeightUnit?
 
-    init(name: String, amount: Double, currency: CurrencyType, category: CategoryType, lastUpdated: Date? = Date(), weightUnit: WeightUnit? = nil) {
+    init(
+        name: String,
+        amount: Double,
+        currency: CurrencyType,
+        category: CategoryType,
+        lastUpdated: Date? = Date(),
+        weightUnit: WeightUnit? = nil,
+        isIncludedInPortfolio: Bool = true
+    ) {
         self.name = name
         self.amount = amount
         self.currency = currency
@@ -61,6 +70,7 @@ final class Asset {
         self.lastUpdated = lastUpdated
         self.historyIdentifier = UUID().uuidString
         self.weightUnit = weightUnit
+        self.isIncludedInPortfolio = isIncludedInPortfolio
     }
 
     var displayName: String {
@@ -87,6 +97,10 @@ final class Asset {
         let identifier = UUID().uuidString
         historyIdentifier = identifier
         return identifier
+    }
+
+    var participatesInPortfolioCalculations: Bool {
+        isIncludedInPortfolio ?? true
     }
     
     enum CurrencyType: String, Codable, CaseIterable, Identifiable {

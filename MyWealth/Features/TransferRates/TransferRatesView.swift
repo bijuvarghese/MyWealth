@@ -23,8 +23,12 @@ struct TransferRatesView: View {
         )
     }
 
+    private var calculationAssets: [Asset] {
+        settings.portfolioCalculationAssets(from: assets)
+    }
+
     private var requiredExchangeRateCurrencies: [Asset.CurrencyType] {
-        [settings.baseCurrency] + settings.totalCurrencies + assets.compactMap(\.currency) + liabilities.compactMap(\.currency)
+        [settings.baseCurrency] + settings.totalCurrencies + calculationAssets.compactMap(\.currency) + liabilities.compactMap(\.currency)
     }
 
     private var isRefreshing: Bool {

@@ -26,9 +26,13 @@ struct DashboardView: View {
     @State private var viewModel = DashboardViewModel()
     @State private var metalViewModel = MetalPricesViewModel()
 
+    private var portfolioAssets: [Asset] {
+        settings.portfolioCalculationAssets(from: assets)
+    }
+
     private var coordinator: PortfolioHistoryCoordinator {
         PortfolioHistoryCoordinator(
-            assets: assets,
+            assets: portfolioAssets,
             liabilities: liabilities,
             netWorthSnapshots: netWorthSnapshots,
             assetValueSnapshots: assetValueSnapshots,
@@ -50,12 +54,19 @@ struct DashboardView: View {
             } else {
                 List {
                     Section {
+                        AppListCard {
+                            IncludeIgnoredAssetsToggle(settings: settings)
+                        }
+                        .appListRow()
+                    }
+
+                    Section {
                         AppListCard(
                             contentPadding: EdgeInsets(top: 12, leading: 0, bottom: 0, trailing: 0)
                         ) {
                             AssetLiabilitySummaryView(
                                 assetTotal: viewModel.convertedTotal(
-                                    assets,
+                                    portfolioAssets,
                                     to: settings.baseCurrency,
                                     exchangeRates: viewModel.exchangeRates
                                 ),
@@ -65,7 +76,7 @@ struct DashboardView: View {
                                     exchangeRates: viewModel.exchangeRates
                                 ),
                                 netWorthTotal: viewModel.netWorthTotal(
-                                    assets,
+                                    portfolioAssets,
                                     liabilities: liabilities,
                                     to: settings.baseCurrency,
                                     exchangeRates: viewModel.exchangeRates
@@ -77,7 +88,7 @@ struct DashboardView: View {
                     }
 
                     let insightRows = viewModel.portfolioInsightRows(
-                        assets: assets,
+                        assets: portfolioAssets,
                         liabilities: liabilities,
                         netWorthSnapshots: netWorthSnapshots,
                         baseCurrency: settings.baseCurrency
@@ -91,16 +102,16 @@ struct DashboardView: View {
                         }
                     }
 
-                    if !assets.isEmpty {
+                    if !portfolioAssets.isEmpty {
                         Section(header: PillLabel("Allocation")) {
                             AppListCard {
                                 PortfolioAllocationView(
                                     rows: viewModel.categoryAllocationRows(
-                                        assets,
+                                        portfolioAssets,
                                         targetCurrency: settings.baseCurrency
                                     ),
                                     portfolioTotal: viewModel.convertedTotal(
-                                        assets,
+                                        portfolioAssets,
                                         to: settings.baseCurrency,
                                         exchangeRates: viewModel.exchangeRates
                                     ),
@@ -138,7 +149,7 @@ struct DashboardView: View {
                             DashboardNetWorthTotalsView(
                                 totals: Array(
                                     viewModel.totalsByCurrency(
-                                        assets,
+                                        portfolioAssets,
                                         liabilities: liabilities,
                                         baseCurrency: settings.baseCurrency,
                                         displayCurrencies: settings.totalCurrencies
@@ -269,9 +280,13 @@ struct NetWorthView: View {
     @State private var metalViewModel = MetalPricesViewModel()
     @State private var showNetWorthHistory = false
 
+    private var portfolioAssets: [Asset] {
+        settings.portfolioCalculationAssets(from: assets)
+    }
+
     private var coordinator: PortfolioHistoryCoordinator {
         PortfolioHistoryCoordinator(
-            assets: assets,
+            assets: portfolioAssets,
             liabilities: liabilities,
             netWorthSnapshots: netWorthSnapshots,
             assetValueSnapshots: assetValueSnapshots,
@@ -297,9 +312,16 @@ struct NetWorthView: View {
                     List {
                         Section {
                             AppListCard {
+                                IncludeIgnoredAssetsToggle(settings: settings)
+                            }
+                            .appListRow()
+                        }
+
+                        Section {
+                            AppListCard {
                                 DashboardNetWorthTotalsView(
                                     totals: viewModel.totalsByCurrency(
-                                        assets,
+                                        portfolioAssets,
                                         liabilities: liabilities,
                                         baseCurrency: settings.baseCurrency,
                                         displayCurrencies: settings.totalCurrencies
@@ -382,5 +404,29 @@ struct NetWorthView: View {
             await metalViewModel.refreshIfNeeded()
             viewModel.enrichWithMetalRates(metalViewModel.metalRates)
         }
+    }
+}
+
+private struct IncludeIgnoredAssetsToggle: View {
+    @Bindable var settings: AppSettings
+
+    var body: some View {
+        Toggle(isOn: $settings.includeIgnoredAssetsInPortfolio) {
+            HStack(spacing: 12) {
+                Image(systemName: "eye.slash")
+                    .foregroundStyle(.accent)
+                    .frame(width: 25)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Include Ignored Assets")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    Text("Count ignored assets in portfolio totals")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .tint(.accentColor)
     }
 }

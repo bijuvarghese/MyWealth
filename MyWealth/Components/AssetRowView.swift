@@ -53,6 +53,12 @@ struct AssetRowView: View {
                 Text(asset.displayName.isEmpty ? "Unnamed Asset" : asset.displayName)
                     .font(.headline)
 
+                if !asset.participatesInPortfolioCalculations {
+                    Label("Marked ignored", systemImage: "eye.slash.fill")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.orange)
+                }
+
                 if isMetal {
                     metalSubtitle
                 } else {

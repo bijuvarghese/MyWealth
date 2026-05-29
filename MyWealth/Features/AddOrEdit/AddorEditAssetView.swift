@@ -20,6 +20,7 @@ struct AddorEditAssetView: View {
     @State private var name = ""
     @State private var currency: Asset.CurrencyType = .usd
     @State private var category: Asset.CategoryType = .others
+    @State private var includeInPortfolio = true
 
     // MARK: - Non-metal state
     @State private var amount = ""
@@ -79,6 +80,7 @@ struct AddorEditAssetView: View {
                     currencySection
                 }
                 categorySection
+                portfolioSection
             }
             .navigationTitle(isEditing ? "Edit Asset" : "Add Asset")
             .toolbar {
@@ -225,6 +227,17 @@ struct AddorEditAssetView: View {
         }
     }
 
+    private var portfolioSection: some View {
+        Section {
+            Toggle(isOn: $includeInPortfolio) {
+                Label("Include in Portfolio", systemImage: "chart.pie.fill")
+            }
+            .tint(.accentColor)
+        } footer: {
+            Text("Ignored assets stay in your list and history, but are left out of portfolio totals unless Settings includes ignored assets.")
+        }
+    }
+
     // MARK: - Save
 
     private func save() {
@@ -247,6 +260,7 @@ struct AddorEditAssetView: View {
             existing.currency = currency
             existing.category = category
             existing.weightUnit = unitToStore
+            existing.isIncludedInPortfolio = includeInPortfolio
             existing.lastUpdated = Date()
         } else {
             let newAsset = Asset(
@@ -255,7 +269,8 @@ struct AddorEditAssetView: View {
                 currency: currency,
                 category: category,
                 lastUpdated: Date(),
-                weightUnit: unitToStore
+                weightUnit: unitToStore,
+                isIncludedInPortfolio: includeInPortfolio
             )
             modelContext.insert(newAsset)
         }
@@ -269,6 +284,7 @@ struct AddorEditAssetView: View {
         name = asset.displayName
         currency = asset.currency ?? .usd
         category = asset.displayCategory
+        includeInPortfolio = asset.participatesInPortfolioCalculations
 
         if asset.displayCategory.isPreciousMetal {
             let unit = asset.weightUnit ?? .troyOz
