@@ -187,37 +187,38 @@ struct DashboardView: View {
 
                     Section(header: PillLabel("Trend")) {
                         DashboardCard {
-                            AssetVsLiabilityTrendChartView(
-                                portfolioRows: viewModel.portfolioTrendRows(
-                                    portfolioSnapshots,
-                                    baseCurrency: settings.baseCurrency
-                                ),
-                                netWorthRows: viewModel.netWorthTrendRows(
-                                    netWorthSnapshots,
-                                    baseCurrency: settings.baseCurrency
-                                ),
-                                currencyCode: settings.baseCurrency.rawValue
-                            )
+                            VStack {
+                                AssetVsLiabilityTrendChartView(
+                                    portfolioRows: viewModel.portfolioTrendRows(
+                                        portfolioSnapshots,
+                                        baseCurrency: settings.baseCurrency
+                                    ),
+                                    netWorthRows: viewModel.netWorthTrendRows(
+                                        netWorthSnapshots,
+                                        baseCurrency: settings.baseCurrency
+                                    ),
+                                    currencyCode: settings.baseCurrency.rawValue
+                                )
+                                Divider()
+                                Button {
+                                    showNetWorthHistory = true
+                                } label: {
+                                    HStack {
+                                        Text("View Full History")
+                                            .font(.subheadline)
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption)
+                                            .foregroundStyle(.tertiary)
+                                    }
+                                    .foregroundStyle(.accent)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                }
+                            }
                         }
                         .dashboardListRow()
 
-                        Button {
-                            showNetWorthHistory = true
-                        } label: {
-                            HStack {
-                                Text("View Full History")
-                                    .font(.subheadline)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.caption)
-                                    .foregroundStyle(.tertiary)
-                            }
-                            .foregroundStyle(.accent)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                        }
-                        .listRowBackground(Color.clear)
-                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 4, trailing: 0))
                     }
 
                     let historyRows = viewModel.recentAssetHistoryRows(assetValueSnapshots)
@@ -352,37 +353,37 @@ struct NetWorthView: View {
 
                         Section(header: PillLabel("Trend")) {
                             DashboardCard {
-                                AssetVsLiabilityTrendChartView(
-                                    portfolioRows: viewModel.portfolioTrendRows(
-                                        portfolioSnapshots,
-                                        baseCurrency: settings.baseCurrency
-                                    ),
-                                    netWorthRows: viewModel.netWorthTrendRows(
-                                        netWorthSnapshots,
-                                        baseCurrency: settings.baseCurrency
-                                    ),
-                                    currencyCode: settings.baseCurrency.rawValue
-                                )
+                                VStack {
+                                    AssetVsLiabilityTrendChartView(
+                                        portfolioRows: viewModel.portfolioTrendRows(
+                                            portfolioSnapshots,
+                                            baseCurrency: settings.baseCurrency
+                                        ),
+                                        netWorthRows: viewModel.netWorthTrendRows(
+                                            netWorthSnapshots,
+                                            baseCurrency: settings.baseCurrency
+                                        ),
+                                        currencyCode: settings.baseCurrency.rawValue
+                                    )
+                                    Divider()
+                                    Button {
+                                        showNetWorthHistory = true
+                                    } label: {
+                                        HStack {
+                                            Text("View Full History")
+                                                .font(.subheadline)
+                                            Spacer()
+                                            Image(systemName: "chevron.right")
+                                                .font(.caption)
+                                                .foregroundStyle(.tertiary)
+                                        }
+                                        .foregroundStyle(.accent)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                    }
+                                }
                             }
                             .dashboardListRow()
-
-                            Button {
-                                showNetWorthHistory = true
-                            } label: {
-                                HStack {
-                                    Text("View Full History")
-                                        .font(.subheadline)
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption)
-                                        .foregroundStyle(.tertiary)
-                                }
-                                .foregroundStyle(.accent)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 10)
-                            }
-                            .listRowBackground(Color.clear)
-                            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 4, trailing: 0))
                         }
 
                         let historyRows = viewModel.recentAssetHistoryRows(assetValueSnapshots)

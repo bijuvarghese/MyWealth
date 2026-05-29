@@ -1,0 +1,90 @@
+import SwiftUI
+
+struct IPadRootView: View {
+    @Bindable var settings: AppSettings
+    @State private var selection: IPadSection = .dashboard
+
+    var body: some View {
+        NavigationSplitView {
+            List {
+                ForEach(IPadSection.allCases) { section in
+                    Button {
+                        selection = section
+                    } label: {
+                        Label(section.title, systemImage: section.systemImage)
+                            .font(.body.weight(selection == section ? .semibold : .regular))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(selection == section ? .accent : .primary)
+                    .listRowBackground(
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .fill(selection == section ? Color.accentColor.opacity(0.14) : Color.clear)
+                    )
+                }
+            }
+            .navigationTitle("Wealth Map")
+            .navigationSplitViewColumnWidth(min: 220, ideal: 260, max: 320)
+        } detail: {
+            detailView(for: selection)
+        }
+        .navigationSplitViewStyle(.balanced)
+    }
+
+    @ViewBuilder
+    private func detailView(for section: IPadSection) -> some View {
+        switch section {
+        case .dashboard:
+            DashboardView(settings: settings)
+        case .assets:
+            AssetListView(settings: settings)
+        case .netWorth:
+            NetWorthView(settings: settings)
+        case .rates:
+            TransferRatesView(settings: settings)
+        case .settings:
+            SettingsView(settings: settings, showsDoneButton: false)
+        }
+    }
+}
+
+private enum IPadSection: String, CaseIterable, Hashable, Identifiable {
+    case dashboard
+    case assets
+    case netWorth
+    case rates
+    case settings
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .dashboard:
+            return "Dashboard"
+        case .assets:
+            return "Assets"
+        case .netWorth:
+            return "Net Worth"
+        case .rates:
+            return "Rates"
+        case .settings:
+            return "Settings"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .dashboard:
+            return "chart.pie.fill"
+        case .assets:
+            return "list.bullet.rectangle"
+        case .netWorth:
+            return "chart.line.uptrend.xyaxis"
+        case .rates:
+            return "arrow.left.arrow.right.circle.fill"
+        case .settings:
+            return "gearshape.fill"
+        }
+    }
+}

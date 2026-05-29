@@ -8,6 +8,9 @@
 import SwiftUI
 import SwiftData
 import UserNotifications
+#if os(iOS)
+import UIKit
+#endif
 
 @main
 struct MyWealthApp: App {
@@ -54,31 +57,10 @@ private struct AppRootView: View {
     var body: some View {
         Group {
             if settings.onboardingStatus().isComplete {
-                TabView {
-                    DashboardView(settings: settings)
-                        .tabItem {
-                            Label("Dashboard", systemImage: "chart.pie.fill")
-                        }
-
-                    AssetListView(settings: settings)
-                        .tabItem {
-                            Label("Assets", systemImage: "list.bullet.rectangle")
-                        }
-
-                    NetWorthView(settings: settings)
-                        .tabItem {
-                            Label("Net Worth", systemImage: "chart.line.uptrend.xyaxis")
-                        }
-
-                    TransferRatesView(settings: settings)
-                        .tabItem {
-                            Label("Rates", systemImage: "arrow.left.arrow.right.circle.fill")
-                        }
-
-                    SettingsView(settings: settings, showsDoneButton: false)
-                        .tabItem {
-                            Label("Settings", systemImage: "gearshape.fill")
-                        }
+                if usesIPadLayout {
+                    IPadRootView(settings: settings)
+                } else {
+                    AppTabView(settings: settings)
                 }
             } else {
                 OnboardingView(settings: settings)
@@ -145,6 +127,47 @@ private struct AppRootView: View {
         }
         .onChange(of: settings.usesCompactCurrencyTotals) {
             if settings.iCloudSyncEnabled { iCloudSync.push(settings: settings) }
+        }
+    }
+
+    private var usesIPadLayout: Bool {
+        #if os(iOS)
+        UIDevice.current.userInterfaceIdiom == .pad
+        #else
+        false
+        #endif
+    }
+}
+
+private struct AppTabView: View {
+    @Bindable var settings: AppSettings
+
+    var body: some View {
+        TabView {
+            DashboardView(settings: settings)
+                .tabItem {
+                    Label("Dashboard", systemImage: "chart.pie.fill")
+                }
+
+            AssetListView(settings: settings)
+                .tabItem {
+                    Label("Assets", systemImage: "list.bullet.rectangle")
+                }
+
+            NetWorthView(settings: settings)
+                .tabItem {
+                    Label("Net Worth", systemImage: "chart.line.uptrend.xyaxis")
+                }
+
+            TransferRatesView(settings: settings)
+                .tabItem {
+                    Label("Rates", systemImage: "arrow.left.arrow.right.circle.fill")
+                }
+
+            SettingsView(settings: settings, showsDoneButton: false)
+                .tabItem {
+                    Label("Settings", systemImage: "gearshape.fill")
+                }
         }
     }
 }
