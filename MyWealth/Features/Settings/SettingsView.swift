@@ -131,7 +131,7 @@ struct SettingsView: View {
 
             List {
                 Section {
-                    SettingsCard {
+                    AppListCard {
                         Button {
                             navigationPath.append(.reminders)
                         } label: {
@@ -144,10 +144,10 @@ struct SettingsView: View {
                         }
                         .buttonStyle(.plain)
                     }
-                    .settingsListRow()
+                    .appListRow()
                 }
                 Section {
-                    SettingsCard {
+                    AppListCard {
                         VStack(spacing: 0) {
                             Toggle(isOn: $settings.usesCompactCurrencyTotals) {
                                 SettingsRow(
@@ -192,10 +192,10 @@ struct SettingsView: View {
                             .buttonStyle(.plain)
                         }
                     }
-                    .settingsListRow()
+                    .appListRow()
                 }
                 Section {
-                    SettingsCard {
+                    AppListCard {
                         VStack(spacing: 0) {
                             cleanupButton
                                 .buttonStyle(.plain)
@@ -211,18 +211,18 @@ struct SettingsView: View {
                                 .buttonStyle(.plain)
                         }
                     }
-                    .settingsListRow()
+                    .appListRow()
                 }
 
                 Section {
-                    SettingsCard {
+                    AppListCard {
                         ICloudSyncRow(settings: settings)
                     }
-                    .settingsListRow()
+                    .appListRow()
                 }
 
                 Section {
-                    SettingsCard {
+                    AppListCard {
                         SettingsValueRow(
                             title: "App Version",
                             value: AppInfo.fullVersion,
@@ -230,7 +230,7 @@ struct SettingsView: View {
                             hidesDisclosureIndicator: true
                         )
                     }
-                    .settingsListRow()
+                    .appListRow()
                 }
             }
             .scrollContentBackground(.hidden)
@@ -579,26 +579,6 @@ private struct ChatGPTExportProgressOverlay: View {
     }
 }
 
-private struct SettingsCard<Content: View>: View {
-    let content: Content
-
-    init(@ViewBuilder content: () -> Content) {
-        self.content = content()
-    }
-
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
-
-            content
-                .padding(12)
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
 private struct SettingsRow: View {
     let title: String
     var subtitle: String?
@@ -757,11 +737,6 @@ private extension View {
             } message: {
                 Text(importError.wrappedValue ?? "")
             }
-    }
-
-    func settingsListRow() -> some View {
-        listRowBackground(Color.clear)
-            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
     }
 
     /// Attaches the confirmation dialog and result alert for the history cleanup action.

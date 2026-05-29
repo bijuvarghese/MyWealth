@@ -22,7 +22,8 @@ enum WidgetDataWriter {
         assetTotal: Double,
         liabilityTotal: Double,
         baseCurrency: String,
-        currencyTotals: [WidgetSnapshot.CurrencyEntry]
+        currencyTotals: [WidgetSnapshot.CurrencyEntry],
+        transferRatesLastUpdated: Date?
     ) {
         let snapshot = WidgetSnapshot(
             netWorth: netWorth,
@@ -30,7 +31,8 @@ enum WidgetDataWriter {
             liabilityTotal: liabilityTotal,
             baseCurrency: baseCurrency,
             currencyTotals: currencyTotals,
-            lastUpdated: Date()
+            lastUpdated: Date(),
+            transferRatesLastUpdated: transferRatesLastUpdated
         )
         WidgetDataStore.save(snapshot)
         WidgetCenter.shared.reloadAllTimelines()

@@ -30,6 +30,8 @@ struct WidgetSnapshot: Codable {
     let currencyTotals: [CurrencyEntry]
     /// When this snapshot was written by the app.
     let lastUpdated: Date
+    /// When transfer/exchange rates were last refreshed.
+    let transferRatesLastUpdated: Date?
 
     struct CurrencyEntry: Codable, Identifiable {
         let code: String
@@ -45,7 +47,8 @@ struct WidgetSnapshot: Codable {
             liabilityTotal: 0,
             baseCurrency: "USD",
             currencyTotals: [],
-            lastUpdated: Date()
+            lastUpdated: Date(),
+            transferRatesLastUpdated: nil
         )
     }
 }

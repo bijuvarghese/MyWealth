@@ -40,7 +40,7 @@ struct TransferRatesView: View {
                 List {
                     // Transfer rates
                     Section {
-                        TransferRatesCard {
+                        AppListCard {
                             VStack(spacing: 8) {
                                 TransferRateWidgetView(
                                     rows: rows,
@@ -53,12 +53,12 @@ struct TransferRatesView: View {
                                 }
                             }
                         }
-                        .transferRatesListRow()
+                        .appListRow()
                     }
 
                     // Metal prices
                     Section {
-                        TransferRatesCard {
+                        AppListCard {
                             VStack(spacing: 8) {
                                 MetalPriceWidgetView(
                                     groups: metalGroups,
@@ -72,7 +72,7 @@ struct TransferRatesView: View {
                                 }
                             }
                         }
-                        .transferRatesListRow()
+                        .appListRow()
                     }
 
                 }
@@ -118,33 +118,5 @@ struct TransferRatesView: View {
                 )
             }
         }
-    }
-}
-
-
-private struct TransferRatesCard<Content: View>: View {
-    let content: Content
-
-    init(@ViewBuilder content: () -> Content) {
-        self.content = content()
-    }
-
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
-
-            content
-                .padding(12)
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
-private extension View {
-    func transferRatesListRow() -> some View {
-        listRowBackground(Color.clear)
-            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
     }
 }

@@ -148,10 +148,12 @@ struct SmallWidgetView: View {
 
             Spacer()
 
-            // Footer: last updated
-            Text(entry.snapshot.lastUpdated.relativeLabel)
+            // Footer: transfer-rate last updated
+            Text(snapshot.transferRatesUpdatedLabel)
                 .font(.system(size: 9))
                 .foregroundStyle(.tertiary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         .containerBackground(for: .widget) { WealthWidgetBackground() }
@@ -199,9 +201,11 @@ struct MediumWidgetView: View {
 
                 Spacer()
 
-                Text(entry.snapshot.lastUpdated.relativeLabel)
+                Text(snapshot.transferRatesUpdatedLabel)
                     .font(.system(size: 9))
                     .foregroundStyle(.tertiary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
             }
             .frame(maxHeight: .infinity, alignment: .leading)
 
@@ -289,9 +293,11 @@ struct RectangularLockScreenView: View {
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
 
-            Text(entry.snapshot.lastUpdated.relativeLabel)
+            Text(snapshot.transferRatesUpdatedLabel)
                 .font(.system(size: 9))
                 .foregroundStyle(.tertiary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .containerBackground(for: .widget) { Color.clear }
@@ -421,15 +427,14 @@ extension Locale {
 }
 
 extension Date {
-    /// A short human-readable label like "just now", "5m ago", or "2h ago".
-    var relativeLabel: String {
-        let seconds = Date().timeIntervalSince(self)
-        switch seconds {
-        case ..<60:       return "just now"
-        case ..<3_600:    return "\(Int(seconds / 60))m ago"
-        case ..<86_400:   return "\(Int(seconds / 3_600))h ago"
-        default:          return formatted(.dateTime.month(.abbreviated).day())
-        }
+    var rateUpdatedLabel: String {
+        "Rates: \(formatted(date: .abbreviated, time: .shortened))"
+    }
+}
+
+extension WidgetSnapshot {
+    var transferRatesUpdatedLabel: String {
+        (transferRatesLastUpdated ?? lastUpdated).rateUpdatedLabel
     }
 }
 
@@ -449,7 +454,8 @@ extension Date {
                 .init(code: "USD", amount: 14_940),
                 .init(code: "EUR", amount: 13_750)
             ],
-            lastUpdated: .now
+            lastUpdated: .now,
+            transferRatesLastUpdated: .now
         ),
         isPlaceholder: false
     )
@@ -470,7 +476,8 @@ extension Date {
                 .init(code: "EUR", amount: 13_750),
                 .init(code: "GBP", amount: 11_800)
             ],
-            lastUpdated: .now
+            lastUpdated: .now,
+            transferRatesLastUpdated: .now
         ),
         isPlaceholder: false
     )
@@ -487,7 +494,8 @@ extension Date {
             liabilityTotal: 250_000,
             baseCurrency: "INR",
             currencyTotals: [],
-            lastUpdated: .now
+            lastUpdated: .now,
+            transferRatesLastUpdated: .now
         ),
         isPlaceholder: false
     )
@@ -504,7 +512,8 @@ extension Date {
             liabilityTotal: 250_000,
             baseCurrency: "INR",
             currencyTotals: [],
-            lastUpdated: .now
+            lastUpdated: .now,
+            transferRatesLastUpdated: .now
         ),
         isPlaceholder: false
     )

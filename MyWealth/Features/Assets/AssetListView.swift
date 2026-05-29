@@ -75,7 +75,7 @@ struct AssetListView: View {
                             Button {
                                 selectedAsset = asset
                             } label: {
-                                AssetListCard {
+                                AppListCard {
                                     HStack(spacing: 12) {
                                         AssetRowView(asset: asset, metalRates: metalViewModel.metalRates)
 
@@ -87,7 +87,7 @@ struct AssetListView: View {
                                 .contentShape(Rectangle())
                             }
                             .buttonStyle(.plain)
-                            .assetListRow()
+                            .appListRow()
                             .listRowSeparator(.hidden)
                         }
                         .onDelete(perform: deleteAssets)
@@ -97,10 +97,10 @@ struct AssetListView: View {
                 if !liabilities.isEmpty {
                     Section(header: PillLabel("Liabilities")) {
                         ForEach(liabilities) { liability in
-                            AssetListCard {
+                            AppListCard {
                                 LiabilityRowView(liability: liability)
                             }
-                            .assetListRow()
+                            .appListRow()
                             .listRowSeparator(.hidden)
                             .onTapGesture {
                                 selectedLiability = liability
@@ -125,32 +125,5 @@ struct AssetListView: View {
         for index in indexSet {
             modelContext.delete(liabilities[index])
         }
-    }
-}
-
-private struct AssetListCard<Content: View>: View {
-    let content: Content
-
-    init(@ViewBuilder content: () -> Content) {
-        self.content = content()
-    }
-
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
-
-            content
-                .padding(12)
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
-private extension View {
-    func assetListRow() -> some View {
-        listRowBackground(Color.clear)
-            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
     }
 }

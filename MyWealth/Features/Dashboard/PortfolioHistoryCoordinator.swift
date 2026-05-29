@@ -98,7 +98,8 @@ struct PortfolioHistoryCoordinator {
             assetTotal: assetTotal,
             liabilityTotal: liabilityTotal,
             baseCurrency: base.rawValue,
-            currencyTotals: currencyTotals
+            currencyTotals: currencyTotals,
+            transferRatesLastUpdated: viewModel.lastUpdated
         )
     }
 }
