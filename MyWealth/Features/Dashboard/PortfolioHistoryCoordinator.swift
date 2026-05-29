@@ -90,7 +90,12 @@ struct PortfolioHistoryCoordinator {
                     to: currency,
                     exchangeRates: rates
                 ) else { return nil }
-                return WidgetSnapshot.CurrencyEntry(code: currency.rawValue, amount: amount)
+                let transferRate = transferRate(from: base, to: currency, rates: rates)
+                return WidgetSnapshot.CurrencyEntry(
+                    code: currency.rawValue,
+                    amount: amount,
+                    transferRate: transferRate
+                )
             }
 
         WidgetDataWriter.write(
@@ -101,6 +106,21 @@ struct PortfolioHistoryCoordinator {
             currencyTotals: currencyTotals,
             transferRatesLastUpdated: viewModel.lastUpdated
         )
+    }
+
+    private func transferRate(
+        from baseCurrency: Asset.CurrencyType,
+        to targetCurrency: Asset.CurrencyType,
+        rates: [String: Double]
+    ) -> Double? {
+        let baseRate = baseCurrency == .usd ? 1 : rates[baseCurrency.rawValue]
+        let targetRate = targetCurrency == .usd ? 1 : rates[targetCurrency.rawValue]
+
+        guard let baseRate, let targetRate, baseRate > 0 else {
+            return nil
+        }
+
+        return targetRate / baseRate
     }
 }
 

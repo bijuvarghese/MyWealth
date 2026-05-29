@@ -36,7 +36,14 @@ struct WidgetSnapshot: Codable {
     struct CurrencyEntry: Codable, Identifiable {
         let code: String
         let amount: Double
+        let transferRate: Double?
         var id: String { code }
+
+        init(code: String, amount: Double, transferRate: Double? = nil) {
+            self.code = code
+            self.amount = amount
+            self.transferRate = transferRate
+        }
     }
 
     /// A placeholder snapshot used while no real data exists yet.

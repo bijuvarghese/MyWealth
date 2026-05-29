@@ -212,28 +212,19 @@ struct MediumWidgetView: View {
             // Divider
             Divider()
 
-            // Right: secondary currency totals
+            // Right: first interested currency total and transfer rate
             VStack(alignment: .leading, spacing: 0) {
-                Text("Also in")
-                    .font(.caption2)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.secondary)
-                    .padding(.bottom, 6)
-
-                if snapshot.currencyTotals.isEmpty {
+                if let preferredCurrency = snapshot.currencyTotals.first {
+                    PreferredCurrencySummary(
+                        entry: preferredCurrency,
+                        baseCurrency: snapshot.baseCurrency
+                    )
+                } else {
                     Spacer()
                     Text("Add display\ncurrencies\nin Settings")
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
                         .multilineTextAlignment(.leading)
-                    Spacer()
-                } else {
-                    ForEach(snapshot.currencyTotals.prefix(3)) { currencyEntry in
-                        CurrencyTotalRow(entry: currencyEntry)
-                        if currencyEntry.id != snapshot.currencyTotals.prefix(3).last?.id {
-                            Divider().padding(.vertical, 4)
-                        }
-                    }
                     Spacer()
                 }
             }
@@ -307,25 +298,55 @@ struct RectangularLockScreenView: View {
 
 // MARK: - Supporting Sub-views
 
-/// A small row showing a secondary currency total inside the medium widget.
-private struct CurrencyTotalRow: View {
+/// Medium-widget summary for the first display currency selected by the user.
+private struct PreferredCurrencySummary: View {
     let entry: WidgetSnapshot.CurrencyEntry
+    let baseCurrency: String
 
     var body: some View {
-        HStack {
-            Text(entry.code)
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Also in")
                 .font(.caption2)
-                .fontWeight(.medium)
+                .fontWeight(.semibold)
                 .foregroundStyle(.secondary)
-                .frame(width: 32, alignment: .leading)
+
+            Text(entry.amount.compactCurrencyString(code: entry.code))
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundStyle(.primary)
+                .minimumScaleFactor(0.55)
+                .lineLimit(1)
+
+            Divider()
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text("Transfer rate")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+
+                if let transferRate = entry.transferRate {
+                    Text("1 \(baseCurrency) = \(transferRate, format: .number.precision(.significantDigits(4...6))) \(entry.code)")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+                        .minimumScaleFactor(0.55)
+                        .lineLimit(1)
+                } else {
+                    Text("Unavailable")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                }
+            }
 
             Spacer()
 
-            Text(entry.amount.compactCurrencyString(code: entry.code))
-                .font(.caption)
+            Text(entry.code)
+                .font(.caption2)
                 .fontWeight(.semibold)
-                .foregroundStyle(.primary)
-                .minimumScaleFactor(0.6)
+                .foregroundStyle(widgetAccent)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(widgetAccent.opacity(0.1), in: Capsule())
                 .lineLimit(1)
         }
     }
@@ -451,8 +472,8 @@ extension WidgetSnapshot {
             liabilityTotal: 250_000,
             baseCurrency: "INR",
             currencyTotals: [
-                .init(code: "USD", amount: 14_940),
-                .init(code: "EUR", amount: 13_750)
+                .init(code: "USD", amount: 14_940, transferRate: 0.012),
+                .init(code: "EUR", amount: 13_750, transferRate: 0.011)
             ],
             lastUpdated: .now,
             transferRatesLastUpdated: .now
@@ -472,9 +493,9 @@ extension WidgetSnapshot {
             liabilityTotal: 250_000,
             baseCurrency: "INR",
             currencyTotals: [
-                .init(code: "USD", amount: 14_940),
-                .init(code: "EUR", amount: 13_750),
-                .init(code: "GBP", amount: 11_800)
+                .init(code: "USD", amount: 14_940, transferRate: 0.012),
+                .init(code: "EUR", amount: 13_750, transferRate: 0.011),
+                .init(code: "GBP", amount: 11_800, transferRate: 0.0094)
             ],
             lastUpdated: .now,
             transferRatesLastUpdated: .now
