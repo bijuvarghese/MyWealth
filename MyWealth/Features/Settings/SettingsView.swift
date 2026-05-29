@@ -103,8 +103,6 @@ struct SettingsView: View {
 
             Section("Data") {
                 cleanupButton
-                chatGPTAnalysisButton
-                inAppChatGPTAnalysisButton
                 exportButton
                 importButton
             }
@@ -200,16 +198,6 @@ struct SettingsView: View {
                     SettingsCard {
                         VStack(spacing: 0) {
                             cleanupButton
-                                .buttonStyle(.plain)
-                            Divider()
-                                .padding(.leading, 44)
-                                .padding(.vertical, 10)
-                            chatGPTAnalysisButton
-                                .buttonStyle(.plain)
-                            Divider()
-                                .padding(.leading, 44)
-                                .padding(.vertical, 10)
-                            inAppChatGPTAnalysisButton
                                 .buttonStyle(.plain)
                             Divider()
                                 .padding(.leading, 44)
