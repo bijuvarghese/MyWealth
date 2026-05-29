@@ -54,13 +54,6 @@ struct DashboardView: View {
             } else {
                 List {
                     Section {
-                        AppListCard {
-                            IncludeIgnoredAssetsToggle(settings: settings)
-                        }
-                        .appListRow()
-                    }
-
-                    Section {
                         AppListCard(
                             contentPadding: EdgeInsets(top: 12, leading: 0, bottom: 0, trailing: 0)
                         ) {
@@ -236,6 +229,17 @@ struct DashboardView: View {
             .navigationTitle("My Assets")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Toggle(isOn: $settings.includeIgnoredAssetsInPortfolio) {
+                            Label("Include Ignored Assets", systemImage: "eye.slash")
+                        }
+                    } label: {
+                        Image(systemName: settings.includeIgnoredAssetsInPortfolio
+                            ? "line.3.horizontal.decrease.circle.fill"
+                            : "line.3.horizontal.decrease.circle")
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showAddSheet = true
                     } label: {
@@ -312,13 +316,6 @@ struct NetWorthView: View {
                     List {
                         Section {
                             AppListCard {
-                                IncludeIgnoredAssetsToggle(settings: settings)
-                            }
-                            .appListRow()
-                        }
-
-                        Section {
-                            AppListCard {
                                 DashboardNetWorthTotalsView(
                                     totals: viewModel.totalsByCurrency(
                                         portfolioAssets,
@@ -382,17 +379,15 @@ struct NetWorthView: View {
             .navigationTitle("Global Net Worth")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        Task {
-                            await viewModel.fetchExchangeRate(
-                                requiredCurrencies: coordinator.requiredExchangeRateCurrencies
-                            )
-                            coordinator.recordPortfolioHistory()
+                    Menu {
+                        Toggle(isOn: $settings.includeIgnoredAssetsInPortfolio) {
+                            Label("Include Ignored Assets", systemImage: "eye.slash")
                         }
                     } label: {
-                        Label("Refresh Rates", systemImage: "arrow.clockwise")
+                        Image(systemName: settings.includeIgnoredAssetsInPortfolio
+                            ? "line.3.horizontal.decrease.circle.fill"
+                            : "line.3.horizontal.decrease.circle")
                     }
-                    .disabled(viewModel.isLoadingRate)
                 }
             }
             .navigationDestination(isPresented: $showNetWorthHistory) {
@@ -404,29 +399,5 @@ struct NetWorthView: View {
             await metalViewModel.refreshIfNeeded()
             viewModel.enrichWithMetalRates(metalViewModel.metalRates)
         }
-    }
-}
-
-private struct IncludeIgnoredAssetsToggle: View {
-    @Bindable var settings: AppSettings
-
-    var body: some View {
-        Toggle(isOn: $settings.includeIgnoredAssetsInPortfolio) {
-            HStack(spacing: 12) {
-                Image(systemName: "eye.slash")
-                    .foregroundStyle(.accent)
-                    .frame(width: 25)
-
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("Include Ignored Assets")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.primary)
-                    Text("Count ignored assets in portfolio totals")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
-        .tint(.accentColor)
     }
 }
