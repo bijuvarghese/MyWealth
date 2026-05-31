@@ -58,11 +58,29 @@ final class MetalPricesViewModel {
 
     // MARK: - Fetch
 
+    var ratesAreStale: Bool {
+        guard let lastUpdated else { return true }
+        return lastUpdated < Self.lastCacheBoundary(before: Date())
+    }
+
+    private static func lastCacheBoundary(before date: Date) -> Date {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "UTC")!
+        let hours = cal.component(.hour, from: date)
+        let boundaryHour = (hours / 8) * 8
+        return cal.date(bySettingHour: boundaryHour, minute: 0, second: 0, of: date)!
+    }
+
     func refreshIfNeeded() async {
         guard !isLoading else {
             return
         }
         await refresh()
+    }
+
+    func refreshIfStale() async {
+        guard ratesAreStale else { return }
+        await refreshIfNeeded()
     }
 
     func refresh() async {

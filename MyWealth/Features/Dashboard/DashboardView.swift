@@ -11,6 +11,7 @@ import SwiftData
 
 struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
     @Query private var assets: [Asset]
     @Query private var liabilities: [Liability]
     @Query private var netWorthSnapshots: [NetWorthSnapshot]
@@ -268,11 +269,20 @@ struct DashboardView: View {
             await metalViewModel.refreshIfNeeded()
             viewModel.enrichWithMetalRates(metalViewModel.metalRates)
         }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard newPhase == .active else { return }
+            Task {
+                await viewModel.refreshExchangeRateIfStale()
+                await metalViewModel.refreshIfStale()
+                viewModel.enrichWithMetalRates(metalViewModel.metalRates)
+            }
+        }
     }
 }
 
 struct NetWorthView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
     @Query private var assets: [Asset]
     @Query private var liabilities: [Liability]
     @Query private var netWorthSnapshots: [NetWorthSnapshot]
@@ -398,6 +408,14 @@ struct NetWorthView: View {
         .task(id: "metalRates") {
             await metalViewModel.refreshIfNeeded()
             viewModel.enrichWithMetalRates(metalViewModel.metalRates)
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard newPhase == .active else { return }
+            Task {
+                await viewModel.refreshExchangeRateIfStale()
+                await metalViewModel.refreshIfStale()
+                viewModel.enrichWithMetalRates(metalViewModel.metalRates)
+            }
         }
     }
 }

@@ -53,12 +53,32 @@ final class DashboardViewModel: AssetOperations {
         }
     }
     
+    /// True when the cached rates predate the server's most recent 8-hour refresh boundary (00:00 / 08:00 / 16:00 UTC).
+    var ratesAreStale: Bool {
+        guard let lastUpdated else { return true }
+        return lastUpdated < Self.lastCacheBoundary(before: Date())
+    }
+
+    private static func lastCacheBoundary(before date: Date) -> Date {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "UTC")!
+        let hours = cal.component(.hour, from: date)
+        let boundaryHour = (hours / 8) * 8
+        return cal.date(bySettingHour: boundaryHour, minute: 0, second: 0, of: date)!
+    }
+
     @MainActor
     func refreshExchangeRateIfNeeded(requiredCurrencies: [Asset.CurrencyType] = []) async {
         guard !isLoadingRate else {
             return
         }
         await fetchExchangeRate(requiredCurrencies: requiredCurrencies)
+    }
+
+    @MainActor
+    func refreshExchangeRateIfStale(requiredCurrencies: [Asset.CurrencyType] = []) async {
+        guard ratesAreStale else { return }
+        await refreshExchangeRateIfNeeded(requiredCurrencies: requiredCurrencies)
     }
     
     func fetchExchangeRate(requiredCurrencies: [Asset.CurrencyType] = []) async {
