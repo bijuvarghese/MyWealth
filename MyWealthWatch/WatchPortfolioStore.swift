@@ -24,12 +24,7 @@ final class WatchPortfolioStore: NSObject, ObservableObject, @preconcurrency WCS
         let session = WCSession.default
         session.delegate = self
         session.activate()
-
-        if !session.applicationContext.isEmpty {
-            updateSnapshot(from: session.applicationContext)
-        } else {
-            requestSnapshot(from: session)
-        }
+        syncSnapshot(from: session)
     }
 
     private func updateSnapshot(from context: [String: Any]) {
@@ -71,6 +66,16 @@ final class WatchPortfolioStore: NSObject, ObservableObject, @preconcurrency WCS
         )
     }
 
+    private func syncSnapshot(from session: WCSession) {
+        guard session.activationState == .activated else { return }
+
+        if !session.receivedApplicationContext.isEmpty {
+            updateSnapshot(from: session.receivedApplicationContext)
+        } else {
+            requestSnapshot(from: session)
+        }
+    }
+
     private static func save(_ snapshot: WatchPortfolioSnapshot) {
         guard let data = try? JSONEncoder().encode(snapshot) else { return }
         UserDefaults.standard.set(data, forKey: snapshotKey)
@@ -89,18 +94,14 @@ final class WatchPortfolioStore: NSObject, ObservableObject, @preconcurrency WCS
             ? "Connected to iPhone"
             : "Waiting for iPhone"
 
-        if !session.applicationContext.isEmpty {
-            updateSnapshot(from: session.applicationContext)
-        } else {
-            requestSnapshot(from: session)
-        }
+        syncSnapshot(from: session)
     }
 
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         updateSnapshot(from: applicationContext)
     }
 
-    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
         updateSnapshot(from: userInfo)
     }
 
