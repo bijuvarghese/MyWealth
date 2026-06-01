@@ -38,17 +38,17 @@ final class WatchSnapshotSender: NSObject, @unchecked Sendable, WCSessionDelegat
         }
     }
 
-    private static func context(for snapshot: WidgetSnapshot) -> [String: Any]? {
+    private nonisolated static func context(for snapshot: WidgetSnapshot) -> [String: Any]? {
         guard let data = try? JSONEncoder().encode(snapshot) else { return nil }
         return ["snapshot": data]
     }
 
-    private static func savedSnapshotContext() -> [String: Any]? {
+    private nonisolated static func savedSnapshotContext() -> [String: Any]? {
         guard let snapshot = WidgetDataStore.load() else { return nil }
         return context(for: snapshot)
     }
 
-    func session(
+    nonisolated func session(
         _ session: WCSession,
         activationDidCompleteWith activationState: WCSessionActivationState,
         error: Error?
@@ -62,7 +62,7 @@ final class WatchSnapshotSender: NSObject, @unchecked Sendable, WCSessionDelegat
         try? session.updateApplicationContext(context)
     }
 
-    func session(
+    nonisolated func session(
         _ session: WCSession,
         didReceiveMessage message: [String: Any],
         replyHandler: @escaping ([String: Any]) -> Void
@@ -83,9 +83,9 @@ final class WatchSnapshotSender: NSObject, @unchecked Sendable, WCSessionDelegat
         }
     }
 
-    func sessionDidBecomeInactive(_ session: WCSession) {}
+    nonisolated func sessionDidBecomeInactive(_ session: WCSession) {}
 
-    func sessionDidDeactivate(_ session: WCSession) {
+    nonisolated func sessionDidDeactivate(_ session: WCSession) {
         session.activate()
     }
 }

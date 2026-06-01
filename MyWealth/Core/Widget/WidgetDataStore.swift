@@ -16,7 +16,7 @@ import Foundation
 
 /// A lightweight, Codable snapshot of the current portfolio state.
 /// Written by the main app after every portfolio change; read by the widget extension.
-struct WidgetSnapshot: Codable {
+nonisolated struct WidgetSnapshot: Codable {
 
     /// Net worth (assets − liabilities) in the base currency.
     let netWorth: Double
@@ -67,7 +67,7 @@ struct WidgetSnapshot: Codable {
 /// **App Group ID:** `group.com.bv.MyWealth`
 /// Both the main app target and the widget extension target must have this
 /// App Group capability enabled in Xcode → Signing & Capabilities.
-enum WidgetDataStore {
+nonisolated enum WidgetDataStore {
 
     /// The App Group identifier. Must match exactly in both target entitlements.
     static let appGroupID = "group.com.bv.MyWealth"
