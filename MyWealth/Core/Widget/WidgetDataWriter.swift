@@ -17,6 +17,7 @@ enum WidgetDataWriter {
     ///
     /// Call this whenever portfolio data or exchange rates change —
     /// `PortfolioHistoryCoordinator.writeWidgetSnapshot()` does this automatically.
+    @MainActor
     static func write(
         netWorth: Double,
         assetTotal: Double,
@@ -35,6 +36,7 @@ enum WidgetDataWriter {
             transferRatesLastUpdated: transferRatesLastUpdated
         )
         WidgetDataStore.save(snapshot)
+        WatchSnapshotSender.shared.send(snapshot)
         WidgetCenter.shared.reloadAllTimelines()
     }
 }
