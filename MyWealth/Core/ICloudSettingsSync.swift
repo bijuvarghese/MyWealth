@@ -8,6 +8,10 @@ final class ICloudSettingsSync {
 
     static let shared = ICloudSettingsSync()
 
+    static var isAvailable: Bool {
+        FileManager.default.ubiquityIdentityToken != nil
+    }
+
     private let store = NSUbiquitousKeyValueStore.default
 
     private enum Keys {
@@ -21,6 +25,8 @@ final class ICloudSettingsSync {
     // MARK: - Push local → iCloud
 
     func push(settings: AppSettings) {
+        guard Self.isAvailable else { return }
+
         store.set(settings.baseCurrency.rawValue, forKey: Keys.baseCurrency)
         store.set(settings.totalCurrencies.map(\.rawValue), forKey: Keys.totalCurrencies)
         store.set(settings.usesCompactCurrencyTotals, forKey: Keys.compactTotals)
@@ -31,6 +37,8 @@ final class ICloudSettingsSync {
 
     /// Applies any iCloud KV values that differ from the current local settings.
     func pull(into settings: AppSettings) {
+        guard Self.isAvailable else { return }
+
         if let raw = store.string(forKey: Keys.baseCurrency),
            let currency = Asset.CurrencyType(rawValue: raw),
            currency != .none {
@@ -50,6 +58,8 @@ final class ICloudSettingsSync {
 
     /// Registers a handler called whenever another device pushes a change to iCloud KV.
     func startObserving(onChange: @Sendable @escaping () -> Void) {
+        guard Self.isAvailable else { return }
+
         NotificationCenter.default.addObserver(
             forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
             object: store,

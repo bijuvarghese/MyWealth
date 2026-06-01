@@ -19,15 +19,18 @@ final class WatchSnapshotSender: NSObject, @unchecked Sendable, WCSessionDelegat
     }
 
     func send(_ snapshot: WidgetSnapshot) {
-        guard
-            let session,
-            session.isWatchAppInstalled,
-            let context = Self.context(for: snapshot)
-        else { return }
+        guard let session, let context = Self.context(for: snapshot) else { return }
 
-        if session.activationState != .activated {
+        guard session.activationState == .activated else {
             session.activate()
+            return
         }
+
+        guard
+            session.isPaired,
+            session.isWatchAppInstalled,
+            session.activationState == .activated
+        else { return }
 
         try? session.updateApplicationContext(context)
 
@@ -55,6 +58,7 @@ final class WatchSnapshotSender: NSObject, @unchecked Sendable, WCSessionDelegat
     ) {
         guard
             activationState == .activated,
+            session.isPaired,
             session.isWatchAppInstalled,
             let context = Self.savedSnapshotContext()
         else { return }
@@ -78,7 +82,7 @@ final class WatchSnapshotSender: NSObject, @unchecked Sendable, WCSessionDelegat
         }
 
         replyHandler(context)
-        if session.isWatchAppInstalled {
+        if session.activationState == .activated, session.isPaired, session.isWatchAppInstalled {
             try? session.updateApplicationContext(context)
         }
     }

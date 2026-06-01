@@ -33,7 +33,7 @@ enum CloudKitSyncManager {
             return try ModelContainer(for: schema, configurations: [config])
         }
 
-        if syncEnabled {
+        if syncEnabled, ICloudSettingsSync.isAvailable {
             // CloudKit private database — data lives in the user's personal iCloud account.
             // SwiftData auto-generates the CloudKit schema on first launch.
             // The Simulator has no real CloudKit access, so fall back to local storage there
