@@ -36,7 +36,6 @@ enum WidgetDataWriter {
             transferRatesLastUpdated: transferRatesLastUpdated
         )
         WidgetDataStore.save(snapshot)
-        WatchSnapshotSender.shared.send(snapshot)
         WidgetCenter.shared.reloadAllTimelines()
     }
 }
