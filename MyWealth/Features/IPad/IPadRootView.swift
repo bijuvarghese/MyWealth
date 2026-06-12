@@ -43,8 +43,8 @@ struct IPadRootView: View {
             NetWorthView(settings: settings)
         case .rates:
             TransferRatesView(settings: settings)
-        case .settings:
-            SettingsView(settings: settings, showsDoneButton: false)
+        case .briefing:
+            BriefingView(settings: settings)
         }
     }
 }
@@ -54,7 +54,7 @@ private enum IPadSection: String, CaseIterable, Hashable, Identifiable {
     case assets
     case netWorth
     case rates
-    case settings
+    case briefing
 
     var id: String { rawValue }
 
@@ -68,8 +68,8 @@ private enum IPadSection: String, CaseIterable, Hashable, Identifiable {
             return "Net Worth"
         case .rates:
             return "Rates"
-        case .settings:
-            return "Settings"
+        case .briefing:
+            return "Briefing"
         }
     }
 
@@ -83,8 +83,8 @@ private enum IPadSection: String, CaseIterable, Hashable, Identifiable {
             return "chart.line.uptrend.xyaxis"
         case .rates:
             return "arrow.left.arrow.right.circle.fill"
-        case .settings:
-            return "gearshape.fill"
+        case .briefing:
+            return "sparkles"
         }
     }
 }

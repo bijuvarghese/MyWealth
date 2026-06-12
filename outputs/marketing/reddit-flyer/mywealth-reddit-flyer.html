@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Wealth Reddit Flyer</title>
+  <style>
+    :root {
+      --gold: #b37f12;
+      --gold-2: #f0b43b;
+      --amber: #f6ca67;
+      --ink: #18211f;
+      --muted: #61706b;
+      --line: #dfe7e2;
+      --paper: #fffdf7;
+      --mint: #74d687;
+      --teal: #5fae8c;
+      --sage: #e9f4ec;
+      --cream: #fff7e7;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      width: 1080px;
+      height: 1350px;
+      background: var(--paper);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+    }
+
+    .flyer {
+      position: relative;
+      width: 1080px;
+      height: 1350px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 82% 12%, rgba(116, 214, 135, 0.28), transparent 26%),
+        radial-gradient(circle at 6% 88%, rgba(179, 127, 18, 0.16), transparent 28%),
+        linear-gradient(160deg, #ffffff 0%, #fffaf0 50%, #f4fbf5 100%);
+    }
+
+    .grid {
+      position: absolute;
+      inset: 0;
+      opacity: 0.2;
+      background-image:
+        linear-gradient(rgba(24, 33, 31, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(24, 33, 31, 0.08) 1px, transparent 1px);
+      background-size: 54px 54px;
+      mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 74%, transparent);
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      padding: 68px 74px 58px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 36px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .app-icon {
+      width: 96px;
+      height: 96px;
+      border-radius: 24px;
+      padding: 10px;
+      background: #ffffff;
+      box-shadow: 0 18px 45px rgba(61, 46, 13, 0.15);
+    }
+
+    .brand-copy {
+      display: grid;
+      gap: 4px;
+    }
+
+    .brand-name {
+      font-size: 42px;
+      line-height: 1;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .brand-meta {
+      font-size: 22px;
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .badge {
+      border: 1px solid rgba(179, 127, 18, 0.35);
+      background: rgba(255, 255, 255, 0.72);
+      color: #6f4a06;
+      border-radius: 999px;
+      padding: 14px 20px;
+      font-size: 20px;
+      font-weight: 800;
+      box-shadow: 0 14px 32px rgba(88, 69, 26, 0.08);
+      white-space: nowrap;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.02fr 0.98fr;
+      gap: 44px;
+      align-items: center;
+      min-height: 0;
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 30px;
+      align-content: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 10px;
+      color: #6a4a08;
+      background: #fff2ce;
+      border: 1px solid rgba(179, 127, 18, 0.28);
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-size: 20px;
+      font-weight: 850;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--gold);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 500px;
+      font-size: 74px;
+      line-height: 0.96;
+      letter-spacing: 0;
+      font-weight: 920;
+      color: var(--ink);
+    }
+
+    .subhead {
+      margin: 0;
+      max-width: 470px;
+      color: #3e4a47;
+      font-size: 28px;
+      line-height: 1.25;
+      font-weight: 650;
+    }
+
+    .features {
+      display: grid;
+      gap: 14px;
+      margin-top: 2px;
+    }
+
+    .feature {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 14px;
+      align-items: start;
+      font-size: 23px;
+      line-height: 1.22;
+      font-weight: 760;
+      color: #24302d;
+    }
+
+    .check {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: linear-gradient(145deg, var(--mint), var(--teal));
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      font-weight: 900;
+      box-shadow: 0 10px 20px rgba(83, 174, 126, 0.25);
+    }
+
+    .phone-wrap {
+      position: relative;
+      display: grid;
+      justify-items: center;
+      align-items: center;
+      min-height: 770px;
+    }
+
+    .halo {
+      position: absolute;
+      width: 430px;
+      height: 430px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(246, 202, 103, 0.38), rgba(116, 214, 135, 0.08) 58%, transparent 70%);
+      filter: blur(4px);
+      transform: translate(18px, -26px);
+    }
+
+    .phone {
+      position: relative;
+      width: 390px;
+      height: 760px;
+      border-radius: 56px;
+      background: #111816;
+      padding: 15px;
+      box-shadow: 0 36px 90px rgba(24, 33, 31, 0.28);
+      transform: rotate(2.5deg);
+    }
+
+    .screen {
+      height: 100%;
+      border-radius: 43px;
+      background: linear-gradient(180deg, #fbfdfb 0%, #f4fbf6 100%);
+      overflow: hidden;
+      padding: 30px 24px;
+      display: grid;
+      gap: 18px;
+      align-content: start;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+    }
+
+    .status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #41504c;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: #edf7ef;
+      color: #447559;
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .screen-title {
+      display: grid;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .tiny-label {
+      color: #78908a;
+      font-size: 14px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .amount {
+      font-size: 42px;
+      line-height: 1;
+      font-weight: 920;
+      color: #16211e;
+    }
+
+    .delta {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: #fff3d6;
+      color: #72510b;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .chart {
+      height: 150px;
+      border-radius: 28px;
+      background:
+        linear-gradient(180deg, rgba(116, 214, 135, 0.25), rgba(116, 214, 135, 0.02)),
+        #ffffff;
+      border: 1px solid #e1ece6;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chart svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .metric {
+      min-height: 104px;
+      border-radius: 24px;
+      background: #ffffff;
+      border: 1px solid #e2ebe6;
+      padding: 17px;
+      display: grid;
+      align-content: space-between;
+      box-shadow: 0 12px 30px rgba(30, 51, 43, 0.06);
+    }
+
+    .metric strong {
+      font-size: 23px;
+      line-height: 1;
+      color: #17231f;
+    }
+
+    .metric span {
+      color: #6d827b;
+      font-size: 13px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .list-card {
+      border-radius: 28px;
+      background: #ffffff;
+      border: 1px solid #e2ebe6;
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+      box-shadow: 0 12px 30px rgba(30, 51, 43, 0.06);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 38px 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .coin {
+      width: 38px;
+      height: 38px;
+      border-radius: 15px;
+      background: #f6cf70;
+      display: grid;
+      place-items: center;
+      color: #5f4107;
+      font-weight: 900;
+    }
+
+    .row-label {
+      display: grid;
+      gap: 3px;
+    }
+
+    .row-label strong {
+      font-size: 16px;
+      color: #1b2623;
+    }
+
+    .row-label span {
+      font-size: 12px;
+      color: #7a8b86;
+      font-weight: 800;
+    }
+
+    .row-value {
+      font-size: 17px;
+      font-weight: 900;
+      color: #21302c;
+    }
+
+    .floating-card {
+      position: absolute;
+      left: 8px;
+      bottom: 54px;
+      width: 224px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(223, 231, 226, 0.9);
+      padding: 18px;
+      display: grid;
+      gap: 8px;
+      box-shadow: 0 26px 60px rgba(34, 44, 40, 0.18);
+      transform: rotate(-3deg);
+    }
+
+    .floating-card .small {
+      color: #6f807b;
+      font-size: 15px;
+      font-weight: 850;
+    }
+
+    .floating-card .big {
+      font-size: 26px;
+      font-weight: 920;
+      color: #15211d;
+    }
+
+    .footer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 32px;
+      border-top: 1px solid rgba(126, 142, 136, 0.25);
+      padding-top: 28px;
+    }
+
+    .cta {
+      display: grid;
+      gap: 8px;
+    }
+
+    .cta strong {
+      font-size: 31px;
+      line-height: 1.06;
+      font-weight: 920;
+    }
+
+    .cta span {
+      font-size: 20px;
+      color: var(--muted);
+      font-weight: 720;
+    }
+
+    .link {
+      display: grid;
+      gap: 8px;
+      text-align: right;
+      justify-items: end;
+    }
+
+    .link-label {
+      font-size: 18px;
+      color: #6a4a08;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .url {
+      color: #17231f;
+      background: #ffffff;
+      border: 1px solid #dfe7e2;
+      border-radius: 18px;
+      padding: 14px 18px;
+      font-size: 22px;
+      font-weight: 850;
+      box-shadow: 0 16px 34px rgba(35, 49, 44, 0.08);
+    }
+  </style>
+</head>
+<body>
+  <main class="flyer" aria-label="My Wealth marketing flyer">
+    <div class="grid"></div>
+    <section class="content">
+      <header class="topbar">
+        <div class="brand">
+          <img class="app-icon" src="../../../../MyWealth/Assets.xcassets/AppIcon.appiconset/1024.png" alt="My Wealth app icon">
+          <div class="brand-copy">
+            <div class="brand-name">My Wealth</div>
+            <div class="brand-meta">SwiftUI iOS app</div>
+          </div>
+        </div>
+        <div class="badge">Local-first finance tracker</div>
+      </header>
+
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span> Built for people tracking wealth across currencies</div>
+          <h1>Know your net worth at a glance.</h1>
+          <p class="subhead">Track assets, liabilities, exchange rates, history, and widgets without giving up control of your financial data.</p>
+
+          <div class="features" aria-label="Feature list">
+            <div class="feature"><div class="check">✓</div><div>Multi-currency net worth totals with cached exchange rates</div></div>
+            <div class="feature"><div class="check">✓</div><div>Manual asset and liability tracking with snapshot history</div></div>
+            <div class="feature"><div class="check">✓</div><div>Portfolio insights, trend charts, transfer-rate preview, and widgets</div></div>
+            <div class="feature"><div class="check">✓</div><div>Stored locally by default, with optional iCloud sync and backups</div></div>
+          </div>
+        </div>
+
+        <div class="phone-wrap" aria-hidden="true">
+          <div class="halo"></div>
+          <div class="phone">
+            <div class="screen">
+              <div class="status"><span>Dashboard</span><span class="pill">Synced</span></div>
+              <div class="screen-title">
+                <div class="tiny-label">Net worth</div>
+                <div class="amount">$428.6K</div>
+                <div class="delta">▲ 4.8% this month</div>
+              </div>
+              <div class="chart">
+                <svg viewBox="0 0 330 150" role="img" aria-label="upward trend chart">
+                  <path d="M0 118 C42 98, 58 112, 92 85 C126 58, 138 74, 166 62 C205 43, 216 56, 252 32 C280 14, 304 22, 330 12 L330 150 L0 150 Z" fill="rgba(116,214,135,0.25)"/>
+                  <path d="M0 118 C42 98, 58 112, 92 85 C126 58, 138 74, 166 62 C205 43, 216 56, 252 32 C280 14, 304 22, 330 12" fill="none" stroke="#51a56f" stroke-width="8" stroke-linecap="round"/>
+                  <circle cx="252" cy="32" r="8" fill="#b37f12"/>
+                  <circle cx="330" cy="12" r="8" fill="#18211f"/>
+                </svg>
+              </div>
+              <div class="metrics">
+                <div class="metric"><span>Assets</span><strong>$512K</strong></div>
+                <div class="metric"><span>Liabilities</span><strong>$83K</strong></div>
+              </div>
+              <div class="list-card">
+                <div class="row">
+                  <div class="coin">$</div>
+                  <div class="row-label"><strong>USD</strong><span>Base currency</span></div>
+                  <div class="row-value">$428.6K</div>
+                </div>
+                <div class="row">
+                  <div class="coin">₹</div>
+                  <div class="row-label"><strong>INR</strong><span>Display total</span></div>
+                  <div class="row-value">₹3.58Cr</div>
+                </div>
+                <div class="row">
+                  <div class="coin">€</div>
+                  <div class="row-label"><strong>EUR</strong><span>Display total</span></div>
+                  <div class="row-value">€397K</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="floating-card">
+            <div class="small">Widget-ready</div>
+            <div class="big">Home + Lock Screen</div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="cta">
+          <strong>Try it, critique it, or follow the build.</strong>
+          <span>Open-source personal finance tracking for iPhone.</span>
+        </div>
+        <div class="link">
+          <div class="link-label">GitHub</div>
+          <div class="url">github.com/bijuvarghese/MyWealth</div>
+        </div>
+      </footer>
+    </section>
+  </main>
+</body>
+</html>

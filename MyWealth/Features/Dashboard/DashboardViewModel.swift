@@ -860,7 +860,8 @@ final class DashboardViewModel: AssetOperations {
             return true
         }
 
-        return abs(snapshot.displayAmount - asset.displayAmount) >= 0.01
+        return abs(snapshot.displayAmount - asset.displayAmount) >= 0.01 ||
+            snapshot.displayCurrencyCode != asset.displayCurrency.rawValue
     }
 
     private func shouldRecordNetWorthSnapshot(_ amount: Double, after snapshot: NetWorthSnapshot?) -> Bool {

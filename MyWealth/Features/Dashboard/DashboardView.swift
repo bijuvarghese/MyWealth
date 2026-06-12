@@ -26,6 +26,8 @@ struct DashboardView: View {
     @State private var selectedCategory: Asset.CategoryType? = nil
     @State private var viewModel = DashboardViewModel()
     @State private var metalViewModel = MetalPricesViewModel()
+    @State private var showSettings = false
+    @State private var showFIRECalculator = false
 
     private var portfolioAssets: [Asset] {
         settings.portfolioCalculationAssets(from: assets)
@@ -33,6 +35,7 @@ struct DashboardView: View {
 
     private var coordinator: PortfolioHistoryCoordinator {
         PortfolioHistoryCoordinator(
+            allAssets: assets,
             assets: portfolioAssets,
             liabilities: liabilities,
             netWorthSnapshots: netWorthSnapshots,
@@ -78,6 +81,36 @@ struct DashboardView: View {
                                 currencyCode: settings.baseCurrency.rawValue
                             )
                         }
+                        .appListRow()
+                    }
+
+                    Section(header: PillLabel("Plan")) {
+                        Button {
+                            showFIRECalculator = true
+                        } label: {
+                            AppListCard {
+                                HStack(spacing: 14) {
+                                    Image(systemName: "flame.fill")
+                                        .font(.title2)
+                                        .foregroundStyle(.orange)
+                                        .frame(width: 42, height: 42)
+                                        .background(Color.orange.opacity(0.12), in: Circle())
+
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("FIRE Calculator")
+                                            .font(.headline)
+                                            .foregroundStyle(.primary)
+                                        Text("Model your financial independence target and timeline")
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                    }
+
+                                    Spacer()
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
                         .appListRow()
                     }
 
@@ -229,6 +262,13 @@ struct DashboardView: View {
             }
             .navigationTitle("My Assets")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        showSettings = true
+                    } label: {
+                        Label("Settings", systemImage: "gearshape")
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Toggle(isOn: $settings.includeIgnoredAssetsInPortfolio) {
@@ -257,8 +297,14 @@ struct DashboardView: View {
                     AddorEditAssetView()
                 }
             )
+            .sheet(isPresented: $showSettings) {
+                SettingsView(settings: settings, showsDoneButton: true)
+            }
             .navigationDestination(item: $selectedCategory) { category in
                 CategoryDetailView(category: category, settings: settings)
+            }
+            .navigationDestination(isPresented: $showFIRECalculator) {
+                FIRECalculatorView(settings: settings)
             }
             .navigationDestination(isPresented: $showNetWorthHistory) {
                 NetWorthHistoryView(settings: settings)
@@ -293,13 +339,37 @@ struct NetWorthView: View {
     @State private var viewModel = DashboardViewModel()
     @State private var metalViewModel = MetalPricesViewModel()
     @State private var showNetWorthHistory = false
+    @AppStorage("netWorthComfort.householdMembers") private var comfortHouseholdMembers = 1
+    @AppStorage("netWorthComfort.monthlyIncome") private var comfortMonthlyIncome = 0.0
+    @AppStorage("netWorthComfort.expectedMonthlySpend") private var comfortExpectedMonthlySpend = 0.0
+    @AppStorage("netWorthComfort.monthlyIncomeWasProvided") private var comfortMonthlyIncomeWasProvided = false
+    @AppStorage("netWorthComfort.expectedMonthlySpendWasProvided") private var comfortExpectedMonthlySpendWasProvided = false
 
     private var portfolioAssets: [Asset] {
         settings.portfolioCalculationAssets(from: assets)
     }
 
+    private var comfortAssumptions: Binding<LivingComfortAssumptions> {
+        Binding {
+            LivingComfortAssumptions(
+                householdMembers: comfortHouseholdMembers,
+                monthlyIncome: comfortMonthlyIncome,
+                expectedMonthlySpend: comfortExpectedMonthlySpend,
+                monthlyIncomeWasProvided: comfortMonthlyIncomeWasProvided || comfortMonthlyIncome > 0,
+                expectedMonthlySpendWasProvided: comfortExpectedMonthlySpendWasProvided || comfortExpectedMonthlySpend > 0
+            )
+        } set: { assumptions in
+            comfortHouseholdMembers = assumptions.safeHouseholdMembers
+            comfortMonthlyIncome = max(assumptions.monthlyIncome, 0)
+            comfortExpectedMonthlySpend = max(assumptions.expectedMonthlySpend, 0)
+            comfortMonthlyIncomeWasProvided = assumptions.monthlyIncomeWasProvided
+            comfortExpectedMonthlySpendWasProvided = assumptions.expectedMonthlySpendWasProvided
+        }
+    }
+
     private var coordinator: PortfolioHistoryCoordinator {
         PortfolioHistoryCoordinator(
+            allAssets: assets,
             assets: portfolioAssets,
             liabilities: liabilities,
             netWorthSnapshots: netWorthSnapshots,
@@ -324,17 +394,32 @@ struct NetWorthView: View {
                     )
                 } else {
                     List {
+                        let netWorthTotals = viewModel.totalsByCurrency(
+                            portfolioAssets,
+                            liabilities: liabilities,
+                            baseCurrency: settings.baseCurrency,
+                            displayCurrencies: settings.totalCurrencies
+                        )
+                        Section(header: PillLabel("Country Comfort")) {
+                            AppListCard {
+                                NetWorthLivingComfortView(
+                                    totals: netWorthTotals,
+                                    baseCurrency: settings.baseCurrency,
+                                    exchangeRates: viewModel.exchangeRates,
+                                    assumptions: comfortAssumptions,
+                                    collapsedRowLimit: 3
+                                )
+                            }
+                            .appListRow()
+                        }
+
                         Section {
                             AppListCard {
                                 DashboardNetWorthTotalsView(
-                                    totals: viewModel.totalsByCurrency(
-                                        portfolioAssets,
-                                        liabilities: liabilities,
-                                        baseCurrency: settings.baseCurrency,
-                                        displayCurrencies: settings.totalCurrencies
-                                    ),
+                                    totals: netWorthTotals,
                                     rateStatus: viewModel.rateStatus,
-                                    useCompactFormatting: settings.usesCompactCurrencyTotals
+                                    useCompactFormatting: settings.usesCompactCurrencyTotals,
+                                    collapsedRowLimit: 3
                                 )
                             }
                             .appListRow()
@@ -370,16 +455,6 @@ struct NetWorthView: View {
                                 )
                             }
                             .appListRow()
-                        }
-
-                        let historyRows = viewModel.recentAssetHistoryRows(assetValueSnapshots)
-                        if !historyRows.isEmpty {
-                            Section(header: PillLabel("History")) {
-                                AppListCard {
-                                    AssetHistoryListView(rows: historyRows)
-                                }
-                                .appListRow()
-                            }
                         }
                     }
                     .scrollContentBackground(.hidden)
