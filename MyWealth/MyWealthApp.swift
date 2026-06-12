@@ -164,9 +164,9 @@ private struct AppTabView: View {
                     Label("Rates", systemImage: "arrow.left.arrow.right.circle.fill")
                 }
 
-            SettingsView(settings: settings, showsDoneButton: false)
+            BriefingView(settings: settings)
                 .tabItem {
-                    Label("Settings", systemImage: "gearshape.fill")
+                    Label("Briefing", systemImage: "sparkles")
                 }
         }
     }

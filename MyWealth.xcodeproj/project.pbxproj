@@ -10,14 +10,14 @@
 		08A4BD92CC1B4975A26E36D1 /* WatchPortfolioStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2B89DD20EE43579A3CA1D0 /* WatchPortfolioStore.swift */; };
 		86DDC753ABB3474399894967 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B7FAC5C4F0244C0D8392B20C /* Assets.xcassets */; };
 		9F42E96A23894BB3AE4EADC5 /* MyWealthWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53CBC9A7EFE4AAE9CD3CAFA /* MyWealthWatchApp.swift */; };
-		B7F224BCF4F94C03A81839BD /* MyWealthWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 4982AC64C23B4EC3A4C54E2B /* MyWealthWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B4BEA7BE07244DEEB198F5E0 /* WatchDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D262AEE01D641BC986AC26F /* WatchDashboardView.swift */; };
+		B7F224BCF4F94C03A81839BD /* MyWealthWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 4982AC64C23B4EC3A4C54E2B /* MyWealthWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C62E2C67AFF5436D9802F027 /* MyWealthWatchExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 89BDB4052A2442EEBB4C98A9 /* MyWealthWatchExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		D9E01E3C570E4F389FCE966A /* WatchPortfolioSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860B93A945B3457FB1EDFF6F /* WatchPortfolioSnapshot.swift */; };
 		C6E4BBF52FC3B964002737D2 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6E4BBD82FC3B85D002737D2 /* WidgetKit.framework */; };
 		C6E4BBF62FC3B964002737D2 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C63A09AF2EC5824F005CDAAE /* SwiftUI.framework */; };
 		C6E4BC012FC3B964002737D2 /* MyWealthWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C6E4BBF42FC3B964002737D2 /* MyWealthWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C6E4BC0C2FC3BB1E002737D2 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6E4BBD82FC3B85D002737D2 /* WidgetKit.framework */; };
+		D9E01E3C570E4F389FCE966A /* WatchPortfolioSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860B93A945B3457FB1EDFF6F /* WatchPortfolioSnapshot.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,13 +27,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 6603841D23E94E269A8DFB33;
 			remoteInfo = MyWealthWatch;
-		};
-		F6F62C20475848909DB6B609 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = C6FF485E2EBE5C0A00A528A7 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 93E3D830AFF84F1EBDCDA62B;
-			remoteInfo = MyWealthWatchExtension;
 		};
 		C64A90802EC048CB001E1F52 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -48,6 +41,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = C6E4BBF32FC3B964002737D2;
 			remoteInfo = MyWealthWidgetExtension;
+		};
+		F6F62C20475848909DB6B609 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C6FF485E2EBE5C0A00A528A7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 93E3D830AFF84F1EBDCDA62B;
+			remoteInfo = MyWealthWatchExtension;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -128,19 +128,6 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		9A44A4A633A44EC1A33F4C87 /* MyWealthWatch */ = {
-			isa = PBXGroup;
-			children = (
-				F53CBC9A7EFE4AAE9CD3CAFA /* MyWealthWatchApp.swift */,
-				0D262AEE01D641BC986AC26F /* WatchDashboardView.swift */,
-				860B93A945B3457FB1EDFF6F /* WatchPortfolioSnapshot.swift */,
-				FA2B89DD20EE43579A3CA1D0 /* WatchPortfolioStore.swift */,
-				B7FAC5C4F0244C0D8392B20C /* Assets.xcassets */,
-				D39F0BDF28C646C88A86E1BC /* ExtensionInfo.plist */,
-			);
-			path = MyWealthWatch;
-			sourceTree = "<group>";
-		};
 		C64A907D2EC048CB001E1F52 /* MyWealthTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = MyWealthTests;
@@ -166,14 +153,14 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		700AB23EA0284B3ABC132724 /* Frameworks */ = {
+		498E754B58E840A28803D6B7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		498E754B58E840A28803D6B7 /* Frameworks */ = {
+		700AB23EA0284B3ABC132724 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -207,6 +194,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9A44A4A633A44EC1A33F4C87 /* MyWealthWatch */ = {
+			isa = PBXGroup;
+			children = (
+				F53CBC9A7EFE4AAE9CD3CAFA /* MyWealthWatchApp.swift */,
+				0D262AEE01D641BC986AC26F /* WatchDashboardView.swift */,
+				860B93A945B3457FB1EDFF6F /* WatchPortfolioSnapshot.swift */,
+				FA2B89DD20EE43579A3CA1D0 /* WatchPortfolioStore.swift */,
+				B7FAC5C4F0244C0D8392B20C /* Assets.xcassets */,
+				D39F0BDF28C646C88A86E1BC /* ExtensionInfo.plist */,
+			);
+			path = MyWealthWatch;
+			sourceTree = "<group>";
+		};
 		C63A09AC2EC5824F005CDAAE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -421,13 +421,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E8D11FE8CAFF456F88E37A82 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		C6E4BBF22FC3B964002737D2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -442,16 +435,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXResourcesBuildPhase section */
-
-/* Begin PBXSourcesBuildPhase section */
-		98E7C8BBFD0D4DE08D8AAA20 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
+		E8D11FE8CAFF456F88E37A82 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
 		89DCE0DAFFB94931AA5D8D0B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -460,6 +453,13 @@
 				B4BEA7BE07244DEEB198F5E0 /* WatchDashboardView.swift in Sources */,
 				D9E01E3C570E4F389FCE966A /* WatchPortfolioSnapshot.swift in Sources */,
 				08A4BD92CC1B4975A26E36D1 /* WatchPortfolioStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		98E7C8BBFD0D4DE08D8AAA20 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -523,7 +523,6 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.bv.MyWealth;
-				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -544,40 +543,6 @@
 			};
 			name = Release;
 		};
-		7D29DE5B7AE548619FB9A0B9 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3B2GBCUUPP;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Wealth Map";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.bv.MyWealth;
-				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 4.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.bv.MyWealth.watchkitapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "watchos watchsimulator";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 26.1;
-			};
-			name = Debug;
-		};
 		484FAB3509744289AC2EC722 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -594,6 +559,39 @@
 				);
 				MARKETING_VERSION = 4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bv.MyWealth.watchkitapp.watchkitextension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.1;
+			};
+			name = Debug;
+		};
+		7D29DE5B7AE548619FB9A0B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3B2GBCUUPP;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Wealth Map";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.bv.MyWealth;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 4.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bv.MyWealth.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;

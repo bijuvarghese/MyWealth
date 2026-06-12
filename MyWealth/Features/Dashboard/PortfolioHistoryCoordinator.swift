@@ -10,6 +10,7 @@ import SwiftData
 import WidgetKit
 
 struct PortfolioHistoryCoordinator {
+    let allAssets: [Asset]
     let assets: [Asset]
     let liabilities: [Liability]
     let netWorthSnapshots: [NetWorthSnapshot]
@@ -19,17 +20,21 @@ struct PortfolioHistoryCoordinator {
     let modelContext: ModelContext
 
     var assetSnapshotSignature: String {
-        assets.map { asset in
+        allAssets.map { asset in
             [
                 String(describing: asset.persistentModelID),
-                asset.displayName,
                 "\(asset.displayAmount)",
-                asset.displayCurrency.rawValue,
-                asset.displayCategory.rawValue,
-                "\(asset.lastUpdated?.timeIntervalSince1970 ?? 0)"
+                asset.displayCurrency.rawValue
             ].joined(separator: ":")
         }
         .joined(separator: "|")
+    }
+
+    var portfolioMembershipSignature: String {
+        [
+            settings.includeIgnoredAssetsInPortfolio ? "include-ignored" : "exclude-ignored",
+            assets.map { String(describing: $0.persistentModelID) }.joined(separator: ":")
+        ].joined(separator: "|")
     }
 
     var liabilitySnapshotSignature: String {
@@ -142,6 +147,14 @@ struct PortfolioHistoryCoordinationModifier: ViewModifier {
                         requiredCurrencies: coordinator.requiredExchangeRateCurrencies
                     )
                     coordinator.recordPortfolioHistory()
+                    coordinator.writeWidgetSnapshot()
+                }
+            }
+            .onChange(of: coordinator.portfolioMembershipSignature) {
+                Task {
+                    await coordinator.viewModel.refreshExchangeRateIfNeeded(
+                        requiredCurrencies: coordinator.requiredExchangeRateCurrencies
+                    )
                     coordinator.writeWidgetSnapshot()
                 }
             }

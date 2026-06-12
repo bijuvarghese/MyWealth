@@ -133,6 +133,102 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func portfolioIntelligenceScoresAllCashPortfolioLikeBriefingReference() async throws {
+        let calculator = PortfolioIntelligenceCalculator()
+        let assets = [
+            Asset(name: "Cash", amount: 800_000, currency: .usd, category: .bank)
+        ]
+
+        let report = calculator.makeReport(
+            assets: assets,
+            liabilities: [],
+            netWorthSnapshots: [],
+            exchangeRates: ["USD": 1],
+            baseCurrency: .usd,
+            generatedAt: Date(timeIntervalSince1970: 1_779_300_000)
+        )
+
+        #expect(report.score == 59)
+        #expect(report.grade == .solid)
+        #expect(report.focusArea == "Diversification")
+        #expect(report.metrics.map(\.score) == [0, 14, 20, 10, 15])
+        #expect(report.observations.contains { $0.id == "asset-concentration" })
+    }
+
+    @MainActor
+    @Test func fireProjectionCalculatesTargetsLevelsAndOneMoreYear() async throws {
+        let projection = FIRECalculator().project(
+            currentPortfolio: 800_000,
+            monthlyExpenses: 2_500,
+            monthlySavings: 2_500,
+            retireAtAge: 65,
+            currentAge: nil,
+            annualReturn: 0.07,
+            currentDate: Date(timeIntervalSince1970: 1_779_300_000)
+        )
+
+        #expect(projection.fireTarget == 750_000)
+        #expect(projection.isFIREReached)
+        #expect(projection.savingsRate == 0.5)
+        #expect(projection.levelProgress.first { $0.kind == .lean }?.isAchieved == true)
+        #expect(projection.levelProgress.first { $0.kind == .standard }?.isAchieved == true)
+        #expect(projection.levelProgress.first { $0.kind == .fat }?.isAchieved == false)
+        #expect(projection.portfolioAfterOneYear > 880_000)
+        #expect(projection.extraAnnualSpendingAfterOneYear > 3_000)
+    }
+
+    @MainActor
+    @Test func livingComfortUsesCurrencyCountryAndHouseholdAssumptions() async throws {
+        let calculator = LivingComfortCalculator()
+        let totals = [
+            CurrencyTotal(currency: .usd, amount: 120_000),
+            CurrencyTotal(currency: .inr, amount: 12_000_000)
+        ]
+        let rows = calculator.rows(
+            totals: totals,
+            baseCurrency: .usd,
+            exchangeRates: ["USD": 1, "INR": 80],
+            assumptions: LivingComfortAssumptions(
+                householdMembers: 2,
+                monthlyIncome: 8_000,
+                expectedMonthlySpend: 3_000,
+                monthlyIncomeWasProvided: true,
+                expectedMonthlySpendWasProvided: true
+            )
+        )
+
+        #expect(rows.map(\.countryName) == ["United States", "India"])
+        #expect(abs((rows.first?.monthlySpendEstimate ?? 0) - 4_950) < 0.01)
+        #expect(abs((rows.first?.runwayMonths ?? 0) - (120_000 / 4_950)) < 0.01)
+        #expect(rows.first?.level == .stable)
+        #expect(abs((rows.last?.monthlySpendEstimate ?? 0) - 98_489.73248563136) < 0.01)
+        #expect(abs((rows.last?.monthlySurplus ?? 0) - 60_685.592743672) < 0.01)
+        #expect(abs((rows.last?.pppConversionFactor ?? 0) - 19.8969156536629) < 0.0001)
+    }
+
+    @MainActor
+    @Test func livingComfortTreatsZeroAsProvidedInput() async throws {
+        let calculator = LivingComfortCalculator()
+        let row = calculator.row(
+            total: CurrencyTotal(currency: .usd, amount: 120_000),
+            baseCurrency: .usd,
+            exchangeRates: ["USD": 1],
+            assumptions: LivingComfortAssumptions(
+                householdMembers: 1,
+                monthlyIncome: 0,
+                expectedMonthlySpend: 0,
+                monthlyIncomeWasProvided: true,
+                expectedMonthlySpendWasProvided: true
+            )
+        )
+
+        #expect(row.monthlySpendEstimate == 0)
+        #expect(row.monthlySurplus == 0)
+        #expect(row.runwayMonths.isInfinite)
+        #expect(row.level == .independent)
+    }
+
+    @MainActor
     @Test func onboardingCompletionPersistsSelectedCurrencies() async throws {
         let defaults = try makeIsolatedDefaults()
         let settings = AppSettings(
@@ -217,6 +313,100 @@ struct MyWealthTests {
         settings.includeIgnoredAssetsInPortfolio = true
 
         #expect(settings.portfolioCalculationAssets(from: [included, ignored]).map(\.displayName) == ["Cash", "Side Account"])
+    }
+
+    @MainActor
+    @Test func hidingAssetChangesMembershipButNotHistorySignature() async throws {
+        let defaults = try makeIsolatedDefaults()
+        let settings = AppSettings(
+            userDefaults: defaults,
+            hasMadeReminderChoice: { true }
+        )
+        let modelContext = try makeInMemoryModelContext()
+        let asset = Asset(name: "Cash", amount: 100, currency: .usd, category: .bank)
+        modelContext.insert(asset)
+
+        let before = PortfolioHistoryCoordinator(
+            allAssets: [asset],
+            assets: settings.portfolioCalculationAssets(from: [asset]),
+            liabilities: [],
+            netWorthSnapshots: [],
+            assetValueSnapshots: [],
+            settings: settings,
+            viewModel: DashboardViewModel(autoRefreshRate: false),
+            modelContext: modelContext
+        )
+
+        let historySignature = before.assetSnapshotSignature
+        let membershipSignature = before.portfolioMembershipSignature
+
+        asset.isIncludedInPortfolio = false
+        asset.lastUpdated = Date()
+
+        let after = PortfolioHistoryCoordinator(
+            allAssets: [asset],
+            assets: settings.portfolioCalculationAssets(from: [asset]),
+            liabilities: [],
+            netWorthSnapshots: [],
+            assetValueSnapshots: [],
+            settings: settings,
+            viewModel: DashboardViewModel(autoRefreshRate: false),
+            modelContext: modelContext
+        )
+
+        #expect(after.assetSnapshotSignature == historySignature)
+        #expect(after.portfolioMembershipSignature != membershipSignature)
+    }
+
+    @MainActor
+    @Test func includeIgnoredAssetsToggleChangesMembershipButNotHistorySignature() async throws {
+        let defaults = try makeIsolatedDefaults()
+        let settings = AppSettings(
+            userDefaults: defaults,
+            hasMadeReminderChoice: { true }
+        )
+        let modelContext = try makeInMemoryModelContext()
+        let included = Asset(name: "Cash", amount: 100, currency: .usd, category: .bank)
+        let ignored = Asset(
+            name: "Side Account",
+            amount: 50,
+            currency: .usd,
+            category: .bank,
+            isIncludedInPortfolio: false
+        )
+        modelContext.insert(included)
+        modelContext.insert(ignored)
+        let allAssets = [included, ignored]
+
+        let before = PortfolioHistoryCoordinator(
+            allAssets: allAssets,
+            assets: settings.portfolioCalculationAssets(from: allAssets),
+            liabilities: [],
+            netWorthSnapshots: [],
+            assetValueSnapshots: [],
+            settings: settings,
+            viewModel: DashboardViewModel(autoRefreshRate: false),
+            modelContext: modelContext
+        )
+
+        let historySignature = before.assetSnapshotSignature
+        let membershipSignature = before.portfolioMembershipSignature
+
+        settings.includeIgnoredAssetsInPortfolio = true
+
+        let after = PortfolioHistoryCoordinator(
+            allAssets: allAssets,
+            assets: settings.portfolioCalculationAssets(from: allAssets),
+            liabilities: [],
+            netWorthSnapshots: [],
+            assetValueSnapshots: [],
+            settings: settings,
+            viewModel: DashboardViewModel(autoRefreshRate: false),
+            modelContext: modelContext
+        )
+
+        #expect(after.assetSnapshotSignature == historySignature)
+        #expect(after.portfolioMembershipSignature != membershipSignature)
     }
 
     @MainActor
@@ -626,7 +816,7 @@ struct MyWealthTests {
             assetIdentifier: String(describing: asset.persistentModelID),
             assetName: "Old Cash",
             amount: 100,
-            currencyCode: "EUR",
+            currencyCode: "USD",
             categoryName: "Stocks"
         )
         modelContext.insert(existingSnapshot)
@@ -641,6 +831,34 @@ struct MyWealthTests {
 
         let snapshots = try modelContext.fetch(FetchDescriptor<AssetValueSnapshot>())
         #expect(snapshots.count == 1)
+    }
+
+    @MainActor
+    @Test func assetSnapshotRecordingUsesCurrencyChanges() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        viewModel.exchangeRates = ["USD": 1, "EUR": 0.5]
+        let modelContext = try makeInMemoryModelContext()
+        let asset = Asset(name: "Cash", amount: 100, currency: .usd, category: .bank)
+        modelContext.insert(asset)
+        let existingSnapshot = AssetValueSnapshot(
+            assetIdentifier: String(describing: asset.persistentModelID),
+            assetName: "Cash",
+            amount: 100,
+            currencyCode: "EUR",
+            categoryName: "Bank Deposits"
+        )
+        modelContext.insert(existingSnapshot)
+
+        viewModel.recordPortfolioHistory(
+            assets: [asset],
+            baseCurrency: .usd,
+            netWorthSnapshots: [],
+            assetValueSnapshots: [existingSnapshot],
+            modelContext: modelContext
+        )
+
+        let snapshots = try modelContext.fetch(FetchDescriptor<AssetValueSnapshot>())
+        #expect(snapshots.count == 2)
     }
 
     @MainActor
