@@ -27,6 +27,7 @@ struct DashboardView: View {
     @State private var viewModel = DashboardViewModel()
     @State private var metalViewModel = MetalPricesViewModel()
     @State private var showSettings = false
+    @State private var showFIRECalculator = false
 
     private var portfolioAssets: [Asset] {
         settings.portfolioCalculationAssets(from: assets)
@@ -84,8 +85,8 @@ struct DashboardView: View {
                     }
 
                     Section(header: PillLabel("Plan")) {
-                        NavigationLink {
-                            FIRECalculatorView(settings: settings)
+                        Button {
+                            showFIRECalculator = true
                         } label: {
                             AppListCard {
                                 HStack(spacing: 14) {
@@ -301,6 +302,9 @@ struct DashboardView: View {
             }
             .navigationDestination(item: $selectedCategory) { category in
                 CategoryDetailView(category: category, settings: settings)
+            }
+            .navigationDestination(isPresented: $showFIRECalculator) {
+                FIRECalculatorView(settings: settings)
             }
             .navigationDestination(isPresented: $showNetWorthHistory) {
                 NetWorthHistoryView(settings: settings)
