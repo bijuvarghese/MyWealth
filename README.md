@@ -1,4 +1,5 @@
 # My Wealth
+
 [![Latest Release](https://img.shields.io/github/v/release/bijuvarghese/MyWealth?label=latest%20release)](https://github.com/bijuvarghese/MyWealth/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-iOS-blue)](https://github.com/bijuvarghese/MyWealth)
 [![Swift](https://img.shields.io/badge/Swift-6-orange?logo=swift)](https://www.swift.org/)
@@ -6,51 +7,58 @@
 [![Functions CI](https://github.com/bijuvarghese/MyWealth/actions/workflows/functions-ci.yml/badge.svg?branch=main)](https://github.com/bijuvarghese/MyWealth/actions/workflows/functions-ci.yml)
 [![Cache Monitor](https://github.com/bijuvarghese/MyWealth/actions/workflows/cache-monitor.yml/badge.svg?branch=main)](https://github.com/bijuvarghese/MyWealth/actions/workflows/cache-monitor.yml)
 
-My Wealth is a SwiftUI iOS app for tracking personal net worth across currencies. It supports manual asset and liability tracking, converted net worth totals, transfer-rate monitoring, portfolio insights, snapshot-based history, home and lock screen widgets, iCloud sync, backup import/export, and configurable portfolio reminders.
+My Wealth is a SwiftUI iOS app for tracking personal net worth across currencies. It supports manual asset and liability tracking, converted net worth totals, transfer-rate and precious-metal monitoring, portfolio insights, FIRE projections, AI-assisted portfolio briefings, snapshot-based history, home and lock screen widgets, optional iCloud sync, backup import/export, and configurable portfolio reminders.
 
-User financial data is stored locally by default, with optional iCloud backup and sync controlled by the user. Exchange rates are fetched through a Firebase HTTPS Cloud Function so the external provider API key is never shipped in the app bundle.
+Financial data is stored locally by default. Users can opt in to iCloud backup and sync, and can export or import a `.backup` file for portability. Exchange rates, metal prices, and AI analysis are routed through Firebase HTTPS Cloud Functions so provider API keys are never shipped in the app bundle.
 
 ## Project Details
 
 - Platform: iOS
-- Deployment target: iOS 26.1, as currently configured in the Xcode project
+- Deployment target: iOS 26.1
 - Xcode: 26.1+
 - Swift: 6.0
-- App version: 3.2
+- App version: 4.5
 - Bundle identifier: `com.bv.MyWealth`
+- Widget bundle identifier: `com.bv.MyWealth.MyWealthWidget`
+- Shared App Group: `group.com.bv.MyWealth`
 
 ## Current Features
 
 - Onboarding for base currency, display currencies, iCloud sync, and reminder preferences
-- Tab-based app experience with Dashboard, Assets, Net Worth, Rates, and Settings
-- Manual asset tracking with name, amount, currency, category, edit, and delete support
+- iPhone tab experience for Dashboard, Assets, Net Worth, Rates, and Briefing
+- iPad `NavigationSplitView` experience with the same primary sections
+- Manual asset tracking with name, amount, currency, category, edit, delete, and portfolio-inclusion controls
 - Manual liability tracking with name, amount, currency, category, edit, and delete support
+- Precious-metal asset entry with weight-unit support for troy ounces, grams, kilograms, and ounces
 - Multi-currency net worth totals using cached exchange rates
-- User-arranged display-currency ordering so priority currencies appear first
-- Dashboard summary for assets, liabilities, net worth, allocation, insights, transfer-rate preview, trend, and recent history
-- Dedicated Net Worth tab with converted totals, exchange-rate status, trend chart, and recent asset history
-- Transfer Rates tab for configured display currencies relative to the selected base currency
+- User-arranged display-currency ordering for totals and widgets
+- Dashboard summaries for assets, liabilities, net worth, allocation, insights, transfer-rate preview, trend, and recent history
+- Dedicated Net Worth view with converted totals, exchange-rate status, trend chart, and recent history
+- Rates view for configured currency transfers and precious-metal prices
+- Briefing view with portfolio health scoring, warnings, allocation notes, return attribution, scenario links, and optional AI analysis
+- FIRE calculator for LeanFIRE, FIRE, and FatFIRE progress and projections
 - Home screen and lock screen widgets for net worth summaries
 - Optional iCloud backup and sync through the user's personal iCloud account
-- Backup export/import for local app data
+- Backup export/import for assets, liabilities, history, and portfolio snapshots
+- ChatGPT-ready export plus in-app AI analysis through the Firebase proxy
 - Configurable compact formatting for large currency totals
 - Portfolio reminders with daily, weekly, and monthly schedules
-- Smart reminder behavior to reduce duplicate reminder pressure after recent portfolio activity
-- Local snapshot history for asset value changes and net worth changes
+- Smart reminder behavior to reduce duplicate reminders after recent portfolio activity
+- Local snapshot history for asset value changes, portfolio totals, and net worth changes
 - Searchable currency selection with common currencies prioritized
 
 ## Architecture
 
 - SwiftUI for app UI and navigation
-- SwiftData for assets, liabilities, asset value snapshots, and net worth snapshots
+- SwiftData for assets, liabilities, asset value snapshots, net worth snapshots, and portfolio snapshots
 - UserDefaults for onboarding state, currency settings, compact-format preference, reminder preferences, and exchange-rate cache metadata
 - CloudKit/iCloud support for optional user-controlled backup and sync
 - WidgetKit and App Group UserDefaults for home and lock screen widget snapshots
-- Observation-powered view models for dashboard and conversion behavior
-- Async/await networking through a reusable network helper
-- Protocol-backed exchange-rate fetching for testability
-- Firebase Cloud Functions as the exchange-rate proxy
-- Swift Testing coverage for conversion, totals, reminders, onboarding, snapshots, settings, and exchange-rate behavior
+- Observation-powered view models for dashboard, conversion, metal-price, and briefing behavior
+- Async/await networking through reusable service helpers
+- Protocol-backed exchange-rate and metal-price fetching for testability
+- Firebase Cloud Functions as provider-key-protecting proxies
+- Swift Testing coverage for conversion, totals, reminders, onboarding, snapshots, settings, FIRE projections, and rate behavior
 
 ## Data Model
 
@@ -60,8 +68,9 @@ The app currently persists these local SwiftData models:
 - `Liability`
 - `AssetValueSnapshot`
 - `NetWorthSnapshot`
+- `PortfolioSnapshot`
 
-Snapshot history powers the dashboard history list and net worth trend chart. Duplicate snapshot cleanup runs automatically for older data, but long-term snapshot retention is still planned.
+Snapshot history powers the dashboard history list, net worth trend chart, portfolio metrics, widget updates, and briefing calculations. Duplicate snapshot cleanup runs automatically for older data.
 
 ## Widgets
 
@@ -74,13 +83,29 @@ The app includes a `MyWealthWidgetExtension` target with WidgetKit views for:
 
 The main app writes a lightweight `WidgetSnapshot` to the shared App Group `group.com.bv.MyWealth` after portfolio, currency, or exchange-rate changes. The widget extension reads that shared snapshot and refreshes its timelines through WidgetKit.
 
-## Exchange Rate Proxy
+## Firebase Proxies
 
-The app fetches exchange rates through a Firebase HTTPS Cloud Function so the Apilayer API key is not shipped in the iOS app.
+The iOS app reads these endpoint URLs from `MyWealth/Info.plist`:
 
-The iOS app reads `ExchangeRateProxyURL` from `MyWealth/Info.plist`, which is currently configured for the `mywealth-api-router` Firebase project. The HTTPS function returns the latest cached Datastore copy instead of calling Apilayer for every app user. A scheduled Firebase function refreshes that Datastore cache three times per day at `00:00`, `08:00`, and `16:00` UTC. Refreshes request the app-supported Apilayer symbol set explicitly, using USD as the base currency.
+- `ExchangeRateProxyURL`: `latestExchangeRate`
+- `MetalPriceProxyURL`: `latestMetalPrice`
+- `ChatGPTAnalysisProxyURL`: `analyzeWealthMap`
 
-### Firebase Setup
+The Firebase project is currently `mywealth-api-router` and the functions run in `us-central1`.
+
+### Exchange Rates
+
+The app fetches exchange rates through a Firebase HTTPS Cloud Function backed by Apilayer. The function caches the latest Datastore copy as `ExchangeRateCache/latest` and serves the cached payload to app clients. A scheduled function refreshes that cache three times per day at `00:00`, `08:00`, and `16:00` UTC using USD as the provider base currency.
+
+### Metal Prices
+
+The app fetches precious-metal prices through a Firebase HTTPS Cloud Function backed by MetalpriceAPI. The function caches supported metal and currency quotes as `MetalPriceCache/latest` and serves that cached payload to app clients. A scheduled function refreshes the cache on the same UTC cadence as exchange rates.
+
+### AI Analysis
+
+The app sends a sanitized portfolio snapshot to `analyzeWealthMap`, which calls the OpenAI Responses API from the server side. The function validates payload shape, applies request-size and per-client rate limits, and frames the response as educational planning analysis rather than financial, legal, tax, immigration, or investment advice.
+
+## Firebase Setup
 
 1. Install and sign in to the Firebase CLI.
 
@@ -90,12 +115,14 @@ The iOS app reads `ExchangeRateProxyURL` from `MyWealth/Info.plist`, which is cu
    firebase use mywealth-api-router
    ```
 
-3. Confirm the project has a default Datastore database. The functions store the shared exchange-rate payload as `ExchangeRateCache/latest`.
+3. Confirm the project has a default Datastore database. The functions store the shared exchange-rate payload as `ExchangeRateCache/latest` and the shared metal-price payload as `MetalPriceCache/latest`.
 
-4. Store the Apilayer key in Secret Manager:
+4. Store provider keys in Secret Manager:
 
    ```sh
    firebase functions:secrets:set EXCHANGE_RATES_API_KEY
+   firebase functions:secrets:set METAL_PRICE_API_KEY
+   firebase functions:secrets:set OPENAI_API_KEY
    ```
 
 5. Install function dependencies:
@@ -112,9 +139,9 @@ The iOS app reads `ExchangeRateProxyURL` from `MyWealth/Info.plist`, which is cu
    firebase deploy --only functions
    ```
 
-After deployment, `refreshExchangeRateCache` keeps the server cache warm automatically. If the cache entity does not exist yet, the public `latestExchangeRate` endpoint will fetch and create it once, then future user requests will read from Datastore.
+After deployment, `refreshExchangeRateCache` and `refreshMetalPriceCache` keep the server caches warm automatically. If a cache entity does not exist yet, the public endpoint fetches and creates it once, then future user requests read from Datastore.
 
-### Cache Freshness Check
+## Cache Freshness Check
 
 For automation or manual health checks, run:
 
@@ -123,9 +150,10 @@ For automation or manual health checks, run:
 ```
 
 The script checks both the exchange-rate and metal-price Firebase endpoints by default, reads each `cacheTimestamp` from the JSON response, and exits non-zero if either cache is older than 8 hours. Use `--exchange-only` or `--metal-only` for a single-endpoint check, `--threshold-hours N` to change the freshness window, or `--url URL` together with a single-endpoint option to override the endpoint.
+
 If the automation sets `SLACK_WEBHOOK_URL`, the script also posts the full run summary to Slack after every run.
 
-### Cloud Run Trigger
+## Cloud Run Trigger
 
 If you want to trigger the cache check remotely from your phone, deploy the included Cloud Run service:
 
@@ -159,7 +187,7 @@ Optional `POST /run` JSON body fields:
 
 ## GitHub Actions
 
-This repository now includes three baseline workflows under `.github/workflows`:
+This repository includes three baseline workflows under `.github/workflows`:
 
 - `ios-ci.yml` to build and test the iOS app on pull requests, pushes to `main`, and manual runs
 - `functions-ci.yml` to validate the Firebase functions package when backend files change
@@ -171,10 +199,16 @@ To enable Slack delivery from `cache-monitor.yml`, add a repository secret named
 
 Open `MyWealth.xcodeproj` in Xcode, select the `MyWealth` scheme, and run the app on an iOS simulator or device.
 
-To run the Firebase function locally or deploy it, use the Firebase CLI from the repository root after completing the setup above.
+To run tests from the command line:
+
+```sh
+xcodebuild test -project MyWealth.xcodeproj -scheme MyWealth -destination 'platform=iOS Simulator,name=iPhone 17'
+```
+
+To work on Firebase functions locally or deploy them, use the Firebase CLI from the repository root after completing the setup above.
 
 ## Current Scope
 
 - The app supports manual financial tracking only.
 - Bank, brokerage, crypto wallet, and account aggregation integrations are not included.
-- CSV import/export, biometric app lock, rate alerts, allocation targets, user-selectable trend ranges, and asset-specific detail/history screens are future scope.
+- CSV import/export, biometric app lock, rate alerts, allocation targets, and user-selectable trend ranges are future scope.
