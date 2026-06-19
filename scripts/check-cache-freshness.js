@@ -240,7 +240,7 @@ function buildSlackPayload(results, overallStatus) {
     attachments: [
       {
         color,
-        text: `${emoji} MyWealth cache freshness check: ${statusLabel}\n${body}`,
+        text: `${emoji} Wealth Map cache freshness check: ${statusLabel}\n${body}`,
       },
     ],
   };

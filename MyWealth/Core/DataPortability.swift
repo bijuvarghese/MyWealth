@@ -135,7 +135,7 @@ enum DataExporter {
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         let data = try encoder.encode(payload)
 
-        let filename = "MyWealth-\(formattedExportDate()).backup"
+        let filename = "WealthMap-\(formattedExportDate()).backup"
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
         try data.write(to: url, options: .atomic)
         return url

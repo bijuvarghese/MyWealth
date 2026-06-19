@@ -1,12 +1,12 @@
-# My Wealth - Requirements
+# Wealth Map - Requirements
 
 Last updated: May 25, 2026
 
-This document defines the current product requirements for the My Wealth iOS app and its exchange-rate proxy. It reflects the current app state: onboarding, local asset and liability tracking, multi-currency net worth, display-currency ordering, exchange-rate caching, portfolio history, widgets, iCloud sync, backup import/export, reminders, and the Firebase rate proxy.
+This document defines the current product requirements for the Wealth Map iOS app and its exchange-rate proxy. It reflects the current app state: onboarding, local asset and liability tracking, multi-currency net worth, display-currency ordering, exchange-rate caching, portfolio history, widgets, iCloud sync, backup import/export, reminders, and the Firebase rate proxy.
 
 ## Product Overview
 
-My Wealth is a SwiftUI iOS app for tracking personal net worth across currencies. Users can configure preferred currencies, arrange display-currency priority, add and maintain assets and liabilities, view converted portfolio totals, monitor transfer rates, review portfolio insights and history, see widget summaries, and rely on cached exchange-rate data fetched through a Firebase proxy.
+Wealth Map is a SwiftUI iOS app for tracking personal net worth across currencies. Users can configure preferred currencies, arrange display-currency priority, add and maintain assets and liabilities, view converted portfolio totals, monitor transfer rates, review portfolio insights and history, see widget summaries, and rely on cached exchange-rate data fetched through a Firebase proxy.
 
 User financial data is stored locally by default. Users may opt into iCloud-backed backup and sync through their personal iCloud account. The app does not provide account aggregation, bank connections, or remote app-managed user accounts.
 
@@ -251,7 +251,7 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 
 ## Planned Enhancements
 
-### MyWealth 3.2+ Suggested Features
+### Wealth Map 3.2+ Suggested Features
 
 These feature ideas build on the existing portfolio history, liability tracking, data portability, and iOS platform foundations. They are not current shipped behavior.
 

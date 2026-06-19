@@ -1,6 +1,6 @@
 {
   "name": "mywealth-functions",
-  "description": "Firebase Cloud Functions for MyWealth",
+  "description": "Firebase Cloud Functions for Wealth Map",
   "main": "index.js",
   "engines": {
     "node": "22"

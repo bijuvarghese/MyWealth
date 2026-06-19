@@ -16,7 +16,7 @@
 			<key>UTTypeIdentifier</key>
 			<string>com.bv.MyWealth.backup</string>
 			<key>UTTypeDescription</key>
-			<string>MyWealth Backup</string>
+			<string>Wealth Map Backup</string>
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.json</string>
