@@ -389,7 +389,7 @@
 				DEVELOPMENT_TEAM = 3B2GBCUUPP;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyWealthWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = MyWealthWidget;
+				INFOPLIST_KEY_CFBundleDisplayName = "Wealth Map";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -421,7 +421,7 @@
 				DEVELOPMENT_TEAM = 3B2GBCUUPP;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyWealthWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = MyWealthWidget;
+				INFOPLIST_KEY_CFBundleDisplayName = "Wealth Map";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				LD_RUNPATH_SEARCH_PATHS = (

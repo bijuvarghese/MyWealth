@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# deploy.sh — Deploy Firebase functions and/or hosting for MyWealth
+# deploy.sh — Deploy Firebase functions and/or hosting for Wealth Map
 #
 # Usage:
 #   ./deploy.sh              # deploy everything (functions + hosting)

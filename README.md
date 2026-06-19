@@ -1,4 +1,4 @@
-# My Wealth
+# Wealth Map
 
 [![Latest Release](https://img.shields.io/github/v/release/bijuvarghese/MyWealth?label=latest%20release)](https://github.com/bijuvarghese/MyWealth/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-iOS-blue)](https://github.com/bijuvarghese/MyWealth)
@@ -7,7 +7,7 @@
 [![Functions CI](https://github.com/bijuvarghese/MyWealth/actions/workflows/functions-ci.yml/badge.svg?branch=main)](https://github.com/bijuvarghese/MyWealth/actions/workflows/functions-ci.yml)
 [![Cache Monitor](https://github.com/bijuvarghese/MyWealth/actions/workflows/cache-monitor.yml/badge.svg?branch=main)](https://github.com/bijuvarghese/MyWealth/actions/workflows/cache-monitor.yml)
 
-My Wealth is a SwiftUI iOS app for tracking personal net worth across currencies. It supports manual asset and liability tracking, converted net worth totals, transfer-rate and precious-metal monitoring, portfolio insights, FIRE projections, AI-assisted portfolio briefings, snapshot-based history, home and lock screen widgets, optional iCloud sync, backup import/export, and configurable portfolio reminders.
+Wealth Map is a SwiftUI iOS app for tracking personal net worth across currencies. It supports manual asset and liability tracking, converted net worth totals, transfer-rate and precious-metal monitoring, portfolio insights, FIRE projections, AI-assisted portfolio briefings, snapshot-based history, home and lock screen widgets, optional iCloud sync, backup import/export, and configurable portfolio reminders.
 
 Financial data is stored locally by default. Users can opt in to iCloud backup and sync, and can export or import a `.backup` file for portability. Exchange rates, metal prices, and AI analysis are routed through Firebase HTTPS Cloud Functions so provider API keys are never shipped in the app bundle.
 
@@ -206,6 +206,24 @@ xcodebuild test -project MyWealth.xcodeproj -scheme MyWealth -destination 'platf
 ```
 
 To work on Firebase functions locally or deploy them, use the Firebase CLI from the repository root after completing the setup above.
+
+## Spec-Driven Development
+
+This repository includes [GitHub Spec Kit](https://github.com/github/spec-kit)
+configured for Codex skills. The project constitution is stored at
+`.specify/memory/constitution.md`, reusable workflow assets live under
+`.specify/`, and Codex skills live under `.agents/skills/`.
+
+Start a feature with `$speckit-specify`, then use `$speckit-plan`,
+`$speckit-tasks`, and `$speckit-implement`. Optional quality steps include
+`$speckit-clarify`, `$speckit-checklist`, and `$speckit-analyze`. Generated
+feature artifacts are stored under `specs/`.
+
+The integration is pinned to Spec Kit `0.8.15`. To verify the installed CLI:
+
+```sh
+specify version
+```
 
 ## Current Scope
 
