@@ -24,8 +24,12 @@ final class ICloudSettingsSync {
 
     // MARK: - Push local → iCloud
 
+    @MainActor
     func push(settings: AppSettings) {
         guard Self.isAvailable else { return }
+
+        let activityID = AppActivityTracker.shared.begin()
+        defer { AppActivityTracker.shared.end(activityID) }
 
         store.set(settings.baseCurrency.rawValue, forKey: Keys.baseCurrency)
         store.set(settings.totalCurrencies.map(\.rawValue), forKey: Keys.totalCurrencies)
@@ -36,8 +40,12 @@ final class ICloudSettingsSync {
     // MARK: - Pull iCloud → local
 
     /// Applies any iCloud KV values that differ from the current local settings.
+    @MainActor
     func pull(into settings: AppSettings) {
         guard Self.isAvailable else { return }
+
+        let activityID = AppActivityTracker.shared.begin()
+        defer { AppActivityTracker.shared.end(activityID) }
 
         if let raw = store.string(forKey: Keys.baseCurrency),
            let currency = Asset.CurrencyType(rawValue: raw),

@@ -36,6 +36,13 @@ final class FirebaseChatGPTAnalysisService: ChatGPTAnalysisFetching {
             throw ChatGPTAnalysisServiceError.missingProxyURL
         }
 
+        let activityID = await AppActivityTracker.shared.begin()
+        defer {
+            Task { @MainActor in
+                AppActivityTracker.shared.end(activityID)
+            }
+        }
+
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         let body = try encoder.encode(payload)
