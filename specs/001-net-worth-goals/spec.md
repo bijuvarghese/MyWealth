@@ -143,6 +143,7 @@ A user can preserve the active goal with a full Wealth Map backup and restore it
 - **SFR-015**: Current-format backups must include the active goal, legacy backups must remain importable, and importing a conflicting goal must require explicit replacement confirmation.
 - **SFR-016**: Goal views must support iPhone and iPad layouts, Dynamic Type, VoiceOver, reduced motion, long localized labels, and large formatted values without relying on color or animation alone.
 - **SFR-017**: Goal calculations must not change existing net worth, conversion, snapshot, dashboard, history, widget, or reminder results.
+- **SFR-018**: Active goal summaries must show the remaining gap, rounded-up months until the target date, and average monthly and annual net worth increases needed to close the gap; achieved, due-today, overdue, and unavailable cases must not show impossible required rates.
 
 ### Key Entities *(include when data changes)*
 

@@ -4,6 +4,7 @@ struct NetWorthGoalCard: View {
     let goal: NetWorthGoal
     let progress: NetWorthGoalProgress
     let outlook: NetWorthGoalOutlook
+    let achievementPlan: NetWorthGoalAchievementPlan
     let useCompactFormatting: Bool
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -57,6 +58,8 @@ struct NetWorthGoalCard: View {
                 .font(.caption)
                 .foregroundStyle(outlookColor)
                 .fixedSize(horizontal: false, vertical: true)
+
+            achievementInsights
         }
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
@@ -110,7 +113,77 @@ struct NetWorthGoalCard: View {
     private var accessibilitySummary: String {
         let percent = progress.rawFraction?.formatted(.percent.precision(.fractionLength(0...1)))
             ?? "unavailable"
-        return "Net Worth Goal. \(progressLabel). Progress \(percent). \(outlookText)"
+        return "Net Worth Goal. \(progressLabel). Progress \(percent). \(outlookText) \(achievementAccessibilitySummary)"
+    }
+
+    @ViewBuilder
+    private var achievementInsights: some View {
+        switch achievementPlan.status {
+        case .active:
+            VStack(alignment: .leading, spacing: 9) {
+                Text("Goal Insights")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                LazyVGrid(
+                    columns: [GridItem(.flexible()), GridItem(.flexible())],
+                    alignment: .leading,
+                    spacing: 10
+                ) {
+                    insightMetric("Remaining", value: formatted(achievementPlan.remainingAmount ?? 0))
+                    insightMetric("Time Left", value: monthsLabel)
+                    insightMetric("Needed / Month", value: formatted(achievementPlan.requiredMonthlyIncrease ?? 0))
+                    insightMetric("Needed / Year", value: formatted(achievementPlan.requiredYearlyIncrease ?? 0))
+                }
+
+                Text("Average net worth increase needed if progress is spread evenly to the target date.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        case .dueToday:
+            Label("The target is due today with \(formatted(achievementPlan.remainingAmount ?? 0)) remaining.", systemImage: "calendar.badge.exclamationmark")
+                .font(.caption)
+                .foregroundStyle(.orange)
+        case .overdue:
+            Label("The target date has passed with \(formatted(achievementPlan.remainingAmount ?? 0)) remaining.", systemImage: "calendar.badge.exclamationmark")
+                .font(.caption)
+                .foregroundStyle(.orange)
+        case .unavailable, .achieved:
+            EmptyView()
+        }
+    }
+
+    private func insightMetric(_ label: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.caption.weight(.semibold))
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private var monthsLabel: String {
+        guard let months = achievementPlan.monthsRemaining else { return "Unavailable" }
+        return months == 1 ? "1 month" : "\(months) months"
+    }
+
+    private var achievementAccessibilitySummary: String {
+        switch achievementPlan.status {
+        case .active:
+            return "\(monthsLabel) left. \(formatted(achievementPlan.remainingAmount ?? 0)) remaining. Average needed per month \(formatted(achievementPlan.requiredMonthlyIncrease ?? 0)); per year \(formatted(achievementPlan.requiredYearlyIncrease ?? 0))."
+        case .dueToday:
+            return "Target is due today."
+        case .overdue:
+            return "Target date has passed."
+        case .unavailable, .achieved:
+            return ""
+        }
     }
 
     private func formatted(_ amount: Double) -> String {

@@ -67,6 +67,9 @@
 - [X] T030 [NFR1.1-NFR6.8] Run `git diff --check`
 - [X] T031 [NFR1.1-NFR6.8] Run the full `xcodebuild test -project MyWealth.xcodeproj -scheme MyWealth -destination 'platform=iOS Simulator,name=iPhone 17'` gate
 - [X] T032 [FR2.1-FR11.6,NFR2.1-NFR6.8,SFR-001-SFR-017] Confirm all tasks and requirement evidence in `specs/001-net-worth-goals/tasks.md`
+- [X] T033 [FR12.16,SFR-018] Add achievement pace calculation and edge-case tests in `MyWealthTests/MyWealthTests.swift`
+- [X] T034 [FR12.16,SFR-018] Implement goal gap, time-left, monthly, and annual insights in `MyWealth/Features/Goals/NetWorthGoalCalculator.swift` and `MyWealth/Features/Goals/NetWorthGoalCard.swift`
+- [X] T035 [FR12.16,SFR-018] Run the full iPhone 17 test gate and `git diff --check`
 
 ## Dependencies and Execution
 

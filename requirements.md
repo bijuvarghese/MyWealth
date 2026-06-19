@@ -196,6 +196,7 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 - **FR12.13**: Deleting a goal must require confirmation and must not delete or alter portfolio records, settings, history, widgets, or reminders.
 - **FR12.14**: Goal views and forms must support iPhone and iPad layouts, Dynamic Type, VoiceOver, reduced motion, long currency labels, and large values without relying on color or animation alone.
 - **FR12.15**: Goal data must not be added to widgets, notifications, Spotlight, Firebase requests, or AI analysis exports by this feature.
+- **FR12.16**: Active goal summaries must show the remaining target gap, rounded-up months until the target date, and the average monthly and annual net worth increase needed to close the gap; achieved, due-today, overdue, and unavailable values must be handled without impossible rates.
 
 ## Non-Functional Requirements
 

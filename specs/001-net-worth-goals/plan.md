@@ -25,6 +25,7 @@ Add one local-first net worth goal with create, edit, delete, Dashboard/Net Wort
 | NFR4.1, NFR4.3, NFR4.6, SFR-005-SFR-012 | Model unavailable/insufficient/non-growing/achieved results explicitly and avoid force unwraps or fabricated values. | `NetWorthGoal.swift`, `NetWorthGoalCalculator.swift`, `NetWorthGoalCard.swift` | Edge-state table tests and empty portfolio UI check. |
 | NFR5.3-NFR5.4, SFR-014 | Keep goal data local unless existing iCloud or export actions are enabled. | SwiftData container and `DataPortability.swift`; no Firebase changes | Data-flow inspection; privacy copy remains accurate. |
 | NFR6.1-NFR6.2, SFR-004-SFR-012, SFR-017 | Keep calculation and persistence policy outside SwiftUI views with injectable pure inputs. | `NetWorthGoalCalculator.swift`, `NetWorthGoalStore.swift` | Direct Swift Testing coverage without rendering UI. |
+| FR12.16, SFR-018 | Derive the remaining gap, months left, and even monthly/yearly pace locally from current progress and the target date. | `NetWorthGoalCalculator.swift`, `NetWorthGoalCard.swift` | Exact one-year calculation plus achieved and overdue edge-case tests. |
 
 ## Technical Context
 

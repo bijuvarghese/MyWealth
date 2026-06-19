@@ -379,6 +379,7 @@ struct DashboardView: View {
                     snapshots: netWorthSnapshots,
                     exchangeRates: viewModel.exchangeRates
                 ),
+                achievementPlan: calculator.achievementPlan(goal: goal, progress: progress),
                 useCompactFormatting: settings.usesCompactCurrencyTotals
             )
         } else {
@@ -610,6 +611,7 @@ struct NetWorthView: View {
                     snapshots: netWorthSnapshots,
                     exchangeRates: viewModel.exchangeRates
                 ),
+                achievementPlan: calculator.achievementPlan(goal: goal, progress: progress),
                 useCompactFormatting: settings.usesCompactCurrencyTotals
             )
         } else {

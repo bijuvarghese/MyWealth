@@ -152,6 +152,68 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func netWorthGoalAchievementPlanCalculatesMonthlyAndYearlyNeeds() async throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let calculator = NetWorthGoalCalculator(calendar: calendar)
+        let now = calendar.startOfDay(for: Date(timeIntervalSince1970: 1_800_000_000))
+        let targetDate = try #require(calendar.date(byAdding: .day, value: 365, to: now))
+        let goal = NetWorthGoal(
+            targetAmount: 100_000,
+            currency: .usd,
+            targetDate: targetDate
+        )
+        let progress = NetWorthGoalProgress(
+            currentAmount: 40_000,
+            rawFraction: 0.4,
+            visualFraction: 0.4,
+            isAchieved: false,
+            rateState: .available
+        )
+
+        let plan = calculator.achievementPlan(
+            goal: goal,
+            progress: progress,
+            currentDate: now
+        )
+
+        #expect(plan.status == .active)
+        #expect(plan.remainingAmount == 60_000)
+        #expect(plan.monthsRemaining == 12)
+        #expect(abs((plan.requiredMonthlyIncrease ?? 0) - 5_002) < 2)
+        #expect(abs((plan.requiredYearlyIncrease ?? 0) - 60_041) < 2)
+    }
+
+    @MainActor
+    @Test func netWorthGoalAchievementPlanHandlesAchievedAndOverdueGoals() async throws {
+        let calculator = NetWorthGoalCalculator()
+        let now = Date()
+        let goal = NetWorthGoal(
+            targetAmount: 100_000,
+            currency: .usd,
+            targetDate: now.addingTimeInterval(-86_400)
+        )
+        let achieved = NetWorthGoalProgress(
+            currentAmount: 110_000,
+            rawFraction: 1.1,
+            visualFraction: 1,
+            isAchieved: true,
+            rateState: .available
+        )
+        let behind = NetWorthGoalProgress(
+            currentAmount: 90_000,
+            rawFraction: 0.9,
+            visualFraction: 0.9,
+            isAchieved: false,
+            rateState: .available
+        )
+
+        #expect(calculator.achievementPlan(goal: goal, progress: achieved, currentDate: now).status == .achieved)
+        #expect(calculator.achievementPlan(goal: goal, progress: behind, currentDate: now).status == .overdue)
+        #expect(calculator.achievementPlan(goal: goal, progress: behind, currentDate: now).requiredMonthlyIncrease == nil)
+    }
+
+    @MainActor
     @Test func netWorthGoalProjectionExplainsInsufficientAndNonGrowingHistory() async throws {
         let calculator = NetWorthGoalCalculator()
         let now = Date()

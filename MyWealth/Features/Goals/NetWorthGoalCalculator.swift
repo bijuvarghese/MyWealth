@@ -33,6 +33,22 @@ enum NetWorthGoalOutlook: Equatable {
     case currentValueUnavailable
 }
 
+enum NetWorthGoalAchievementStatus: Equatable {
+    case unavailable
+    case achieved
+    case active
+    case dueToday
+    case overdue
+}
+
+struct NetWorthGoalAchievementPlan: Equatable {
+    let status: NetWorthGoalAchievementStatus
+    let remainingAmount: Double?
+    let monthsRemaining: Int?
+    let requiredMonthlyIncrease: Double?
+    let requiredYearlyIncrease: Double?
+}
+
 struct NetWorthGoalCalculator {
     let calendar: Calendar
 
@@ -210,6 +226,57 @@ struct NetWorthGoalCalculator {
         let pace: NetWorthGoalPace = calendar.startOfDay(for: projectedDate)
             <= calendar.startOfDay(for: goal.displayTargetDate) ? .onTrack : .behind
         return .projected(date: projectedDate, pace: pace)
+    }
+
+    func achievementPlan(
+        goal: NetWorthGoal,
+        progress: NetWorthGoalProgress,
+        currentDate: Date = Date()
+    ) -> NetWorthGoalAchievementPlan {
+        guard let currentAmount = progress.currentAmount else {
+            return NetWorthGoalAchievementPlan(
+                status: .unavailable,
+                remainingAmount: nil,
+                monthsRemaining: nil,
+                requiredMonthlyIncrease: nil,
+                requiredYearlyIncrease: nil
+            )
+        }
+
+        let remaining = max(goal.displayTargetAmount - currentAmount, 0)
+        if progress.isAchieved || remaining == 0 {
+            return NetWorthGoalAchievementPlan(
+                status: .achieved,
+                remainingAmount: 0,
+                monthsRemaining: 0,
+                requiredMonthlyIncrease: 0,
+                requiredYearlyIncrease: 0
+            )
+        }
+
+        let daysRemaining = calendar.dateComponents(
+            [.day],
+            from: calendar.startOfDay(for: currentDate),
+            to: calendar.startOfDay(for: goal.displayTargetDate)
+        ).day ?? 0
+        guard daysRemaining > 0 else {
+            return NetWorthGoalAchievementPlan(
+                status: daysRemaining == 0 ? .dueToday : .overdue,
+                remainingAmount: remaining,
+                monthsRemaining: 0,
+                requiredMonthlyIncrease: nil,
+                requiredYearlyIncrease: nil
+            )
+        }
+
+        let dailyIncrease = remaining / Double(daysRemaining)
+        return NetWorthGoalAchievementPlan(
+            status: .active,
+            remainingAmount: remaining,
+            monthsRemaining: max(Int(ceil(Double(daysRemaining) / 30.4375)), 1),
+            requiredMonthlyIncrease: dailyIncrease * 30.4375,
+            requiredYearlyIncrease: dailyIncrease * 365.25
+        )
     }
 
     private func requiredCurrencies(
