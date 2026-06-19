@@ -1,8 +1,8 @@
 # Wealth Map - Requirements
 
-Last updated: May 25, 2026
+Last updated: June 19, 2026
 
-This document defines the current product requirements for the Wealth Map iOS app and its exchange-rate proxy. It reflects the current app state: onboarding, local asset and liability tracking, multi-currency net worth, display-currency ordering, exchange-rate caching, portfolio history, widgets, iCloud sync, backup import/export, reminders, and the Firebase rate proxy.
+This document defines the current product requirements for the Wealth Map iOS app and its exchange-rate proxy. It reflects the current app state: onboarding, local asset and liability tracking, multi-currency net worth, net worth goals, display-currency ordering, exchange-rate caching, portfolio history, widgets, iCloud sync, backup import/export, reminders, and the Firebase rate proxy.
 
 ## Product Overview
 
@@ -179,6 +179,25 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 - **FR11.5**: The widget extension must show placeholder or empty-state content when no app snapshot is available yet.
 - **FR11.6**: The main app must request WidgetKit timeline reloads after writing updated widget data.
 
+### 12. Net Worth Goals
+
+- **FR12.1**: Users must be able to create, edit, and remove at most one active net worth goal.
+- **FR12.2**: A goal must include a finite positive target amount, a supported currency, and a target date that is not before the current calendar day when saved.
+- **FR12.3**: Dashboard, Net Worth, and the goal form must show current net worth in the selected goal currency when complete conversion data is available; active-goal summaries must also show the target, date, and progress.
+- **FR12.4**: Goal progress must use net worth after liabilities; its visual indicator must remain between 0% and 100% while text may show achievement beyond 100%.
+- **FR12.5**: A goal must be marked achieved when current net worth in the goal currency is greater than or equal to its target amount.
+- **FR12.6**: Missing required rates must make goal progress unavailable rather than showing a partial or fabricated value; stale cached rates may be used with visible stale-rate context.
+- **FR12.7**: Goal progress must refresh after goal, asset, liability, relevant rate, or portfolio currency changes.
+- **FR12.8**: An indicative achievement projection requires at least three valid net worth observations on distinct dates spanning at least 30 days with positive oldest-to-newest average daily growth.
+- **FR12.9**: Goal outlook must distinguish achieved, on-track, behind-pace, insufficient-history, non-growing, conversion-unavailable, and current-value-unavailable states.
+- **FR12.10**: Goal projections must be calculated locally from existing history and cached rates and must not be represented as financial advice or a guarantee.
+- **FR12.11**: Goal data must persist locally across launches and participate in the existing personal iCloud data store only when the user enables iCloud sync.
+- **FR12.12**: Backup exports must include the active goal, legacy backups without a goal must remain importable, and a conflicting imported goal must not replace the current goal without explicit confirmation.
+- **FR12.13**: Deleting a goal must require confirmation and must not delete or alter portfolio records, settings, history, widgets, or reminders.
+- **FR12.14**: Goal views and forms must support iPhone and iPad layouts, Dynamic Type, VoiceOver, reduced motion, long currency labels, and large values without relying on color or animation alone.
+- **FR12.15**: Goal data must not be added to widgets, notifications, Spotlight, Firebase requests, or AI analysis exports by this feature.
+- **FR12.16**: Active goal summaries must show the remaining target gap, rounded-up months until the target date, and the average monthly and annual net worth increase needed to close the gap; achieved, due-today, overdue, and unavailable values must be handled without impossible rates.
+
 ## Non-Functional Requirements
 
 ### 1. Platform and Tooling
@@ -254,18 +273,6 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 ### Wealth Map 3.2+ Suggested Features
 
 These feature ideas build on the existing portfolio history, liability tracking, data portability, and iOS platform foundations. They are not current shipped behavior.
-
-#### Net Worth Goals
-
-Let users set a target net worth, such as `₹1 Cr by Dec 2027`, and show progress toward that target.
-
-Potential requirements:
-
-- Users can create, edit, and remove one active net worth goal.
-- Goals include a target amount, target currency, and target date.
-- The Dashboard or Net Worth tab shows a progress ring against the active goal.
-- The app estimates time-to-goal from historical net worth snapshots when enough history exists.
-- The estimate falls back gracefully when there is not enough history or growth is flat/negative.
 
 #### Debt Payoff Insights
 

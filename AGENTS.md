@@ -40,6 +40,7 @@ Always run `git diff --check` before delivery.
 
 <!-- SPECKIT START -->
 For feature work, use the project-local `$speckit-*` skills. Read the current
-feature plan and `.specify/memory/requirements-context.md` for additional
+feature plan at `specs/001-net-worth-goals/plan.md` and
+`.specify/memory/requirements-context.md` for additional
 technology, structure, scope, and traceability context.
 <!-- SPECKIT END -->

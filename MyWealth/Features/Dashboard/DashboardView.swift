@@ -17,6 +17,7 @@ struct DashboardView: View {
     @Query private var netWorthSnapshots: [NetWorthSnapshot]
     @Query private var portfolioSnapshots: [PortfolioSnapshot]
     @Query private var assetValueSnapshots: [AssetValueSnapshot]
+    @Query private var netWorthGoals: [NetWorthGoal]
     @Bindable var settings: AppSettings
 
     @State private var showAddSheet = false
@@ -28,6 +29,11 @@ struct DashboardView: View {
     @State private var metalViewModel = MetalPricesViewModel()
     @State private var showSettings = false
     @State private var showFIRECalculator = false
+    @State private var showNetWorthGoalForm = false
+
+    private var activeGoal: NetWorthGoal? {
+        NetWorthGoalStore.canonicalGoal(from: netWorthGoals)
+    }
 
     private var portfolioAssets: [Asset] {
         settings.portfolioCalculationAssets(from: assets)
@@ -50,11 +56,17 @@ struct DashboardView: View {
     private var contentView: some View {
         VStack(spacing: 0) {
             if assets.isEmpty && liabilities.isEmpty {
-                ContentUnavailableView(
-                    "No Assets or Debt",
-                    systemImage: "banknote",
-                    description: Text("Add assets or liabilities to start tracking net worth.")
-                )
+                VStack(spacing: 20) {
+                    ContentUnavailableView(
+                        "No Assets or Debt",
+                        systemImage: "banknote",
+                        description: Text("Add assets or liabilities to start tracking net worth.")
+                    )
+                    Button(activeGoal == nil ? "Set a Net Worth Goal" : "Manage Net Worth Goal") {
+                        showNetWorthGoalForm = true
+                    }
+                    .buttonStyle(.bordered)
+                }
             } else {
                 List {
                     Section {
@@ -85,6 +97,17 @@ struct DashboardView: View {
                     }
 
                     Section(header: PillLabel("Plan")) {
+                        Button {
+                            showNetWorthGoalForm = true
+                        } label: {
+                            AppListCard {
+                                goalContent
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .appListRow()
+                        .listRowSeparator(.hidden)
+
                         Button {
                             showFIRECalculator = true
                         } label: {
@@ -300,6 +323,17 @@ struct DashboardView: View {
             .sheet(isPresented: $showSettings) {
                 SettingsView(settings: settings, showsDoneButton: true)
             }
+            .sheet(isPresented: $showNetWorthGoalForm) {
+                NetWorthGoalFormView(
+                    goal: activeGoal,
+                    defaultCurrency: settings.baseCurrency,
+                    assets: portfolioAssets,
+                    liabilities: liabilities,
+                    exchangeRates: viewModel.exchangeRates,
+                    ratesAreStale: viewModel.ratesAreStale,
+                    useCompactFormatting: settings.usesCompactCurrencyTotals
+                )
+            }
             .navigationDestination(item: $selectedCategory) { category in
                 CategoryDetailView(category: category, settings: settings)
             }
@@ -324,6 +358,34 @@ struct DashboardView: View {
             }
         }
     }
+
+    @ViewBuilder
+    private var goalContent: some View {
+        if let goal = activeGoal {
+            let calculator = NetWorthGoalCalculator()
+            let progress = calculator.progress(
+                goal: goal,
+                assets: portfolioAssets,
+                liabilities: liabilities,
+                exchangeRates: viewModel.exchangeRates,
+                ratesAreStale: viewModel.ratesAreStale
+            )
+            NetWorthGoalCard(
+                goal: goal,
+                progress: progress,
+                outlook: calculator.outlook(
+                    goal: goal,
+                    progress: progress,
+                    snapshots: netWorthSnapshots,
+                    exchangeRates: viewModel.exchangeRates
+                ),
+                achievementPlan: calculator.achievementPlan(goal: goal, progress: progress),
+                useCompactFormatting: settings.usesCompactCurrencyTotals
+            )
+        } else {
+            NetWorthGoalInvitationCard()
+        }
+    }
 }
 
 struct NetWorthView: View {
@@ -334,11 +396,13 @@ struct NetWorthView: View {
     @Query private var netWorthSnapshots: [NetWorthSnapshot]
     @Query private var portfolioSnapshots: [PortfolioSnapshot]
     @Query private var assetValueSnapshots: [AssetValueSnapshot]
+    @Query private var netWorthGoals: [NetWorthGoal]
     @Bindable var settings: AppSettings
 
     @State private var viewModel = DashboardViewModel()
     @State private var metalViewModel = MetalPricesViewModel()
     @State private var showNetWorthHistory = false
+    @State private var showNetWorthGoalForm = false
     @AppStorage("netWorthComfort.householdMembers") private var comfortHouseholdMembers = 1
     @AppStorage("netWorthComfort.monthlyIncome") private var comfortMonthlyIncome = 0.0
     @AppStorage("netWorthComfort.expectedMonthlySpend") private var comfortExpectedMonthlySpend = 0.0
@@ -347,6 +411,10 @@ struct NetWorthView: View {
 
     private var portfolioAssets: [Asset] {
         settings.portfolioCalculationAssets(from: assets)
+    }
+
+    private var activeGoal: NetWorthGoal? {
+        NetWorthGoalStore.canonicalGoal(from: netWorthGoals)
     }
 
     private var comfortAssumptions: Binding<LivingComfortAssumptions> {
@@ -387,11 +455,17 @@ struct NetWorthView: View {
                     .ignoresSafeArea(.all)
 
                 if assets.isEmpty && liabilities.isEmpty {
-                    ContentUnavailableView(
-                        "No Net Worth Data",
-                        systemImage: "banknote",
-                        description: Text("Add assets or liabilities to calculate net worth.")
-                    )
+                    VStack(spacing: 20) {
+                        ContentUnavailableView(
+                            "No Net Worth Data",
+                            systemImage: "banknote",
+                            description: Text("Add assets or liabilities to calculate net worth.")
+                        )
+                        Button(activeGoal == nil ? "Set a Net Worth Goal" : "Manage Net Worth Goal") {
+                            showNetWorthGoalForm = true
+                        }
+                        .buttonStyle(.bordered)
+                    }
                 } else {
                     List {
                         let netWorthTotals = viewModel.totalsByCurrency(
@@ -437,6 +511,18 @@ struct NetWorthView: View {
                             }
                         }
 
+                        Section(header: PillLabel("Goal")) {
+                            Button {
+                                showNetWorthGoalForm = true
+                            } label: {
+                                AppListCard {
+                                    netWorthGoalContent
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .appListRow()
+                        }
+
                         Section(header: PillLabel("Trend")) {
                             AppListCard {
                                 DashboardTrendView(
@@ -478,6 +564,17 @@ struct NetWorthView: View {
             .navigationDestination(isPresented: $showNetWorthHistory) {
                 NetWorthHistoryView(settings: settings)
             }
+            .sheet(isPresented: $showNetWorthGoalForm) {
+                NetWorthGoalFormView(
+                    goal: activeGoal,
+                    defaultCurrency: settings.baseCurrency,
+                    assets: portfolioAssets,
+                    liabilities: liabilities,
+                    exchangeRates: viewModel.exchangeRates,
+                    ratesAreStale: viewModel.ratesAreStale,
+                    useCompactFormatting: settings.usesCompactCurrencyTotals
+                )
+            }
         }
         .coordinatePortfolioHistory(coordinator)
         .task(id: "metalRates") {
@@ -491,6 +588,34 @@ struct NetWorthView: View {
                 await metalViewModel.refreshIfStale()
                 viewModel.enrichWithMetalRates(metalViewModel.metalRates)
             }
+        }
+    }
+
+    @ViewBuilder
+    private var netWorthGoalContent: some View {
+        if let goal = activeGoal {
+            let calculator = NetWorthGoalCalculator()
+            let progress = calculator.progress(
+                goal: goal,
+                assets: portfolioAssets,
+                liabilities: liabilities,
+                exchangeRates: viewModel.exchangeRates,
+                ratesAreStale: viewModel.ratesAreStale
+            )
+            NetWorthGoalCard(
+                goal: goal,
+                progress: progress,
+                outlook: calculator.outlook(
+                    goal: goal,
+                    progress: progress,
+                    snapshots: netWorthSnapshots,
+                    exchangeRates: viewModel.exchangeRates
+                ),
+                achievementPlan: calculator.achievementPlan(goal: goal, progress: progress),
+                useCompactFormatting: settings.usesCompactCurrencyTotals
+            )
+        } else {
+            NetWorthGoalInvitationCard()
         }
     }
 }

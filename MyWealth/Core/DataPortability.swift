@@ -13,8 +13,9 @@ struct ExportPayload: Codable, Sendable {
     let assetValueSnapshots: [AssetValueSnapshotExport]
     let netWorthSnapshots: [NetWorthSnapshotExport]
     let portfolioSnapshots: [PortfolioSnapshotExport]
+    let netWorthGoal: NetWorthGoalExport?
 
-    static let currentVersion = 1
+    static let currentVersion = 2
 }
 
 struct AssetExport: Codable, Sendable {
@@ -59,6 +60,32 @@ struct PortfolioSnapshotExport: Codable, Sendable {
     let recordedAt: Date
 }
 
+struct NetWorthGoalExport: Codable, Sendable, Equatable {
+    let stableIdentifier: String
+    let targetAmount: Double
+    let currencyCode: String
+    let targetDate: Date
+    let createdAt: Date
+    let updatedAt: Date
+
+    init(goal: NetWorthGoal) {
+        stableIdentifier = goal.displayStableIdentifier
+        targetAmount = goal.displayTargetAmount
+        currencyCode = goal.displayCurrency.rawValue
+        targetDate = goal.displayTargetDate
+        createdAt = goal.displayCreatedAt
+        updatedAt = goal.displayUpdatedAt
+    }
+
+    var isValid: Bool {
+        guard let currency = Asset.CurrencyType(rawValue: currencyCode) else { return false }
+        return !stableIdentifier.isEmpty
+            && targetAmount.isFinite
+            && targetAmount > 0
+            && currency != .none
+    }
+}
+
 // MARK: - UTType
 
 extension UTType {
@@ -77,6 +104,7 @@ enum DataExporter {
         let assetSnapshots     = try context.fetch(FetchDescriptor<AssetValueSnapshot>())
         let netWorthSnapshots  = try context.fetch(FetchDescriptor<NetWorthSnapshot>())
         let portfolioSnapshots = try context.fetch(FetchDescriptor<PortfolioSnapshot>())
+        let netWorthGoal = try NetWorthGoalStore.canonicalGoal(in: context)
 
         let payload = ExportPayload(
             version: ExportPayload.currentVersion,
@@ -127,7 +155,8 @@ enum DataExporter {
                     currencyCode: $0.currencyCode ?? "",
                     recordedAt: $0.recordedAt ?? Date()
                 )
-            }
+            },
+            netWorthGoal: netWorthGoal.map(NetWorthGoalExport.init(goal:))
         )
 
         let encoder = JSONEncoder()
@@ -151,21 +180,93 @@ enum DataExporter {
 // MARK: - Import
 
 enum DataImporter {
+    enum GoalConflictResolution: Equatable {
+        case requireDecision
+        case keepExisting
+        case replaceExisting
+    }
+
+    struct ImportPreview {
+        let hasGoalConflict: Bool
+        let importedGoal: NetWorthGoalExport?
+    }
+
     enum ImportError: LocalizedError {
         case unsupportedVersion(Int)
+        case invalidGoal
+        case goalConflict
         var errorDescription: String? {
             switch self {
             case .unsupportedVersion(let v):
                 return "Backup version \(v) is not supported by this app version."
+            case .invalidGoal:
+                return "The backup contains an invalid net worth goal."
+            case .goalConflict:
+                return "The backup contains a different net worth goal. Choose whether to keep or replace your current goal."
             }
         }
+    }
+
+    @MainActor
+    static func previewImport(_ data: Data, into context: ModelContext) throws -> ImportPreview {
+        let payload = try decodePayload(data)
+        if let goal = payload.netWorthGoal, !goal.isValid {
+            throw ImportError.invalidGoal
+        }
+        let existing = try NetWorthGoalStore.canonicalGoal(in: context).map(NetWorthGoalExport.init(goal:))
+        let hasConflict = if let imported = payload.netWorthGoal, let existing {
+            !goalsAreMateriallyEqual(imported, existing)
+        } else {
+            false
+        }
+        return ImportPreview(hasGoalConflict: hasConflict, importedGoal: payload.netWorthGoal)
     }
 
     /// Reads `url`, decodes the JSON payload, and inserts any records not
     /// already present in `context`. Existing records are skipped (additive).
     @MainActor
-    static func importFromURL(_ url: URL, into context: ModelContext) throws -> ImportSummary {
+    static func importFromURL(
+        _ url: URL,
+        into context: ModelContext,
+        goalConflictResolution: GoalConflictResolution = .requireDecision
+    ) throws -> ImportSummary {
         let data = try Data(contentsOf: url)
+        return try importData(
+            data,
+            into: context,
+            goalConflictResolution: goalConflictResolution
+        )
+    }
+
+    @MainActor
+    static func importData(
+        _ data: Data,
+        into context: ModelContext,
+        goalConflictResolution: GoalConflictResolution = .requireDecision
+    ) throws -> ImportSummary {
+        let payload = try decodePayload(data)
+        if let goal = payload.netWorthGoal, !goal.isValid {
+            throw ImportError.invalidGoal
+        }
+        let existingGoal = try NetWorthGoalStore.canonicalGoal(in: context)
+        let hasGoalConflict = if let imported = payload.netWorthGoal, let existingGoal {
+            !goalsAreMateriallyEqual(imported, NetWorthGoalExport(goal: existingGoal))
+        } else {
+            false
+        }
+        if hasGoalConflict, goalConflictResolution == .requireDecision {
+            throw ImportError.goalConflict
+        }
+
+        return try apply(
+            payload,
+            into: context,
+            existingGoal: existingGoal,
+            goalConflictResolution: goalConflictResolution
+        )
+    }
+
+    private static func decodePayload(_ data: Data) throws -> ExportPayload {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let payload = try decoder.decode(ExportPayload.self, from: data)
@@ -173,7 +274,16 @@ enum DataImporter {
         guard payload.version <= ExportPayload.currentVersion else {
             throw ImportError.unsupportedVersion(payload.version)
         }
+        return payload
+    }
 
+    @MainActor
+    private static func apply(
+        _ payload: ExportPayload,
+        into context: ModelContext,
+        existingGoal: NetWorthGoal?,
+        goalConflictResolution: GoalConflictResolution
+    ) throws -> ImportSummary {
         let existingAssetIDs = Set(
             (try context.fetch(FetchDescriptor<Asset>())).compactMap(\.historyIdentifier)
         )
@@ -263,8 +373,37 @@ enum DataImporter {
             summary.portfolioSnapshots += 1
         }
 
+        if let importedGoal = payload.netWorthGoal {
+            let shouldApply = existingGoal == nil || goalConflictResolution == .replaceExisting
+            if shouldApply {
+                for goal in try context.fetch(FetchDescriptor<NetWorthGoal>()) {
+                    context.delete(goal)
+                }
+                let currency = Asset.CurrencyType(rawValue: importedGoal.currencyCode) ?? .none
+                context.insert(NetWorthGoal(
+                    targetAmount: importedGoal.targetAmount,
+                    currency: currency,
+                    targetDate: importedGoal.targetDate,
+                    stableIdentifier: importedGoal.stableIdentifier,
+                    createdAt: importedGoal.createdAt,
+                    updatedAt: importedGoal.updatedAt
+                ))
+                summary.netWorthGoals = 1
+            }
+        }
+
         try context.save()
         return summary
+    }
+
+    private static func goalsAreMateriallyEqual(
+        _ lhs: NetWorthGoalExport,
+        _ rhs: NetWorthGoalExport
+    ) -> Bool {
+        lhs.stableIdentifier == rhs.stableIdentifier
+            && lhs.targetAmount == rhs.targetAmount
+            && lhs.currencyCode == rhs.currencyCode
+            && lhs.targetDate == rhs.targetDate
     }
 }
 
@@ -276,6 +415,7 @@ struct ImportSummary {
     var assetSnapshots = 0
     var netWorthSnapshots = 0
     var portfolioSnapshots = 0
+    var netWorthGoals = 0
 
     var description: String {
         var parts: [String] = []
@@ -284,6 +424,7 @@ struct ImportSummary {
         if assetSnapshots > 0     { parts.append("\(assetSnapshots) asset history entries") }
         if netWorthSnapshots > 0  { parts.append("\(netWorthSnapshots) net worth snapshots") }
         if portfolioSnapshots > 0 { parts.append("\(portfolioSnapshots) portfolio snapshots") }
+        if netWorthGoals > 0      { parts.append("\(netWorthGoals) net worth goal") }
         guard !parts.isEmpty else { return "Nothing new to import — all records already exist." }
         return "Imported: " + parts.joined(separator: ", ") + "."
     }
