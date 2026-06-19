@@ -39,6 +39,13 @@ final class NetworkManager {
         body: Data? = nil,
         decoder: JSONDecoder = JSONDecoder()
     ) async throws -> T {
+        let activityID = await AppActivityTracker.shared.begin()
+        defer {
+            Task { @MainActor in
+                AppActivityTracker.shared.end(activityID)
+            }
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
         headers?.forEach { key, value in

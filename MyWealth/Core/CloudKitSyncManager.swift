@@ -109,6 +109,9 @@ final class ContainerHolder {
     /// so all existing data is immediately available in the new container.
     @MainActor
     func switchSync(enabled: Bool) {
+        let activityID = AppActivityTracker.shared.begin()
+        defer { AppActivityTracker.shared.end(activityID) }
+
         do {
             container = try CloudKitSyncManager.makeContainer(
                 syncEnabled: enabled,
@@ -128,6 +131,9 @@ final class ContainerHolder {
     @objc private func onAccountChange() {
         Task { @MainActor [weak self] in
             guard let self else { return }
+            let activityID = AppActivityTracker.shared.begin()
+            defer { AppActivityTracker.shared.end(activityID) }
+
             iCloudAccountChanged = true
             let syncEnabled = UserDefaults.standard.bool(forKey: "settings.iCloudSyncEnabled")
             do {

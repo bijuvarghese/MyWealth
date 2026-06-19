@@ -34,15 +34,48 @@ struct MyWealthApp: App {
 
     var body: some Scene {
         WindowGroup {
-            AppRootView()
-                .setupReminderModule()
-                // Inject the holder so child views can trigger a container switch.
-                .environment(containerHolder)
-                // The modelContainer and .id are applied here so that when
-                // rebuildId changes the entire content tree re-mounts with the
-                // new container — no app restart needed.
-                .modelContainer(containerHolder.container)
-                .id(containerHolder.rebuildId)
+            LaunchSplashContainer {
+                AppRootView()
+                    .setupReminderModule()
+                    // Inject the holder so child views can trigger a container switch.
+                    .environment(containerHolder)
+                    // The modelContainer and .id are applied here so that when
+                    // rebuildId changes the entire content tree re-mounts with the
+                    // new container — no app restart needed.
+                    .modelContainer(containerHolder.container)
+                    .id(containerHolder.rebuildId)
+            }
+        }
+    }
+}
+
+private struct LaunchSplashContainer<Content: View>: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var isShowingSplash = true
+
+    private let content: Content
+
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        ZStack {
+            content
+
+            if isShowingSplash {
+                WealthMapSplashView()
+                    .transition(.opacity)
+                    .zIndex(1)
+            }
+        }
+        .task {
+            let delay = reduceMotion ? 900_000_000 : 2_350_000_000
+            try? await Task.sleep(nanoseconds: UInt64(delay))
+
+            withAnimation(.easeInOut(duration: reduceMotion ? 0.2 : 0.45)) {
+                isShowingSplash = false
+            }
         }
     }
 }
@@ -51,6 +84,7 @@ private struct AppRootView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(ContainerHolder.self) private var containerHolder
     @State private var settings = AppSettings()
+    @State private var activityTracker = AppActivityTracker.shared
 
     private let iCloudSync = ICloudSettingsSync.shared
 
@@ -119,6 +153,15 @@ private struct AppRootView: View {
             }
         }
         .animation(.easeInOut, value: containerHolder.iCloudAccountChanged)
+        .overlay(alignment: .top) {
+            if activityTracker.isActive {
+                AppActivityBar()
+                    .ignoresSafeArea(edges: .top)
+                    .transition(.opacity)
+                    .zIndex(2)
+            }
+        }
+        .animation(.easeInOut(duration: 0.2), value: activityTracker.isActive)
         .onChange(of: settings.baseCurrency) {
             if settings.iCloudSyncEnabled { iCloudSync.push(settings: settings) }
         }
@@ -172,52 +215,82 @@ private struct AppTabView: View {
     }
 }
 
-private struct AnimatedDotLaunchView: View {
+private struct WealthMapSplashView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var isAnimating = false
+    @State private var hasAppeared = false
+
+    private let gold = Color(red: 212/255, green: 175/255, blue: 55/255)
+    private let highlightGold = Color(red: 255/255, green: 224/255, blue: 130/255)
+    private let charcoal = Color(red: 21/255, green: 21/255, blue: 21/255)
 
     var body: some View {
         ZStack {
-            Color(.systemBackground)
+            LinearGradient(
+                colors: [
+                    Color(red: 250/255, green: 247/255, blue: 239/255),
+                    Color(red: 245/255, green: 238/255, blue: 222/255)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
                 .ignoresSafeArea()
 
-            AnimatedWaveDotBackground(dotRadius: 1.2, spacing: 20)
+            AnimatedWaveDotBackground(
+                dotColor: gold.opacity(0.25),
+                dotRadius: 1,
+                spacing: 18
+            )
                 .ignoresSafeArea()
 
-            VStack(spacing: 18) {
-                Image("launchImage")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 104, height: 104)
-                    .scaleEffect(isAnimating && !reduceMotion ? 1.04 : 0.96)
-                    .animation(
-                        .easeInOut(duration: 0.75)
-                            .repeatForever(autoreverses: true),
-                        value: isAnimating
-                    )
+            VStack(spacing: 22) {
+                ZStack {
+                    Circle()
+                        .stroke(gold.opacity(0.22), lineWidth: 1)
+                        .frame(width: 216, height: 216)
 
-                HStack(spacing: 10) {
-                    ForEach(0..<3, id: \.self) { index in
-                        Circle()
-                            .fill(.accent)
-                            .frame(width: 9, height: 9)
-                            .scaleEffect(isAnimating && !reduceMotion ? 1.12 : 0.86)
-                            .offset(y: isAnimating && !reduceMotion ? -6 : 6)
-                            .opacity(isAnimating && !reduceMotion ? 1 : 0.55)
-                            .animation(
-                                .easeInOut(duration: 0.5)
-                                    .repeatForever(autoreverses: true)
-                                    .delay(Double(index) * 0.12),
-                                value: isAnimating
-                            )
-                    }
+                    Circle()
+                        .trim(from: 0.08, to: 0.42)
+                        .stroke(
+                            LinearGradient(
+                                colors: [highlightGold.opacity(0.1), highlightGold, gold],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            style: StrokeStyle(lineWidth: 4, lineCap: .round)
+                        )
+                        .frame(width: 216, height: 216)
+                        .rotationEffect(.degrees(hasAppeared && !reduceMotion ? 330 : -35))
+                        .opacity(hasAppeared ? 1 : 0)
+
+                    Image("WealthMapCoin")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 164, height: 164)
+                        .shadow(color: gold.opacity(0.4), radius: 22, x: 0, y: 14)
+                        .scaleEffect(hasAppeared && !reduceMotion ? 1 : 0.72)
+                        .opacity(hasAppeared ? 1 : 0)
                 }
+                .animation(.spring(response: 0.72, dampingFraction: 0.72), value: hasAppeared)
+                .animation(.easeOut(duration: 1.15), value: hasAppeared)
+
+                VStack(spacing: 7) {
+                    Text("Wealth Map")
+                        .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                        .foregroundStyle(charcoal)
+
+                    Text("Mapping your money clearly")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(charcoal.opacity(0.62))
+                }
+                .offset(y: hasAppeared && !reduceMotion ? 0 : 10)
+                .opacity(hasAppeared ? 1 : 0)
             }
-            .padding(22)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .padding(.horizontal, 28)
         }
         .onAppear {
-            isAnimating = true
+            withAnimation(.easeOut(duration: reduceMotion ? 0.2 : 0.55)) {
+                hasAppeared = true
+            }
         }
     }
 }
