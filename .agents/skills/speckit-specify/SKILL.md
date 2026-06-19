@@ -90,7 +90,8 @@ Given that feature description, do this:
 
    **Create the directory and spec file**:
    - `mkdir -p SPECIFY_FEATURE_DIRECTORY`
-   - Copy `.specify/templates/spec-template.md` to `SPECIFY_FEATURE_DIRECTORY/spec.md` as the starting point
+   - Resolve `SPEC_TEMPLATE` to `.specify/templates/overrides/spec-template.md` when it exists; otherwise use `.specify/templates/spec-template.md`
+   - Copy `SPEC_TEMPLATE` to `SPECIFY_FEATURE_DIRECTORY/spec.md` as the starting point
    - Set `SPEC_FILE` to `SPECIFY_FEATURE_DIRECTORY/spec.md`
    - Persist the resolved path to `.specify/feature.json`:
      ```json
@@ -106,7 +107,7 @@ Given that feature description, do this:
    - The spec directory name and the git branch name are independent — they may be the same but that is the user's choice
    - The spec directory and file are always created by this command, never by the hook
 
-4. Load `.specify/templates/spec-template.md` to understand required sections.
+4. Load `requirements.md`, `.specify/memory/requirements-context.md`, `.specify/memory/constitution.md`, and the resolved `SPEC_TEMPLATE`. Treat baseline FR/NFR requirements as shipped contracts and planned enhancements as candidates only.
 
 5. Follow this execution flow:
     1. Parse user description from arguments
@@ -163,6 +164,10 @@ Given that feature description, do this:
       - [ ] Edge cases are identified
       - [ ] Scope is clearly bounded
       - [ ] Dependencies and assumptions identified
+      - [ ] Baseline Impact cites every affected FR/NFR ID and disposition
+      - [ ] Shipped baseline, current limitations, and planned enhancements are distinguished
+      - [ ] Privacy and data-flow categories are completed with reasons for N/A
+      - [ ] Compatibility, migration, stable identifier, and rollback impacts are completed
 
       ## Feature Readiness
 

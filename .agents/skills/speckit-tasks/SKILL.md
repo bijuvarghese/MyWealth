@@ -55,8 +55,8 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 1. **Setup**: Run `.specify/scripts/bash/setup-tasks.sh --json` from repo root and parse FEATURE_DIR, TASKS_TEMPLATE, and AVAILABLE_DOCS list. `FEATURE_DIR` and `TASKS_TEMPLATE` must be absolute paths when provided. `AVAILABLE_DOCS` is a list of document names/relative paths available under `FEATURE_DIR` (for example `research.md` or `contracts/`). For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
-2. **Load design documents**: Read from FEATURE_DIR:
-   - **Required**: plan.md (tech stack, libraries, structure), spec.md (user stories with priorities)
+2. **Load design documents**: Read `requirements.md` and `.specify/memory/requirements-context.md`, then read from FEATURE_DIR:
+   - **Required**: plan.md (tech stack, libraries, structure and traceability), spec.md (user stories, priorities and affected baseline IDs)
    - **Optional**: data-model.md (entities), contracts/ (interface contracts), research.md (decisions), quickstart.md (test scenarios)
    - Note: Not all projects have all documents. Generate tasks based on what's available.
 
@@ -136,7 +136,7 @@ The tasks.md should be immediately executable - each task must be specific enoug
 
 **CRITICAL**: Tasks MUST be organized by user story to enable independent implementation and testing.
 
-**Tests are OPTIONAL**: Only generate test tasks if explicitly requested in the feature specification or if user requests TDD approach.
+**Tests are RISK-BASED**: Generate automated test tasks for financial calculations, persistence/migrations, settings compatibility, networking, notifications, widgets, import/export, and defect corrections. For other UI-only work, generate the verification tasks required by the plan.
 
 ### Checklist Format (REQUIRED)
 

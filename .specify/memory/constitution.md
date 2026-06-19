@@ -1,11 +1,12 @@
 <!--
 Sync Impact Report
-- Version: template -> 1.0.0
+- Version: 1.0.0 -> 1.1.0
 - Adopted principles: Privacy by Default; Financial Correctness and Compatibility;
   Native, Accessible Product Quality; Clear Boundaries and Simple Design;
   Verification Before Delivery
-- Added sections: Platform and Operational Constraints; Development Workflow
-- Templates reviewed: plan, spec, tasks, and checklist templates remain compatible
+- Added requirement-ID traceability, shipped-versus-planned scope rules, and
+  mandatory regression coverage for affected baseline requirements
+- Template overrides added: plan, spec, tasks, and checklist templates
 -->
 # Wealth Map Constitution
 
@@ -27,6 +28,12 @@ value. Persisted schemas, backup formats, UserDefaults keys, bundle identifiers,
 App Groups, notification identifiers, widget kinds, and deployed endpoint names
 MUST remain backward-compatible unless a specification includes an explicit
 migration and rollback plan.
+
+Every feature specification MUST cite the affected `FR*` and `NFR*` identifiers
+from `requirements.md`, state whether each requirement is preserved, extended,
+or changed, and define regression evidence for preserved behavior. Planned
+enhancements are not baseline requirements until promoted into an approved
+feature specification.
 
 ### III. Native, Accessible Product Quality
 Features MUST follow established SwiftUI and Apple platform patterns and remain
@@ -64,13 +71,17 @@ documents why it cannot run and what equivalent evidence was collected.
   `group.com.bv.MyWealth` are stable compatibility contracts.
 - Public product naming is Wealth Map. Technical target, scheme, source path,
   Firebase project, and repository names may retain MyWealth.
-- Scope and behavior in `requirements.md` are baseline product context. A new
-  feature specification MUST identify any intended change to that baseline.
+- Functional and non-functional requirements in `requirements.md` are shipped
+  baseline contracts. Current Scope Notes are present limitations, while Planned
+  Enhancements are candidates only. A feature specification MUST identify any
+  baseline change or candidate it promotes and MUST preserve all unlisted
+  baseline behavior.
 
 ## Development Workflow
 
 1. Start meaningful product work with `$speckit-specify`; use
-   `$speckit-clarify` when material behavior is unresolved.
+   `$speckit-clarify` when material behavior is unresolved. Read
+   `.specify/memory/requirements-context.md` and `requirements.md` first.
 2. Use `$speckit-plan` to record architecture, privacy, migration, platform,
    and test decisions before implementation.
 3. Use `$speckit-tasks` to produce independently verifiable work ordered by
@@ -100,4 +111,4 @@ MAJOR for removed or incompatible principles, MINOR for new principles or
 materially expanded obligations, and PATCH for clarifications. `README.md` and
 `requirements.md` provide product context but do not override this constitution.
 
-**Version**: 1.0.0 | **Ratified**: 2026-06-19 | **Last Amended**: 2026-06-19
+**Version**: 1.1.0 | **Ratified**: 2026-06-19 | **Last Amended**: 2026-06-19
