@@ -116,8 +116,8 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Map focus selections to category scaffolding
    - Infer any missing context from spec/plan/tasks (do NOT hallucinate)
 
-4. **Load feature context**: Read from FEATURE_DIR:
-   - spec.md: Feature requirements and scope
+4. **Load feature context**: Read `requirements.md` and `.specify/memory/requirements-context.md`, then read from FEATURE_DIR:
+   - spec.md: Feature requirements, affected baseline IDs, and scope
    - plan.md (if exists): Technical details, dependencies
    - tasks.md (if exists): Implementation tasks
 

@@ -211,13 +211,20 @@ To work on Firebase functions locally or deploy them, use the Firebase CLI from 
 
 This repository includes [GitHub Spec Kit](https://github.com/github/spec-kit)
 configured for Codex skills. The project constitution is stored at
-`.specify/memory/constitution.md`, reusable workflow assets live under
-`.specify/`, and Codex skills live under `.agents/skills/`.
+`.specify/memory/constitution.md`, the requirements routing guide is stored at
+`.specify/memory/requirements-context.md`, Wealth Map template customizations
+live under `.specify/templates/overrides/`, and Codex skills live under
+`.agents/skills/`.
 
 Start a feature with `$speckit-specify`, then use `$speckit-plan`,
 `$speckit-tasks`, and `$speckit-implement`. Optional quality steps include
 `$speckit-clarify`, `$speckit-checklist`, and `$speckit-analyze`. Generated
 feature artifacts are stored under `specs/`.
+
+Generated specs must trace affected `FR*` and `NFR*` identifiers from
+`requirements.md`. Functional and non-functional requirements are treated as
+the shipped baseline; planned enhancements remain candidates until promoted
+into an approved feature spec.
 
 The integration is pinned to Spec Kit `0.8.15`. To verify the installed CLI:
 

@@ -2,7 +2,19 @@
 
 Wealth Map is a SwiftUI personal net-worth app with a WidgetKit extension and
 Firebase proxy functions. Read `README.md`, `requirements.md`, and
-`.specify/memory/constitution.md` before planning product changes.
+`.specify/memory/constitution.md` before planning product changes. Use
+`.specify/memory/requirements-context.md` to map requirement IDs to code areas.
+
+## Requirements Discipline
+
+- Treat `FR1.1`-`FR11.6` and `NFR1.1`-`NFR6.8` in `requirements.md` as the
+  shipped baseline.
+- Treat Current Scope Notes as present limitations and Planned Enhancements as
+  candidates, not shipped commitments.
+- Every feature spec and plan must cite affected requirement IDs, state what is
+  preserved or changed, and define regression evidence.
+- Update `requirements.md` when implementation changes shipped behavior or
+  removes a documented limitation.
 
 ## Stable Technical Contracts
 
@@ -28,5 +40,6 @@ Always run `git diff --check` before delivery.
 
 <!-- SPECKIT START -->
 For feature work, use the project-local `$speckit-*` skills. Read the current
-feature plan for additional technology, structure, and command context.
+feature plan and `.specify/memory/requirements-context.md` for additional
+technology, structure, scope, and traceability context.
 <!-- SPECKIT END -->
