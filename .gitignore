@@ -7,6 +7,11 @@ firebase-debug.log
 firebase-debug.*.log
 .firebase/
 
+# Keep project-local Spec Kit skills, ignore any other agent-local state.
+.agents/*
+!.agents/skills/
+!.agents/skills/**
+
 # GCP / Firebase service account keys — never commit these
 *service-account*.json
 *service_account*.json

@@ -207,6 +207,24 @@ xcodebuild test -project MyWealth.xcodeproj -scheme MyWealth -destination 'platf
 
 To work on Firebase functions locally or deploy them, use the Firebase CLI from the repository root after completing the setup above.
 
+## Spec-Driven Development
+
+This repository includes [GitHub Spec Kit](https://github.com/github/spec-kit)
+configured for Codex skills. The project constitution is stored at
+`.specify/memory/constitution.md`, reusable workflow assets live under
+`.specify/`, and Codex skills live under `.agents/skills/`.
+
+Start a feature with `$speckit-specify`, then use `$speckit-plan`,
+`$speckit-tasks`, and `$speckit-implement`. Optional quality steps include
+`$speckit-clarify`, `$speckit-checklist`, and `$speckit-analyze`. Generated
+feature artifacts are stored under `specs/`.
+
+The integration is pinned to Spec Kit `0.8.15`. To verify the installed CLI:
+
+```sh
+specify version
+```
+
 ## Current Scope
 
 - The app supports manual financial tracking only.
