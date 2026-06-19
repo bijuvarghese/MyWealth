@@ -25,6 +25,7 @@ enum CloudKitSyncManager {
             AssetValueSnapshot.self,
             NetWorthSnapshot.self,
             PortfolioSnapshot.self,
+            NetWorthGoal.self,
         ])
 
         // Always use in-memory for unit tests.

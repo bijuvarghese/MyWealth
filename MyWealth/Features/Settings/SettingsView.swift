@@ -22,6 +22,8 @@ struct SettingsView: View {
     @State private var isImporting = false
     @State private var importResultMessage: String? = nil
     @State private var importError: String? = nil
+    @State private var pendingGoalImportData: Data? = nil
+    @State private var isConfirmingGoalReplacement = false
     @Bindable var settings: AppSettings
     var showsDoneButton = true
 
@@ -117,6 +119,8 @@ struct SettingsView: View {
             isImporting: $isImporting,
             importResultMessage: $importResultMessage,
             importError: $importError,
+            pendingGoalImportData: $pendingGoalImportData,
+            isConfirmingGoalReplacement: $isConfirmingGoalReplacement,
             modelContext: modelContext
         )
         .cleanupAlerts(
@@ -266,6 +270,8 @@ struct SettingsView: View {
             isImporting: $isImporting,
             importResultMessage: $importResultMessage,
             importError: $importError,
+            pendingGoalImportData: $pendingGoalImportData,
+            isConfirmingGoalReplacement: $isConfirmingGoalReplacement,
             modelContext: modelContext
         )
     }
@@ -696,6 +702,8 @@ private extension View {
         isImporting: Binding<Bool>,
         importResultMessage: Binding<String?>,
         importError: Binding<String?>,
+        pendingGoalImportData: Binding<Data?>,
+        isConfirmingGoalReplacement: Binding<Bool>,
         modelContext: ModelContext
     ) -> some View {
         self
@@ -735,8 +743,15 @@ private extension View {
                         do {
                             guard url.startAccessingSecurityScopedResource() else { return }
                             defer { url.stopAccessingSecurityScopedResource() }
-                            let summary = try DataImporter.importFromURL(url, into: modelContext)
-                            importResultMessage.wrappedValue = summary.description
+                            let data = try Data(contentsOf: url)
+                            let preview = try DataImporter.previewImport(data, into: modelContext)
+                            if preview.hasGoalConflict {
+                                pendingGoalImportData.wrappedValue = data
+                                isConfirmingGoalReplacement.wrappedValue = true
+                            } else {
+                                let summary = try DataImporter.importData(data, into: modelContext)
+                                importResultMessage.wrappedValue = summary.description
+                            }
                         } catch {
                             importError.wrappedValue = error.localizedDescription
                         }
@@ -769,6 +784,57 @@ private extension View {
             } message: {
                 Text(importError.wrappedValue ?? "")
             }
+            .confirmationDialog(
+                "Replace Net Worth Goal?",
+                isPresented: isConfirmingGoalReplacement,
+                titleVisibility: .visible
+            ) {
+                Button("Keep Current Goal") {
+                    applyPendingImport(
+                        resolution: .keepExisting,
+                        data: pendingGoalImportData,
+                        resultMessage: importResultMessage,
+                        errorMessage: importError,
+                        context: modelContext
+                    )
+                }
+                Button("Replace Goal", role: .destructive) {
+                    applyPendingImport(
+                        resolution: .replaceExisting,
+                        data: pendingGoalImportData,
+                        resultMessage: importResultMessage,
+                        errorMessage: importError,
+                        context: modelContext
+                    )
+                }
+                Button("Cancel", role: .cancel) {
+                    pendingGoalImportData.wrappedValue = nil
+                }
+            } message: {
+                Text("This backup contains a different goal. Other backup records remain additive.")
+            }
+    }
+
+    @MainActor
+    private func applyPendingImport(
+        resolution: DataImporter.GoalConflictResolution,
+        data: Binding<Data?>,
+        resultMessage: Binding<String?>,
+        errorMessage: Binding<String?>,
+        context: ModelContext
+    ) {
+        guard let pendingData = data.wrappedValue else { return }
+        defer { data.wrappedValue = nil }
+        do {
+            let summary = try DataImporter.importData(
+                pendingData,
+                into: context,
+                goalConflictResolution: resolution
+            )
+            resultMessage.wrappedValue = summary.description
+        } catch {
+            errorMessage.wrappedValue = error.localizedDescription
+        }
     }
 
     /// Attaches the confirmation dialog and result alert for the history cleanup action.

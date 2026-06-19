@@ -7,7 +7,7 @@
 [![Functions CI](https://github.com/bijuvarghese/MyWealth/actions/workflows/functions-ci.yml/badge.svg?branch=main)](https://github.com/bijuvarghese/MyWealth/actions/workflows/functions-ci.yml)
 [![Cache Monitor](https://github.com/bijuvarghese/MyWealth/actions/workflows/cache-monitor.yml/badge.svg?branch=main)](https://github.com/bijuvarghese/MyWealth/actions/workflows/cache-monitor.yml)
 
-Wealth Map is a SwiftUI iOS app for tracking personal net worth across currencies. It supports manual asset and liability tracking, converted net worth totals, transfer-rate and precious-metal monitoring, portfolio insights, FIRE projections, AI-assisted portfolio briefings, snapshot-based history, home and lock screen widgets, optional iCloud sync, backup import/export, and configurable portfolio reminders.
+Wealth Map is a SwiftUI iOS app for tracking personal net worth across currencies. It supports manual asset and liability tracking, converted net worth totals, transfer-rate and precious-metal monitoring, net worth goals, portfolio insights, FIRE projections, AI-assisted portfolio briefings, snapshot-based history, home and lock screen widgets, optional iCloud sync, backup import/export, and configurable portfolio reminders.
 
 Financial data is stored locally by default. Users can opt in to iCloud backup and sync, and can export or import a `.backup` file for portability. Exchange rates, metal prices, and AI analysis are routed through Firebase HTTPS Cloud Functions so provider API keys are never shipped in the app bundle.
 
@@ -34,6 +34,7 @@ Financial data is stored locally by default. Users can opt in to iCloud backup a
 - User-arranged display-currency ordering for totals and widgets
 - Dashboard summaries for assets, liabilities, net worth, allocation, insights, transfer-rate preview, trend, and recent history
 - Dedicated Net Worth view with converted totals, exchange-rate status, trend chart, and recent history
+- One active net worth goal with multi-currency progress, target date, and history-based outlook
 - Rates view for configured currency transfers and precious-metal prices
 - Briefing view with portfolio health scoring, warnings, allocation notes, return attribution, scenario links, and optional AI analysis
 - FIRE calculator for LeanFIRE, FIRE, and FatFIRE progress and projections
@@ -50,7 +51,7 @@ Financial data is stored locally by default. Users can opt in to iCloud backup a
 ## Architecture
 
 - SwiftUI for app UI and navigation
-- SwiftData for assets, liabilities, asset value snapshots, net worth snapshots, and portfolio snapshots
+- SwiftData for assets, liabilities, asset value snapshots, net worth snapshots, portfolio snapshots, and the active net worth goal
 - UserDefaults for onboarding state, currency settings, compact-format preference, reminder preferences, and exchange-rate cache metadata
 - CloudKit/iCloud support for optional user-controlled backup and sync
 - WidgetKit and App Group UserDefaults for home and lock screen widget snapshots

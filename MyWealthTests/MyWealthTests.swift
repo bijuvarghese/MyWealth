@@ -13,6 +13,274 @@ import SwiftData
 struct MyWealthTests {
 
     @MainActor
+    @Test func netWorthGoalDraftValidationRejectsInvalidValues() async throws {
+        let today = Date(timeIntervalSince1970: 1_800_000_000)
+        let invalid = NetWorthGoalDraft(
+            targetAmount: 0,
+            currency: .none,
+            targetDate: today.addingTimeInterval(-86_400)
+        )
+
+        #expect(invalid.validationIssues(today: today) == [.targetAmount, .currency, .targetDate])
+    }
+
+    @MainActor
+    @Test func netWorthGoalStoreUpsertsAndReconcilesSingleton() async throws {
+        let context = try makeInMemoryModelContext()
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        context.insert(NetWorthGoal(
+            targetAmount: 10_000,
+            currency: .usd,
+            targetDate: now.addingTimeInterval(90 * 86_400),
+            stableIdentifier: "older",
+            createdAt: now.addingTimeInterval(-100),
+            updatedAt: now.addingTimeInterval(-100)
+        ))
+        context.insert(NetWorthGoal(
+            targetAmount: 20_000,
+            currency: .eur,
+            targetDate: now.addingTimeInterval(120 * 86_400),
+            stableIdentifier: "newer",
+            createdAt: now,
+            updatedAt: now
+        ))
+
+        let result = try NetWorthGoalStore.upsert(
+            NetWorthGoalDraft(
+                targetAmount: 25_000,
+                currency: .inr,
+                targetDate: now.addingTimeInterval(180 * 86_400)
+            ),
+            in: context,
+            now: now.addingTimeInterval(10)
+        )
+        let stored = try context.fetch(FetchDescriptor<NetWorthGoal>())
+
+        #expect(stored.count == 1)
+        #expect(result.displayStableIdentifier == "newer")
+        #expect(result.displayTargetAmount == 25_000)
+        #expect(result.displayCurrency == .inr)
+    }
+
+    @MainActor
+    @Test func netWorthGoalProgressRequiresCompleteRatesAndBoundsVisualValue() async throws {
+        let calculator = NetWorthGoalCalculator()
+        let goal = NetWorthGoal(
+            targetAmount: 1_000,
+            currency: .eur,
+            targetDate: Date().addingTimeInterval(365 * 86_400)
+        )
+        let assets = [Asset(name: "Cash", amount: 3_000, currency: .usd, category: .bank)]
+        let liabilities = [Liability(name: "Loan", amount: 500, currency: .usd, category: .personalLoan)]
+
+        let missing = calculator.progress(
+            goal: goal,
+            assets: assets,
+            liabilities: liabilities,
+            exchangeRates: ["USD": 1],
+            ratesAreStale: false
+        )
+        let achieved = calculator.progress(
+            goal: goal,
+            assets: assets,
+            liabilities: liabilities,
+            exchangeRates: ["USD": 1, "EUR": 0.5],
+            ratesAreStale: true
+        )
+
+        #expect(missing.currentAmount == nil)
+        #expect(missing.rateState == .unavailable(missingCodes: ["EUR"]))
+        #expect(achieved.currentAmount == 1_250)
+        #expect(achieved.rawFraction == 1.25)
+        #expect(achieved.visualFraction == 1)
+        #expect(achieved.isAchieved)
+        #expect(achieved.rateState == .stale)
+    }
+
+    @MainActor
+    @Test func netWorthGoalCurrentValueUsesSelectedGoalCurrency() async throws {
+        let value = NetWorthGoalCalculator().currentValue(
+            currency: .eur,
+            assets: [Asset(name: "Cash", amount: 2_000, currency: .usd, category: .bank)],
+            liabilities: [Liability(name: "Loan", amount: 500, currency: .usd, category: .personalLoan)],
+            exchangeRates: ["USD": 1, "EUR": 0.5],
+            ratesAreStale: false
+        )
+
+        #expect(value.amount == 750)
+        #expect(value.rateState == .available)
+    }
+
+    @MainActor
+    @Test func netWorthGoalProjectionUsesThreeSnapshotsAcrossThirtyDays() async throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let calculator = NetWorthGoalCalculator(calendar: calendar)
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        let goal = NetWorthGoal(
+            targetAmount: 2_000,
+            currency: .usd,
+            targetDate: now.addingTimeInterval(200 * 86_400)
+        )
+        let progress = NetWorthGoalProgress(
+            currentAmount: 1_400,
+            rawFraction: 0.7,
+            visualFraction: 0.7,
+            isAchieved: false,
+            rateState: .available
+        )
+        let snapshots = [
+            NetWorthSnapshot(amount: 1_000, currencyCode: "USD", recordedAt: now.addingTimeInterval(-40 * 86_400)),
+            NetWorthSnapshot(amount: 1_200, currencyCode: "USD", recordedAt: now.addingTimeInterval(-20 * 86_400)),
+            NetWorthSnapshot(amount: 1_400, currencyCode: "USD", recordedAt: now)
+        ]
+
+        let result = calculator.outlook(
+            goal: goal,
+            progress: progress,
+            snapshots: snapshots,
+            exchangeRates: ["USD": 1],
+            currentDate: now
+        )
+
+        guard case .projected(let date, let pace) = result else {
+            Issue.record("Expected a projected outlook")
+            return
+        }
+        #expect(calendar.dateComponents([.day], from: calendar.startOfDay(for: now), to: date).day == 60)
+        #expect(pace == .onTrack)
+    }
+
+    @MainActor
+    @Test func netWorthGoalProjectionExplainsInsufficientAndNonGrowingHistory() async throws {
+        let calculator = NetWorthGoalCalculator()
+        let now = Date()
+        let goal = NetWorthGoal(
+            targetAmount: 2_000,
+            currency: .usd,
+            targetDate: now.addingTimeInterval(365 * 86_400)
+        )
+        let progress = NetWorthGoalProgress(
+            currentAmount: 1_000,
+            rawFraction: 0.5,
+            visualFraction: 0.5,
+            isAchieved: false,
+            rateState: .available
+        )
+        let shortHistory = [
+            NetWorthSnapshot(amount: 800, currencyCode: "USD", recordedAt: now.addingTimeInterval(-10 * 86_400)),
+            NetWorthSnapshot(amount: 900, currencyCode: "USD", recordedAt: now.addingTimeInterval(-5 * 86_400)),
+            NetWorthSnapshot(amount: 1_000, currencyCode: "USD", recordedAt: now)
+        ]
+        let fallingHistory = [
+            NetWorthSnapshot(amount: 1_200, currencyCode: "USD", recordedAt: now.addingTimeInterval(-40 * 86_400)),
+            NetWorthSnapshot(amount: 1_100, currencyCode: "USD", recordedAt: now.addingTimeInterval(-20 * 86_400)),
+            NetWorthSnapshot(amount: 1_000, currencyCode: "USD", recordedAt: now)
+        ]
+
+        #expect(calculator.outlook(
+            goal: goal,
+            progress: progress,
+            snapshots: shortHistory,
+            exchangeRates: ["USD": 1]
+        ) == .needsHistory)
+        #expect(calculator.outlook(
+            goal: goal,
+            progress: progress,
+            snapshots: fallingHistory,
+            exchangeRates: ["USD": 1]
+        ) == .nonGrowing)
+    }
+
+    @MainActor
+    @Test func netWorthGoalBackupRoundTripsAndRequiresConflictResolution() async throws {
+        let source = try makeInMemoryModelContext()
+        let target = try makeInMemoryModelContext()
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        source.insert(NetWorthGoal(
+            targetAmount: 100_000,
+            currency: .usd,
+            targetDate: now.addingTimeInterval(365 * 86_400),
+            stableIdentifier: "imported-goal",
+            createdAt: now,
+            updatedAt: now
+        ))
+        target.insert(NetWorthGoal(
+            targetAmount: 50_000,
+            currency: .eur,
+            targetDate: now.addingTimeInterval(180 * 86_400),
+            stableIdentifier: "current-goal",
+            createdAt: now,
+            updatedAt: now
+        ))
+        try source.save()
+        try target.save()
+
+        let url = try DataExporter.buildExportURL(context: source)
+        let data = try Data(contentsOf: url)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let payload = try decoder.decode(ExportPayload.self, from: data)
+        let preview = try DataImporter.previewImport(data, into: target)
+
+        #expect(payload.version == 2)
+        #expect(payload.netWorthGoal?.stableIdentifier == "imported-goal")
+        #expect(preview.hasGoalConflict)
+        #expect(throws: DataImporter.ImportError.self) {
+            try DataImporter.importData(data, into: target)
+        }
+
+        _ = try DataImporter.importData(
+            data,
+            into: target,
+            goalConflictResolution: .replaceExisting
+        )
+        let imported = try NetWorthGoalStore.canonicalGoal(in: target)
+        #expect(imported?.displayStableIdentifier == "imported-goal")
+        #expect(imported?.displayTargetAmount == 100_000)
+    }
+
+    @MainActor
+    @Test func netWorthGoalDeletionLeavesPortfolioRecordsUntouched() async throws {
+        let context = try makeInMemoryModelContext()
+        context.insert(Asset(name: "Cash", amount: 500, currency: .usd, category: .bank))
+        context.insert(Liability(name: "Loan", amount: 100, currency: .usd, category: .personalLoan))
+        context.insert(NetWorthSnapshot(amount: 400, currencyCode: "USD"))
+        context.insert(NetWorthGoal(
+            targetAmount: 1_000,
+            currency: .usd,
+            targetDate: Date().addingTimeInterval(365 * 86_400)
+        ))
+        try context.save()
+
+        try NetWorthGoalStore.deleteAll(in: context)
+
+        #expect(try context.fetchCount(FetchDescriptor<NetWorthGoal>()) == 0)
+        #expect(try context.fetchCount(FetchDescriptor<Asset>()) == 1)
+        #expect(try context.fetchCount(FetchDescriptor<Liability>()) == 1)
+        #expect(try context.fetchCount(FetchDescriptor<NetWorthSnapshot>()) == 1)
+    }
+
+    @MainActor
+    @Test func legacyVersionOneBackupWithoutGoalStillImports() async throws {
+        let source = try makeInMemoryModelContext()
+        let target = try makeInMemoryModelContext()
+        source.insert(Asset(name: "Cash", amount: 500, currency: .usd, category: .bank))
+        try source.save()
+        let url = try DataExporter.buildExportURL(context: source)
+        var json = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any])
+        json["version"] = 1
+        json.removeValue(forKey: "netWorthGoal")
+        let legacyData = try JSONSerialization.data(withJSONObject: json)
+
+        let summary = try DataImporter.importData(legacyData, into: target)
+
+        #expect(summary.assets == 1)
+        #expect(try contextCount(Asset.self, in: target) == 1)
+        #expect(try NetWorthGoalStore.canonicalGoal(in: target) == nil)
+    }
+
+    @MainActor
     @Test func assetCurrencyTotalsConvertEveryAssetIntoEachCurrency() async throws {
         let viewModel = DashboardViewModel(autoRefreshRate: false)
         viewModel.exchangeRates = [
@@ -1103,10 +1371,19 @@ struct MyWealthTests {
             AssetValueSnapshot.self,
             NetWorthSnapshot.self,
             PortfolioSnapshot.self,
+            NetWorthGoal.self,
         ])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: schema, configurations: [configuration])
         return ModelContext(container)
+    }
+
+    @MainActor
+    private func contextCount<T: PersistentModel>(
+        _ type: T.Type,
+        in context: ModelContext
+    ) throws -> Int {
+        try context.fetchCount(FetchDescriptor<T>())
     }
 
     private struct LegacyReminderPreference: Codable {
