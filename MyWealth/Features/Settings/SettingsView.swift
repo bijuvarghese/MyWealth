@@ -24,6 +24,7 @@ struct SettingsView: View {
     @State private var importError: String? = nil
     @State private var pendingGoalImportData: Data? = nil
     @State private var isConfirmingGoalReplacement = false
+    @State private var didLogSettingsView = false
     @Bindable var settings: AppSettings
     var showsDoneButton = true
 
@@ -64,6 +65,18 @@ struct SettingsView: View {
                 ChatGPTAnalysisResultView(result: result)
             }
         }
+        .onAppear {
+            logSettingsViewedIfNeeded()
+        }
+    }
+
+    private func logSettingsViewedIfNeeded() {
+        guard !didLogSettingsView else { return }
+        didLogSettingsView = true
+        AnalyticsService.shared.log(
+            .settingsViewed,
+            parameters: [.sourceScreen: AnalyticsService.SourceScreen.settings.rawValue]
+        )
     }
 
     @ViewBuilder

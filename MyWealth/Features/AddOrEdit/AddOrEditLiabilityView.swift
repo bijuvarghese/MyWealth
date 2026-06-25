@@ -5,7 +5,8 @@ struct AddOrEditLiabilityView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
 
-    var liability: Liability?
+    let liability: Liability?
+    let sourceScreen: AnalyticsService.SourceScreen
 
     @State private var name = ""
     @State private var amount = ""
@@ -15,8 +16,14 @@ struct AddOrEditLiabilityView: View {
     private var isEditing: Bool { liability != nil }
     private var amountValue: Double? { Double(amount) }
 
-    init(liability: Liability? = nil) {
+    @State private var didLogAddStart = false
+
+    init(
+        liability: Liability? = nil,
+        sourceScreen: AnalyticsService.SourceScreen = .assets
+    ) {
         self.liability = liability
+        self.sourceScreen = sourceScreen
     }
 
     var body: some View {
@@ -84,6 +91,13 @@ struct AddOrEditLiabilityView: View {
                                 lastUpdated: Date()
                             )
                             modelContext.insert(newLiability)
+                            AnalyticsService.shared.log(
+                                .liabilityAdded,
+                                parameters: [
+                                    .sourceScreen: sourceScreen.rawValue,
+                                    .liabilityType: AnalyticsService.valueName(category.rawValue)
+                                ]
+                            )
                         }
 
                         dismiss()
@@ -102,7 +116,18 @@ struct AddOrEditLiabilityView: View {
                 amount = String(liability.displayAmount)
                 currency = liability.currency ?? .usd
                 category = liability.displayCategory
+            } else {
+                logAddStartedIfNeeded()
             }
         }
+    }
+
+    private func logAddStartedIfNeeded() {
+        guard !didLogAddStart else { return }
+        didLogAddStart = true
+        AnalyticsService.shared.log(
+            .liabilityAddStarted,
+            parameters: [.sourceScreen: sourceScreen.rawValue]
+        )
     }
 }

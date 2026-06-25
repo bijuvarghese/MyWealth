@@ -6,6 +6,12 @@
 	<string>https://us-central1-mywealth-api-router.cloudfunctions.net/analyzeWealthMap</string>
 	<key>ExchangeRateProxyURL</key>
 	<string>https://us-central1-mywealth-api-router.cloudfunctions.net/latestExchangeRate</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
+	<key>FirebaseAutomaticScreenReportingEnabled</key>
+	<false/>
+	<key>GOOGLE_ANALYTICS_DEFAULT_ALLOW_AD_PERSONALIZATION_SIGNALS</key>
+	<false/>
 	<key>MetalPriceProxyURL</key>
 	<string>https://us-central1-mywealth-api-router.cloudfunctions.net/latestMetalPrice</string>
 	<key>ITSAppUsesNonExemptEncryption</key>

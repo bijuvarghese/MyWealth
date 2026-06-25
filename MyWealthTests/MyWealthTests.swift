@@ -13,6 +13,67 @@ import SwiftData
 struct MyWealthTests {
 
     @MainActor
+    @Test func analyticsEventCatalogMatchesPrivacyPlan() async throws {
+        let eventNames = Set(AnalyticsService.Event.allCases.map(\.rawValue))
+        let parameterNames = Set(AnalyticsService.Parameter.allCases.map(\.rawValue))
+
+        #expect(eventNames == [
+            "onboarding_started",
+            "onboarding_completed",
+            "dashboard_viewed",
+            "networth_summary_viewed",
+            "asset_add_started",
+            "asset_added",
+            "liability_add_started",
+            "liability_added",
+            "goal_created",
+            "goal_updated",
+            "budget_created",
+            "budget_updated",
+            "fire_calculator_viewed",
+            "fire_calculator_completed",
+            "settings_viewed"
+        ])
+        #expect(parameterNames == [
+            "source_screen",
+            "asset_type",
+            "liability_type",
+            "goal_type",
+            "budget_type",
+            "calculator_mode",
+            "app_version"
+        ])
+        #expect(parameterNames.isDisjoint(with: AnalyticsService.disallowedParameterNames))
+    }
+
+    @MainActor
+    @Test func analyticsSanitizerDropsDisallowedAndUnknownPayloadKeys() async throws {
+        let sanitized = AnalyticsService.sanitizedRawParameters([
+            "source_screen": "dashboard",
+            "asset_type": "bank_deposits",
+            "amount": "100000",
+            "account_name": "Checking",
+            "free_text_notes": "private note",
+            "email": "person@example.com",
+            "unexpected": "value",
+            "app_version": "v1 (1)"
+        ])
+
+        #expect(sanitized == [
+            "source_screen": "dashboard",
+            "asset_type": "bank_deposits",
+            "app_version": "v1 (1)"
+        ])
+    }
+
+    @MainActor
+    @Test func analyticsValueNamesAreStableAndNonFreeText() async throws {
+        #expect(AnalyticsService.valueName("Bank Deposits") == "bank_deposits")
+        #expect(AnalyticsService.valueName("Line of Credit") == "line_of_credit")
+        #expect(AnalyticsService.valueName("   ") == "unknown")
+    }
+
+    @MainActor
     @Test func netWorthGoalDraftValidationRejectsInvalidValues() async throws {
         let today = Date(timeIntervalSince1970: 1_800_000_000)
         let invalid = NetWorthGoalDraft(

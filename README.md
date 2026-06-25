@@ -142,6 +142,28 @@ The app sends a sanitized portfolio snapshot to `analyzeWealthMap`, which calls 
 
 After deployment, `refreshExchangeRateCache` and `refreshMetalPriceCache` keep the server caches warm automatically. If a cache entity does not exist yet, the public endpoint fetches and creates it once, then future user requests read from Datastore.
 
+## Firebase Analytics and Crashlytics
+
+Wealth Map uses Firebase Analytics and Crashlytics for behavior-only usage,
+retention, and crash diagnostics. Analytics calls must go through
+`AnalyticsService`; views must not call Firebase directly. The allowed event
+parameters are limited to source screen, asset type, liability type, goal type,
+budget type, calculator mode, and app version. Never attach balances, amounts,
+net worth, income, expense values, account names, institution names,
+transaction names, notes, email, name, phone, or other user-entered financial
+values.
+
+To enable Firebase locally or for release:
+
+1. In Firebase Console, register the iOS app with bundle ID `com.bv.MyWealth`.
+2. Download `GoogleService-Info.plist` and add it locally to the `MyWealth`
+   app target so it is bundled with `MyWealth.app`.
+3. Keep the downloaded plist out of source control. The app skips Firebase
+   configuration when the plist is absent, which keeps tests and fresh clones
+   buildable.
+4. Confirm Crashlytics dSYM upload succeeds from the `Upload Crashlytics dSYMs`
+   Xcode build phase when archiving a release build.
+
 ## Cache Freshness Check
 
 For automation or manual health checks, run:
