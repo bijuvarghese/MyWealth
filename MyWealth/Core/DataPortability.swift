@@ -430,6 +430,39 @@ struct ImportSummary {
     }
 }
 
+// MARK: - Portfolio sharing
+
+enum PortfolioShareSummaryBuilder {
+    static func build(
+        netWorth: Double,
+        baseCurrency: Asset.CurrencyType,
+        goal: NetWorthGoal? = nil,
+        goalProgressFraction: Double? = nil
+    ) -> String {
+        var lines = [
+            "Wealth Map update",
+            "Net worth: \(formatted(netWorth, currency: baseCurrency))"
+        ]
+
+        if let goal {
+            if let goalProgressFraction {
+                lines.append("Goal progress: \(goalProgressFraction.formatted(.percent.precision(.fractionLength(0...1))))")
+            }
+            lines.append("Goal target: \(formatted(goal.displayTargetAmount, currency: goal.displayCurrency)) by \(goal.displayTargetDate.formatted(date: .abbreviated, time: .omitted))")
+        }
+
+        lines.append("Tracked privately with Wealth Map.")
+        return lines.joined(separator: "\n")
+    }
+
+    private static func formatted(_ amount: Double, currency: Asset.CurrencyType) -> String {
+        amount.formatted(
+            .currency(code: currency.rawValue)
+                .precision(.fractionLength(0...2))
+        )
+    }
+}
+
 // MARK: - Share sheet
 
 /// Wraps UIActivityViewController so a backup file URL can be shared via the
@@ -439,6 +472,18 @@ struct ActivityView: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
         UIActivityViewController(activityItems: [url], applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
+/// Wraps UIActivityViewController for lightweight share actions that are not
+/// backup files, such as a user-controlled portfolio milestone summary.
+struct ActivityItemsView: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
     }
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}

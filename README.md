@@ -7,7 +7,7 @@
 [![Functions CI](https://github.com/bijuvarghese/MyWealth/actions/workflows/functions-ci.yml/badge.svg?branch=main)](https://github.com/bijuvarghese/MyWealth/actions/workflows/functions-ci.yml)
 [![Cache Monitor](https://github.com/bijuvarghese/MyWealth/actions/workflows/cache-monitor.yml/badge.svg?branch=main)](https://github.com/bijuvarghese/MyWealth/actions/workflows/cache-monitor.yml)
 
-Wealth Map is a SwiftUI iOS app for tracking personal net worth across currencies. It supports manual asset and liability tracking, converted net worth totals, transfer-rate and precious-metal monitoring, net worth goals, portfolio insights, FIRE projections, AI-assisted portfolio briefings, snapshot-based history, home and lock screen widgets, optional iCloud sync, backup import/export, and configurable portfolio reminders.
+Wealth Map is a SwiftUI iOS app for tracking personal net worth across currencies. It supports manual asset and liability tracking, converted net worth totals, transfer-rate and precious-metal monitoring, net worth goals, portfolio insights, FIRE projections, AI-assisted portfolio briefings, user-controlled progress sharing, snapshot-based history, home and lock screen widgets, optional iCloud sync, backup import/export, and configurable portfolio reminders.
 
 Financial data is stored locally by default. Users can opt in to iCloud backup and sync, and can export or import a `.backup` file for portability. Exchange rates, metal prices, and AI analysis are routed through Firebase HTTPS Cloud Functions so provider API keys are never shipped in the app bundle.
 
@@ -33,6 +33,7 @@ Financial data is stored locally by default. Users can opt in to iCloud backup a
 - Multi-currency net worth totals using cached exchange rates
 - User-arranged display-currency ordering for totals and widgets
 - Dashboard summaries for assets, liabilities, net worth, allocation, insights, transfer-rate preview, trend, and recent history
+- User-initiated Dashboard sharing for a text-only net worth progress summary
 - Dedicated Net Worth view with converted totals, exchange-rate status, trend chart, and recent history
 - One active net worth goal with multi-currency progress, target date, and history-based outlook
 - Rates view for configured currency transfers and precious-metal prices
@@ -40,7 +41,7 @@ Financial data is stored locally by default. Users can opt in to iCloud backup a
 - FIRE calculator for LeanFIRE, FIRE, and FatFIRE progress and projections
 - Home screen and lock screen widgets for net worth summaries
 - Optional iCloud backup and sync through the user's personal iCloud account
-- Backup export/import for assets, liabilities, history, and portfolio snapshots
+- Backup export/import for assets, liabilities, history, portfolio snapshots, and the active net worth goal
 - ChatGPT-ready export plus in-app AI analysis through the Firebase proxy
 - Configurable compact formatting for large currency totals
 - Portfolio reminders with daily, weekly, and monthly schedules

@@ -25,7 +25,7 @@ struct OnboardingICloudStepView: View {
     var body: some View {
         Form {
             Section {
-                Toggle("Enable iCloud Backup & Sync", isOn: $iCloudSyncEnabled)
+                Toggle("Enable iCloud Backup and Sync", isOn: $iCloudSyncEnabled)
                     .tint(.accentColor)
                     .disabled(!iCloudAvailable)
                     .padding(12)
@@ -46,19 +46,19 @@ struct OnboardingICloudStepView: View {
                 }
             } header: {
                 VStack(alignment: .leading, spacing: 12) {
-                    Label("Back Up & Sync Your Wealth Map", systemImage: "icloud.fill")
+                    Label("Choose local-only or iCloud", systemImage: "icloud.fill")
                         .font(.title3.bold())
                         .foregroundStyle(primaryTextColor)
 
-                    Text("Your assets and net worth history will be securely backed up to your personal iCloud account and synced across all your devices.")
+                    Text("Wealth Map keeps your financial records on this device by default.")
                         .font(.body)
                         .foregroundStyle(primaryTextColor)
 
-                    Text("Your data is private — only you can access it. No one else, including the app developer, can see it.")
+                    Text("Turn on iCloud only if you want Apple iCloud backup and sync through your personal account.")
                         .font(.footnote)
                         .foregroundStyle(secondaryTextColor)
 
-                    Text("You can change this anytime in Settings.")
+                    Text("Wealth Map does not require a separate account or bank login, and you can change this anytime in Settings.")
                         .font(.footnote)
                         .foregroundStyle(secondaryTextColor)
                 }

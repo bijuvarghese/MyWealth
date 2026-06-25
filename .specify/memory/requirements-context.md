@@ -26,7 +26,7 @@ behavior.
 | Asset management | FR3.1-FR3.11 | `MyWealth/Features/AddOrEdit/`, `MyWealth/Features/Assets/`, `MyWealth/Core/Asset.swift` |
 | Liability management | FR4.1-FR4.10 | `MyWealth/Features/AddOrEdit/`, `MyWealth/Features/Assets/` |
 | Navigation and tabs | FR5.1-FR5.8 | `MyWealth/MyWealthApp.swift`, `MyWealth/Features/IPad/` |
-| Dashboard and net worth | FR6.1-FR6.15 | `MyWealth/Features/Dashboard/`, shared components |
+| Dashboard and net worth | FR6.1-FR6.16 | `MyWealth/Features/Dashboard/`, shared components |
 | Exchange rates | FR7.1-FR7.16 | iOS networking services, `functions/`, Firebase configuration |
 | Reminders | FR8.1-FR8.12 | `MyWealth/Core/Notifications/`, reminder feature views |
 | Portfolio history | FR9.1-FR9.9 | snapshot models, dashboard coordinators and sanitizers |

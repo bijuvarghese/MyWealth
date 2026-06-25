@@ -118,7 +118,10 @@ struct SettingsView: View {
                 ICloudSyncRow(settings: settings)
             }
 
-            Section("Data") {
+            Section("Data Controls") {
+                Text("Wealth Map keeps records on this device unless you enable iCloud sync or export a backup.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 cleanupButton
                 exportButton
                 importButton
@@ -231,6 +234,16 @@ struct SettingsView: View {
                 Section {
                     AppListCard {
                         VStack(spacing: 0) {
+                            SettingsRow(
+                                title: "Private by Default",
+                                subtitle: "Records stay on this device unless you enable iCloud sync or export a backup",
+                                systemImage: "lock.shield"
+                            )
+
+                            Divider()
+                                .padding(.leading, 44)
+                                .padding(.vertical, 10)
+
                             cleanupButton
                                 .buttonStyle(.plain)
                             Divider()
@@ -299,8 +312,8 @@ struct SettingsView: View {
             }
         } label: {
             SettingsRow(
-                title: "Export Data",
-                subtitle: "Save a backup of all your data",
+                title: "Export Backup",
+                subtitle: "Create a local backup file you choose where to share or store",
                 systemImage: "square.and.arrow.up"
             )
         }
@@ -389,8 +402,8 @@ struct SettingsView: View {
             isImporting = true
         } label: {
             SettingsRow(
-                title: "Import Data",
-                subtitle: "Restore from a backup file",
+                title: "Import Backup",
+                subtitle: "Restore records from a Wealth Map backup file",
                 systemImage: "square.and.arrow.down"
             )
         }
@@ -510,7 +523,7 @@ private struct ICloudSyncRow: View {
                     .font(.body.weight(.medium))
                     .foregroundStyle(.primary)
                 Text(iCloudAvailable
-                     ? "Back up and sync across your devices."
+                     ? "Optional backup and sync through your personal iCloud account."
                      : "Sign in to iCloud in Settings to enable.")
                     .font(.caption)
                     .foregroundStyle(.secondary)

@@ -6,7 +6,7 @@ This document defines the current product requirements for the Wealth Map iOS ap
 
 ## Product Overview
 
-Wealth Map is a SwiftUI iOS app for tracking personal net worth across currencies. Users can configure preferred currencies, arrange display-currency priority, add and maintain assets and liabilities, view converted portfolio totals, monitor transfer rates, review portfolio insights and history, see widget summaries, and rely on cached exchange-rate data fetched through a Firebase proxy.
+Wealth Map is a SwiftUI iOS app for tracking personal net worth across currencies. Users can configure preferred currencies, arrange display-currency priority, add and maintain assets and liabilities, view converted portfolio totals, monitor transfer rates, review portfolio insights and history, share a text progress summary, see widget summaries, and rely on cached exchange-rate data fetched through a Firebase proxy.
 
 User financial data is stored locally by default. Users may opt into iCloud-backed backup and sync through their personal iCloud account. The app does not provide account aggregation, bank connections, or remote app-managed user accounts.
 
@@ -107,6 +107,7 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 - **FR6.13**: Net worth trend charts must use recorded `NetWorthSnapshot` data for the active base currency.
 - **FR6.14**: Recent history must use recorded `AssetValueSnapshot` data and display the most recent asset value changes first.
 - **FR6.15**: Converted totals and transfer-rate previews must respect the user-arranged display-currency order.
+- **FR6.16**: The Dashboard tab must allow users to initiate a standard iOS share sheet for a text-only net worth progress summary when the required converted total can be calculated. No share summary data may leave the device unless the user chooses a destination in the share sheet.
 
 ### 7. Exchange Rates and Conversion
 

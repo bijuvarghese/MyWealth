@@ -385,6 +385,33 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func portfolioShareSummaryIncludesOnlyUserControlledProgressText() async throws {
+        let goal = NetWorthGoal(
+            targetAmount: 4_000_000,
+            currency: .usd,
+            targetDate: Date(timeIntervalSince1970: 1_814_284_800),
+            stableIdentifier: "share-goal"
+        )
+
+        let summary = PortfolioShareSummaryBuilder.build(
+            netWorth: 200_000,
+            baseCurrency: .usd,
+            goal: goal,
+            goalProgressFraction: 0.05
+        )
+
+        #expect(summary.contains("Wealth Map update"))
+        #expect(summary.contains("Net worth:"))
+        #expect(summary.contains("200,000"))
+        #expect(summary.contains("Goal progress: 5%"))
+        #expect(summary.contains("Goal target:"))
+        #expect(summary.contains("4,000,000"))
+        #expect(summary.contains("Tracked privately with Wealth Map."))
+        #expect(!summary.contains("Asset 1"))
+        #expect(!summary.contains("Liability 1"))
+    }
+
+    @MainActor
     @Test func legacyVersionOneBackupWithoutGoalStillImports() async throws {
         let source = try makeInMemoryModelContext()
         let target = try makeInMemoryModelContext()

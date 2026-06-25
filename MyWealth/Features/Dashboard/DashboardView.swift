@@ -30,6 +30,7 @@ struct DashboardView: View {
     @State private var showSettings = false
     @State private var showFIRECalculator = false
     @State private var showNetWorthGoalForm = false
+    @State private var shareSummaryText: String? = nil
     @State private var didLogDashboardView = false
 
     private var activeGoal: NetWorthGoal? {
@@ -135,6 +136,35 @@ struct DashboardView: View {
                             }
                         }
                         .buttonStyle(.plain)
+                        .appListRow()
+
+                        Button {
+                            shareSummaryText = dashboardShareSummary()
+                        } label: {
+                            AppListCard {
+                                HStack(spacing: 14) {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.title2)
+                                        .foregroundStyle(.accent)
+                                        .frame(width: 42, height: 42)
+                                        .background(Color.accentColor.opacity(0.12), in: Circle())
+
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Share Progress")
+                                            .font(.headline)
+                                            .foregroundStyle(.primary)
+                                        Text(shareProgressSubtitle)
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                    }
+
+                                    Spacer()
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(dashboardShareSummary() == nil)
                         .appListRow()
                     }
 
@@ -324,6 +354,15 @@ struct DashboardView: View {
             .sheet(isPresented: $showSettings) {
                 SettingsView(settings: settings, showsDoneButton: true)
             }
+            .sheet(isPresented: Binding(
+                get: { shareSummaryText != nil },
+                set: { if !$0 { shareSummaryText = nil } }
+            )) {
+                if let shareSummaryText {
+                    ActivityItemsView(items: [shareSummaryText])
+                        .ignoresSafeArea()
+                }
+            }
             .sheet(isPresented: $showNetWorthGoalForm) {
                 NetWorthGoalFormView(
                     goal: activeGoal,
@@ -370,6 +409,45 @@ struct DashboardView: View {
         AnalyticsService.shared.log(
             .dashboardViewed,
             parameters: [.sourceScreen: AnalyticsService.SourceScreen.dashboard.rawValue]
+        )
+    }
+
+    private var shareProgressSubtitle: String {
+        dashboardShareSummary() == nil
+            ? "Available after totals can be calculated"
+            : "Share a text milestone you control"
+    }
+
+    private func dashboardShareSummary() -> String? {
+        guard let netWorth = viewModel.netWorthTotal(
+            portfolioAssets,
+            liabilities: liabilities,
+            to: settings.baseCurrency,
+            exchangeRates: viewModel.exchangeRates
+        ) else {
+            return nil
+        }
+
+        if let goal = activeGoal {
+            let calculator = NetWorthGoalCalculator()
+            let progress = calculator.progress(
+                goal: goal,
+                assets: portfolioAssets,
+                liabilities: liabilities,
+                exchangeRates: viewModel.exchangeRates,
+                ratesAreStale: viewModel.ratesAreStale
+            )
+            return PortfolioShareSummaryBuilder.build(
+                netWorth: netWorth,
+                baseCurrency: settings.baseCurrency,
+                goal: goal,
+                goalProgressFraction: progress.rawFraction
+            )
+        }
+
+        return PortfolioShareSummaryBuilder.build(
+            netWorth: netWorth,
+            baseCurrency: settings.baseCurrency
         )
     }
 

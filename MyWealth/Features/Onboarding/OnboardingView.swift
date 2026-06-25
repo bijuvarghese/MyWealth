@@ -172,19 +172,19 @@ private struct OnboardingBaseCurrencyStepView: View {
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             } header: {
                 VStack(alignment: .leading, spacing: 12) {
-                    Label("Select your base currency", systemImage: "globe")
+                    Label("Start with your home currency", systemImage: "globe")
                             .font(.title3.bold())
                             .foregroundStyle(primaryTextColor)
 
-                        Text("Your base currency is the foundation of your Wealth Map.")
+                        Text("Wealth Map uses this currency as the anchor for your private net worth view.")
                             .font(.headline)
                             .foregroundStyle(primaryTextColor)
 
-                        Text("It’s used to calculate your total wealth and convert assets using current exchange rates.")
+                        Text("Assets and liabilities can still use other currencies; totals are converted back here when rates are available.")
                             .font(.body)
                             .foregroundStyle(primaryTextColor)
 
-                        Text("You can update this later in Settings.")
+                        Text("You can change this later in Settings.")
                             .font(.footnote)
                             .foregroundStyle(secondaryTextColor)
                 }
@@ -223,7 +223,7 @@ private struct OnboardingDisplayCurrencyStepView: View {
                         requiredCurrency: baseCurrency
                     )
                 } label: {
-                    LabeledContent("Select Currencies(Optional)") {
+                    LabeledContent("Display Currencies") {
                         Text(displayCurrencies.map(\.rawValue).joined(separator: ", "))
                             .foregroundStyle(.primary)
                     }
@@ -258,13 +258,13 @@ private struct OnboardingDisplayCurrencyStepView: View {
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             } header: {
                 VStack(alignment: .leading, spacing: 12) {
-                    Label("Track Wealth Across Global Currencies", systemImage: "globe")
+                    Label("See wealth across currencies", systemImage: "globe")
                         .font(.title3.bold())
                         .foregroundStyle(primaryTextColor)
-                    Text("View your net worth in multiple global currencies for a clearer perspective on your wealth around the world.")
+                    Text("Choose the currencies you want to see on totals, rates, widgets, and net worth views.")
                         .font(.body)
                         .foregroundStyle(primaryTextColor)
-                    Text("Your base currency will always be included.")
+                    Text("Your base currency is always included, and you can reorder the rest anytime.")
                         .font(.footnote)
                         .foregroundStyle(secondaryTextColor)
                 }
