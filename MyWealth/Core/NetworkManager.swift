@@ -39,7 +39,7 @@ final class NetworkManager {
         body: Data? = nil,
         decoder: JSONDecoder = JSONDecoder()
     ) async throws -> T {
-        let activityID = await AppActivityTracker.shared.begin()
+        let activityID = AppActivityTracker.shared.begin()
         defer {
             Task { @MainActor in
                 AppActivityTracker.shared.end(activityID)

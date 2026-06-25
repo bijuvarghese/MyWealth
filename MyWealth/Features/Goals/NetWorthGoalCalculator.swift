@@ -169,7 +169,7 @@ struct NetWorthGoalCalculator {
             $0.displayAmount.isFinite
                 && $0.recordedAt != nil
                 && Asset.CurrencyType(rawValue: $0.displayCurrencyCode) != nil
-                && Asset.CurrencyType(rawValue: $0.displayCurrencyCode) != .none
+                && Asset.CurrencyType(rawValue: $0.displayCurrencyCode) != Asset.CurrencyType.none
         }
         let missingSnapshotRate = validSnapshots.contains { snapshot in
             guard let currency = Asset.CurrencyType(rawValue: snapshot.displayCurrencyCode) else {
