@@ -11,6 +11,7 @@ struct NetWorthGoalFormView: View {
     let exchangeRates: [String: Double]
     let ratesAreStale: Bool
     let useCompactFormatting: Bool
+    let sourceScreen: AnalyticsService.SourceScreen
     @State private var amountText: String
     @State private var currency: Asset.CurrencyType
     @State private var targetDate: Date
@@ -24,7 +25,8 @@ struct NetWorthGoalFormView: View {
         liabilities: [Liability],
         exchangeRates: [String: Double],
         ratesAreStale: Bool,
-        useCompactFormatting: Bool
+        useCompactFormatting: Bool,
+        sourceScreen: AnalyticsService.SourceScreen = .netWorth
     ) {
         self.goal = goal
         self.assets = assets
@@ -32,6 +34,7 @@ struct NetWorthGoalFormView: View {
         self.exchangeRates = exchangeRates
         self.ratesAreStale = ratesAreStale
         self.useCompactFormatting = useCompactFormatting
+        self.sourceScreen = sourceScreen
         _amountText = State(initialValue: goal.map { String($0.displayTargetAmount) } ?? "")
         _currency = State(initialValue: goal?.displayCurrency ?? defaultCurrency)
         _targetDate = State(initialValue: goal?.displayTargetDate ?? Calendar.current.date(byAdding: .year, value: 1, to: Date()) ?? Date())
@@ -199,6 +202,13 @@ struct NetWorthGoalFormView: View {
         guard let draft else { return }
         do {
             _ = try NetWorthGoalStore.upsert(draft, in: modelContext)
+            AnalyticsService.shared.log(
+                goal == nil ? .goalCreated : .goalUpdated,
+                parameters: [
+                    .sourceScreen: sourceScreen.rawValue,
+                    .goalType: "net_worth"
+                ]
+            )
             dismiss()
         } catch {
             errorMessage = error.localizedDescription

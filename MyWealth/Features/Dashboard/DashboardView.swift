@@ -30,6 +30,7 @@ struct DashboardView: View {
     @State private var showSettings = false
     @State private var showFIRECalculator = false
     @State private var showNetWorthGoalForm = false
+    @State private var didLogDashboardView = false
 
     private var activeGoal: NetWorthGoal? {
         NetWorthGoalStore.canonicalGoal(from: netWorthGoals)
@@ -317,7 +318,7 @@ struct DashboardView: View {
                     viewModel.selectedAsset = nil
                 },
                 content: {
-                    AddorEditAssetView()
+                    AddorEditAssetView(sourceScreen: .dashboard)
                 }
             )
             .sheet(isPresented: $showSettings) {
@@ -331,7 +332,8 @@ struct DashboardView: View {
                     liabilities: liabilities,
                     exchangeRates: viewModel.exchangeRates,
                     ratesAreStale: viewModel.ratesAreStale,
-                    useCompactFormatting: settings.usesCompactCurrencyTotals
+                    useCompactFormatting: settings.usesCompactCurrencyTotals,
+                    sourceScreen: .dashboard
                 )
             }
             .navigationDestination(item: $selectedCategory) { category in
@@ -357,6 +359,18 @@ struct DashboardView: View {
                 viewModel.enrichWithMetalRates(metalViewModel.metalRates)
             }
         }
+        .onAppear {
+            logDashboardViewedIfNeeded()
+        }
+    }
+
+    private func logDashboardViewedIfNeeded() {
+        guard !didLogDashboardView else { return }
+        didLogDashboardView = true
+        AnalyticsService.shared.log(
+            .dashboardViewed,
+            parameters: [.sourceScreen: AnalyticsService.SourceScreen.dashboard.rawValue]
+        )
     }
 
     @ViewBuilder
@@ -403,6 +417,7 @@ struct NetWorthView: View {
     @State private var metalViewModel = MetalPricesViewModel()
     @State private var showNetWorthHistory = false
     @State private var showNetWorthGoalForm = false
+    @State private var didLogNetWorthView = false
     @AppStorage("netWorthComfort.householdMembers") private var comfortHouseholdMembers = 1
     @AppStorage("netWorthComfort.monthlyIncome") private var comfortMonthlyIncome = 0.0
     @AppStorage("netWorthComfort.expectedMonthlySpend") private var comfortExpectedMonthlySpend = 0.0
@@ -572,7 +587,8 @@ struct NetWorthView: View {
                     liabilities: liabilities,
                     exchangeRates: viewModel.exchangeRates,
                     ratesAreStale: viewModel.ratesAreStale,
-                    useCompactFormatting: settings.usesCompactCurrencyTotals
+                    useCompactFormatting: settings.usesCompactCurrencyTotals,
+                    sourceScreen: .netWorth
                 )
             }
         }
@@ -589,6 +605,18 @@ struct NetWorthView: View {
                 viewModel.enrichWithMetalRates(metalViewModel.metalRates)
             }
         }
+        .onAppear {
+            logNetWorthViewedIfNeeded()
+        }
+    }
+
+    private func logNetWorthViewedIfNeeded() {
+        guard !didLogNetWorthView else { return }
+        didLogNetWorthView = true
+        AnalyticsService.shared.log(
+            .netWorthSummaryViewed,
+            parameters: [.sourceScreen: AnalyticsService.SourceScreen.netWorth.rawValue]
+        )
     }
 
     @ViewBuilder

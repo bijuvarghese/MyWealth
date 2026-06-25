@@ -42,13 +42,13 @@ struct AssetListView: View {
                 }
             }
             .sheet(isPresented: $showAddSheet) {
-                AddorEditAssetView()
+                AddorEditAssetView(sourceScreen: .assets)
             }
             .task {
                 await metalViewModel.refreshIfNeeded()
             }
             .sheet(isPresented: $showAddLiabilitySheet) {
-                AddOrEditLiabilityView()
+                AddOrEditLiabilityView(sourceScreen: .assets)
             }
             .sheet(item: $selectedLiability) { liability in
                 AddOrEditLiabilityView(liability: liability)

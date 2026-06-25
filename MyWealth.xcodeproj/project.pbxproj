@@ -11,6 +11,8 @@
 		C6E4BBF62FC3B964002737D2 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C63A09AF2EC5824F005CDAAE /* SwiftUI.framework */; };
 		C6E4BC012FC3B964002737D2 /* MyWealthWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C6E4BBF42FC3B964002737D2 /* MyWealthWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C6E4BC0C2FC3BB1E002737D2 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6E4BBD82FC3B85D002737D2 /* WidgetKit.framework */; };
+		C7A000012FD0000000000001 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = C7A000032FD0000000000001 /* FirebaseAnalytics */; };
+		C7A000022FD0000000000001 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = C7A000042FD0000000000001 /* FirebaseCrashlytics */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -122,6 +124,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C7A000022FD0000000000001 /* FirebaseCrashlytics in Frameworks */,
+				C7A000012FD0000000000001 /* FirebaseAnalytics in Frameworks */,
 				C6E4BC0C2FC3BB1E002737D2 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -215,6 +219,7 @@
 				C6FF48632EBE5C0A00A528A7 /* Frameworks */,
 				C6FF48642EBE5C0A00A528A7 /* Resources */,
 				C63A09C02EC5824F005CDAAE /* Embed Foundation Extensions */,
+				C7A000062FD0000000000001 /* Upload Crashlytics dSYMs */,
 			);
 			buildRules = (
 			);
@@ -226,6 +231,8 @@
 			);
 			name = MyWealth;
 			packageProductDependencies = (
+				C7A000032FD0000000000001 /* FirebaseAnalytics */,
+				C7A000042FD0000000000001 /* FirebaseCrashlytics */,
 			);
 			productName = MyWealth;
 			productReference = C6FF48662EBE5C0A00A528A7 /* MyWealth.app */;
@@ -262,6 +269,9 @@
 			);
 			mainGroup = C6FF485D2EBE5C0A00A528A7;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C7A000052FD0000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C6FF48672EBE5C0A00A528A7 /* Products */;
 			projectDirPath = "";
@@ -297,6 +307,33 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C7A000062FD0000000000001 /* Upload Crashlytics dSYMs */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+			);
+			name = "Upload Crashlytics dSYMs";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "GOOGLE_SERVICE_INFO=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleService-Info.plist\"\nif [ ! -f \"$GOOGLE_SERVICE_INFO\" ]; then\n  echo \"Skipping Crashlytics dSYM upload: GoogleService-Info.plist is not bundled.\"\n  exit 0\nfi\n\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		C64A90782EC048CB001E1F52 /* Sources */ = {
@@ -397,7 +434,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.5.1;
+				MARKETING_VERSION = 4.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bv.MyWealth.MyWealthWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -429,7 +466,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.5.1;
+				MARKETING_VERSION = 4.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bv.MyWealth.MyWealthWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -451,6 +488,7 @@
 				CODE_SIGN_ENTITLEMENTS = "MyWealth/MyWealth-Debug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 3B2GBCUUPP;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -467,7 +505,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.5.1;
+				MARKETING_VERSION = 4.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bv.MyWealth;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -493,6 +531,7 @@
 				CODE_SIGN_ENTITLEMENTS = "MyWealth/MyWealth-Release.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 3B2GBCUUPP;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -509,7 +548,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.5.1;
+				MARKETING_VERSION = 4.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bv.MyWealth;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -697,6 +736,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C7A000052FD0000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = exactVersion;
+				version = 12.11.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C7A000032FD0000000000001 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7A000052FD0000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		C7A000042FD0000000000001 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7A000052FD0000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C6FF485E2EBE5C0A00A528A7 /* Project object */;
 }

@@ -14,7 +14,13 @@ struct AddorEditAssetView: View {
     @Environment(\.modelContext) private var modelContext
 
     // If provided, we are editing this asset; otherwise we're adding a new one
-    var asset: Asset?
+    let asset: Asset?
+    let sourceScreen: AnalyticsService.SourceScreen
+
+    init(asset: Asset? = nil, sourceScreen: AnalyticsService.SourceScreen = .assets) {
+        self.asset = asset
+        self.sourceScreen = sourceScreen
+    }
 
     // MARK: - Common state
     @State private var name = ""
@@ -29,6 +35,7 @@ struct AddorEditAssetView: View {
     @State private var metalWeight = ""
     @State private var weightUnit: WeightUnit = .troyOz
     @State private var metalViewModel = MetalPricesViewModel()
+    @State private var didLogAddStart = false
 
     // MARK: - Helpers
 
@@ -108,6 +115,7 @@ struct AddorEditAssetView: View {
         }
         .onAppear {
             prefillIfEditing()
+            logAddStartedIfNeeded()
             Task { await metalViewModel.refreshIfNeeded() }
         }
     }
@@ -273,8 +281,24 @@ struct AddorEditAssetView: View {
                 isIncludedInPortfolio: includeInPortfolio
             )
             modelContext.insert(newAsset)
+            AnalyticsService.shared.log(
+                .assetAdded,
+                parameters: [
+                    .sourceScreen: sourceScreen.rawValue,
+                    .assetType: AnalyticsService.valueName(category.rawValue)
+                ]
+            )
         }
         dismiss()
+    }
+
+    private func logAddStartedIfNeeded() {
+        guard !isEditing, !didLogAddStart else { return }
+        didLogAddStart = true
+        AnalyticsService.shared.log(
+            .assetAddStarted,
+            parameters: [.sourceScreen: sourceScreen.rawValue]
+        )
     }
 
     // MARK: - Edit prefill

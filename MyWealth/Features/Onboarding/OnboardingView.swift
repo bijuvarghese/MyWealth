@@ -12,6 +12,7 @@ struct OnboardingView: View {
     @State private var reminderFrequency: ReminderFrequency = .weekly
     @State private var iCloudSyncEnabled = false
     @State private var didLoadInitialValues = false
+    @State private var didLogOnboardingStart = false
 
     var body: some View {
         NavigationStack {
@@ -48,6 +49,7 @@ struct OnboardingView: View {
         .onAppear {
             guard !didLoadInitialValues else { return }
 
+            logOnboardingStartedIfNeeded()
             baseCurrency = settings.baseCurrency
             displayCurrencies = settings.totalCurrencies
             currentStep = settings.firstMissingOnboardingStep()
@@ -117,11 +119,24 @@ struct OnboardingView: View {
             if iCloudSyncEnabled {
                 containerHolder.switchSync(enabled: true)
             }
+            AnalyticsService.shared.log(
+                .onboardingCompleted,
+                parameters: [.sourceScreen: AnalyticsService.SourceScreen.onboarding.rawValue]
+            )
             settings.completeOnboarding(
                 baseCurrency: baseCurrency,
                 displayCurrencies: displayCurrencies
             )
         }
+    }
+
+    private func logOnboardingStartedIfNeeded() {
+        guard !didLogOnboardingStart else { return }
+        didLogOnboardingStart = true
+        AnalyticsService.shared.log(
+            .onboardingStarted,
+            parameters: [.sourceScreen: AnalyticsService.SourceScreen.onboarding.rawValue]
+        )
     }
 }
 

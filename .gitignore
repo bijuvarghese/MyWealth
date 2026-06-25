@@ -7,6 +7,11 @@ firebase-debug.log
 firebase-debug.*.log
 .firebase/
 
+# Firebase client configuration is environment-specific. Add the real plist
+# locally to the app target before release; do not commit downloaded configs.
+GoogleService-Info.plist
+**/GoogleService-Info.plist
+
 # Keep project-local Spec Kit skills, ignore any other agent-local state.
 .agents/*
 !.agents/skills/

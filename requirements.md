@@ -1,6 +1,6 @@
 # Wealth Map - Requirements
 
-Last updated: June 19, 2026
+Last updated: June 25, 2026
 
 This document defines the current product requirements for the Wealth Map iOS app and its exchange-rate proxy. It reflects the current app state: onboarding, local asset and liability tracking, multi-currency net worth, net worth goals, display-currency ordering, exchange-rate caching, portfolio history, widgets, iCloud sync, backup import/export, reminders, and the Firebase rate proxy.
 
@@ -198,6 +198,18 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 - **FR12.15**: Goal data must not be added to widgets, notifications, Spotlight, Firebase requests, or AI analysis exports by this feature.
 - **FR12.16**: Active goal summaries must show the remaining target gap, rounded-up months until the target date, and the average monthly and annual net worth increase needed to close the gap; achieved, due-today, overdue, and unavailable values must be handled without impossible rates.
 
+### 13. Privacy-Preserving App Telemetry
+
+- **FR13.1**: The app may initialize Firebase Analytics and Crashlytics only for usage, retention, and crash diagnostics.
+- **FR13.2**: App views must send analytics through an app-owned wrapper rather than calling Firebase Analytics or Crashlytics directly.
+- **FR13.3**: Analytics event names must be defined in one central typed catalog.
+- **FR13.4**: Analytics parameters must be limited to source screen, asset type, liability type, goal type, budget type, calculator mode, and app version.
+- **FR13.5**: Analytics and Crashlytics payloads must not include balances, amounts, net worth, income, expense values, account names, institution names, transaction names, free-text notes, email, name, phone, or other user-entered financial values.
+- **FR13.6**: The first telemetry scope must include onboarding start and completion, dashboard and net worth views, asset and liability add starts and completions, goal create and update, budget create and update when those flows exist, FIRE calculator view and completion, and settings view.
+- **FR13.7**: Firebase must be initialized once during the iOS app lifecycle and must not crash development or test builds when `GoogleService-Info.plist` has not been bundled.
+- **FR13.8**: Crashlytics breadcrumbs and optional non-fatal errors must use only the same non-sensitive typed parameter catalog.
+- **FR13.9**: Firebase user identifiers must not be set from email, Apple ID, name, account identifiers, or financial identifiers.
+
 ## Non-Functional Requirements
 
 ### 1. Platform and Tooling
@@ -242,6 +254,8 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 - **NFR5.3**: User asset, liability, and snapshot data must stay local to the device unless the user enables iCloud sync.
 - **NFR5.4**: Public privacy content must accurately describe data handling for the deployed app.
 - **NFR5.5**: The app must not expose exchange-rate provider credentials through logs, UI, source control, or app configuration.
+- **NFR5.6**: Firebase telemetry must remain behavior-only and must not transmit user-entered financial data, financial labels, free text, or direct personal identifiers.
+- **NFR5.7**: The downloaded `GoogleService-Info.plist` must be treated as environment-specific configuration and kept out of source control.
 
 ### 6. Architecture
 
@@ -253,6 +267,7 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 - **NFR6.6**: Reminder scheduling should remain isolated behind reminder manager, scheduler, and preference store types.
 - **NFR6.7**: Widget snapshot writing and reading should remain isolated behind shared widget data-store helpers.
 - **NFR6.8**: Data import/export should remain isolated from SwiftUI views behind dedicated data portability helpers.
+- **NFR6.9**: Analytics and crash breadcrumb calls should remain isolated behind a small app-owned service with typed event and parameter definitions.
 
 ## Current Scope Notes
 

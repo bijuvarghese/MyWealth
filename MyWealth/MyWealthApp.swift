@@ -14,6 +14,10 @@ import UIKit
 
 @main
 struct MyWealthApp: App {
+    #if os(iOS)
+    @UIApplicationDelegateAdaptor(FirebaseAppDelegate.self) private var firebaseAppDelegate
+    #endif
+
     @State private var containerHolder = ContainerHolder(isRunningTests: Self.isRunningTests)
 
     init() {

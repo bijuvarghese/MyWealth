@@ -18,6 +18,8 @@ struct FIRECalculatorView: View {
     @State private var metalViewModel = MetalPricesViewModel()
     @State private var savingsExplorer = 0.0
     @State private var fireExplainerIsExpanded = true
+    @State private var didLogViewed = false
+    @State private var didLogCompleted = false
     @FocusState private var focusedInput: FIREInputField?
 
     private let calculator = FIRECalculator()
@@ -94,6 +96,40 @@ struct FIRECalculatorView: View {
                 viewModel.enrichWithMetalRates(metalViewModel.metalRates)
             }
         }
+        .onAppear {
+            logViewedIfNeeded()
+            logCompletedIfReady()
+        }
+        .onChange(of: monthlyExpenses) { _, _ in
+            logCompletedIfReady()
+        }
+        .onChange(of: monthlySavings) { _, _ in
+            logCompletedIfReady()
+        }
+    }
+
+    private func logViewedIfNeeded() {
+        guard !didLogViewed else { return }
+        didLogViewed = true
+        AnalyticsService.shared.log(
+            .fireCalculatorViewed,
+            parameters: [
+                .sourceScreen: AnalyticsService.SourceScreen.fireCalculator.rawValue,
+                .calculatorMode: "standard_fire"
+            ]
+        )
+    }
+
+    private func logCompletedIfReady() {
+        guard !didLogCompleted, monthlyExpenses > 0, monthlySavings > 0 else { return }
+        didLogCompleted = true
+        AnalyticsService.shared.log(
+            .fireCalculatorCompleted,
+            parameters: [
+                .sourceScreen: AnalyticsService.SourceScreen.fireCalculator.rawValue,
+                .calculatorMode: "standard_fire"
+            ]
+        )
     }
 
     private var numbersCard: some View {
