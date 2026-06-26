@@ -9,10 +9,10 @@ struct AppActivityBar: View {
             let segmentWidth = max(proxy.size.width * 0.34, 88)
 
             ZStack(alignment: .leading) {
-                Color.accentColor.opacity(0.16)
+                WealthMapDesignTokens.ColorToken.brandPrimary.opacity(0.16)
 
                 Capsule(style: .continuous)
-                    .fill(Color.accentColor)
+                    .fill(WealthMapDesignTokens.ColorToken.brandPrimary)
                     .frame(width: segmentWidth)
                     .offset(
                         x: reduceMotion

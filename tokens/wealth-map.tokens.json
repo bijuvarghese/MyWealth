@@ -1,0 +1,276 @@
+{
+  "$schema": "wealth-map.design-tokens.v1",
+  "version": 1,
+  "tokens": [
+    {
+      "name": "brand.color.primary",
+      "category": "brandColor",
+      "description": "Primary Wealth Map accent used for key emphasis, selected state, and widget identity.",
+      "value": "#9E1487",
+      "platformValues": {
+        "ios": "Color(red: 0.62, green: 0.08, blue: 0.53)",
+        "android": "#9E1487",
+        "web": "#9E1487"
+      },
+      "accessibilityNotes": "Use with sufficient contrast and avoid communicating state by color alone."
+    },
+    {
+      "name": "brand.color.primary.strong",
+      "category": "brandColor",
+      "description": "Stronger brand accent for gradients and high-emphasis brand surfaces.",
+      "value": "#610A57",
+      "platformValues": {
+        "ios": "Color(red: 0.38, green: 0.04, blue: 0.34)",
+        "android": "#610A57",
+        "web": "#610A57"
+      },
+      "accessibilityNotes": "Use as a supporting brand color, not as body text on dark backgrounds."
+    },
+    {
+      "name": "semantic.color.text.primary",
+      "category": "semanticColor",
+      "description": "Default primary text color.",
+      "value": "platform-primary-text",
+      "platformValues": {
+        "ios": "Color.primary",
+        "android": "colorOnSurface",
+        "web": "CanvasText"
+      },
+      "accessibilityNotes": "Follows platform contrast and color-scheme settings."
+    },
+    {
+      "name": "semantic.color.text.secondary",
+      "category": "semanticColor",
+      "description": "Secondary supporting text color.",
+      "value": "platform-secondary-text",
+      "platformValues": {
+        "ios": "Color.secondary",
+        "android": "colorOnSurfaceVariant",
+        "web": "color-mix(in srgb, CanvasText 68%, Canvas 32%)"
+      },
+      "accessibilityNotes": "Avoid using for critical warnings or validation errors."
+    },
+    {
+      "name": "semantic.color.surface.card",
+      "category": "semanticColor",
+      "description": "Elevated card surface used for grouped financial summaries.",
+      "value": "platform-translucent-card",
+      "platformValues": {
+        "ios": "ultraThinMaterial",
+        "android": "surfaceContainerLow",
+        "web": "rgba(255, 255, 255, 0.76)"
+      },
+      "accessibilityNotes": "Content on this surface must remain readable in light and dark modes."
+    },
+    {
+      "name": "semantic.color.status.success",
+      "category": "semanticColor",
+      "description": "Positive or available status treatment.",
+      "value": "#248A3D",
+      "platformValues": {
+        "ios": "Color.green",
+        "android": "#248A3D",
+        "web": "#248A3D"
+      },
+      "accessibilityNotes": "Pair with text, icons, or labels that identify the state."
+    },
+    {
+      "name": "semantic.color.status.warning",
+      "category": "semanticColor",
+      "description": "Warning, stale, or attention-needed status treatment.",
+      "value": "#C46A00",
+      "platformValues": {
+        "ios": "Color.orange",
+        "android": "#C46A00",
+        "web": "#C46A00"
+      },
+      "accessibilityNotes": "Pair with text, icons, or labels that identify the state."
+    },
+    {
+      "name": "semantic.color.status.danger",
+      "category": "semanticColor",
+      "description": "Destructive, debt, error, or unavailable status treatment.",
+      "value": "#D70015",
+      "platformValues": {
+        "ios": "Color.red",
+        "android": "#D70015",
+        "web": "#D70015"
+      },
+      "accessibilityNotes": "Pair with explicit destructive or error copy."
+    },
+    {
+      "name": "semantic.color.status.neutral",
+      "category": "semanticColor",
+      "description": "Neutral informational or inactive status treatment.",
+      "value": "platform-tertiary-text",
+      "platformValues": {
+        "ios": "Color.secondary",
+        "android": "colorOnSurfaceVariant",
+        "web": "color-mix(in srgb, CanvasText 56%, Canvas 44%)"
+      },
+      "accessibilityNotes": "Use for non-critical status labels."
+    },
+    {
+      "name": "typography.amount.prominent",
+      "category": "typography",
+      "description": "Prominent monetary value text.",
+      "value": "title-rounded-bold",
+      "platformValues": {
+        "ios": "title, rounded, bold",
+        "android": "headlineSmall",
+        "web": "font: 700 1.375rem system-ui"
+      },
+      "accessibilityNotes": "Must scale with user text-size settings and support compact notation."
+    },
+    {
+      "name": "typography.label.compact",
+      "category": "typography",
+      "description": "Compact labels, badges, and metadata.",
+      "value": "caption-semibold",
+      "platformValues": {
+        "ios": "caption, semibold",
+        "android": "labelSmall",
+        "web": "font: 600 0.75rem system-ui"
+      },
+      "accessibilityNotes": "Do not use as the only presentation of critical information at very small sizes."
+    },
+    {
+      "name": "spacing.card.padding",
+      "category": "spacing",
+      "description": "Default internal padding for reusable card surfaces.",
+      "value": 12,
+      "platformValues": {
+        "ios": "12pt",
+        "android": "12dp",
+        "web": "0.75rem"
+      },
+      "accessibilityNotes": "Increase in local layouts when Dynamic Type or long labels need more room."
+    },
+    {
+      "name": "spacing.inline.xs",
+      "category": "spacing",
+      "description": "Small inline spacing between compact icon and label elements.",
+      "value": 4,
+      "platformValues": {
+        "ios": "4pt",
+        "android": "4dp",
+        "web": "0.25rem"
+      },
+      "accessibilityNotes": "Keep tap targets governed by platform minimums, not this spacing value."
+    },
+    {
+      "name": "shape.radius.card",
+      "category": "shape",
+      "description": "Default radius for grouped app card surfaces.",
+      "value": 12,
+      "platformValues": {
+        "ios": "12pt continuous",
+        "android": "12dp",
+        "web": "12px"
+      },
+      "accessibilityNotes": "Shape must not be the only cue for state."
+    },
+    {
+      "name": "shape.radius.pill",
+      "category": "shape",
+      "description": "Fully rounded badge and compact label shape.",
+      "value": "capsule",
+      "platformValues": {
+        "ios": "Capsule",
+        "android": "full",
+        "web": "999px"
+      },
+      "accessibilityNotes": "Pair with text for meaning."
+    },
+    {
+      "name": "elevation.card",
+      "category": "elevation",
+      "description": "Subtle card lift used by repeated grouped surfaces.",
+      "value": {
+        "color": "#000000",
+        "opacity": 0.06,
+        "radius": 6,
+        "x": 0,
+        "y": 3
+      },
+      "platformValues": {
+        "ios": "black 6% shadow, radius 6, y 3",
+        "android": "tonal elevation 1",
+        "web": "0 3px 6px rgba(0, 0, 0, 0.06)"
+      },
+      "accessibilityNotes": "Do not rely on shadow alone to separate critical content."
+    },
+    {
+      "name": "icon.size.status",
+      "category": "iconSizing",
+      "description": "Compact status icon size used beside labels and badge text.",
+      "value": 12,
+      "platformValues": {
+        "ios": "caption2",
+        "android": "12dp",
+        "web": "0.75rem"
+      },
+      "accessibilityNotes": "Icons that carry meaning need accessible labels or adjacent text."
+    },
+    {
+      "name": "chart.color.asset",
+      "category": "chartStatusColor",
+      "description": "Asset and positive-total chart/status treatment.",
+      "value": "#248A3D",
+      "platformValues": {
+        "ios": "Color.green",
+        "android": "#248A3D",
+        "web": "#248A3D"
+      },
+      "accessibilityNotes": "Pair chart colors with legends or labels."
+    },
+    {
+      "name": "chart.color.liability",
+      "category": "chartStatusColor",
+      "description": "Liability, debt, and negative-total chart/status treatment.",
+      "value": "#D70015",
+      "platformValues": {
+        "ios": "Color.red",
+        "android": "#D70015",
+        "web": "#D70015"
+      },
+      "accessibilityNotes": "Pair chart colors with legends or labels."
+    },
+    {
+      "name": "chart.color.netWorth",
+      "category": "chartStatusColor",
+      "description": "Net worth trend and brand-highlight chart/status treatment.",
+      "value": "#9E1487",
+      "platformValues": {
+        "ios": "Color(red: 0.62, green: 0.08, blue: 0.53)",
+        "android": "#9E1487",
+        "web": "#9E1487"
+      },
+      "accessibilityNotes": "Pair chart colors with labels and values."
+    },
+    {
+      "name": "motion.intent.standard",
+      "category": "motionIntent",
+      "description": "Default motion intent for subtle state transitions.",
+      "value": "standard",
+      "platformValues": {
+        "ios": "default animation when appropriate",
+        "android": "platform default animation when appropriate",
+        "web": "transition: standard duration and easing when appropriate"
+      },
+      "accessibilityNotes": "Respect reduced-motion settings."
+    },
+    {
+      "name": "motion.intent.reduced",
+      "category": "motionIntent",
+      "description": "Reduced-motion equivalent for transitions that should become instant or minimal.",
+      "value": "reduced",
+      "platformValues": {
+        "ios": "Disable or minimize nonessential animation",
+        "android": "Disable or minimize nonessential animation",
+        "web": "Use prefers-reduced-motion to remove nonessential animation"
+      },
+      "accessibilityNotes": "Must remain functionally equivalent to standard motion."
+    }
+  ]
+}

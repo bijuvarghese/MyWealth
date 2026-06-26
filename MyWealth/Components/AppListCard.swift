@@ -14,9 +14,14 @@ struct AppListCard<Content: View>: View {
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
                 .fill(.ultraThinMaterial)
-                .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                .shadow(
+                    color: WealthMapDesignTokens.Elevation.cardShadowColor,
+                    radius: WealthMapDesignTokens.Elevation.cardShadowRadius,
+                    x: WealthMapDesignTokens.Elevation.cardShadowX,
+                    y: WealthMapDesignTokens.Elevation.cardShadowY
+                )
 
             content
                 .padding(contentPadding)
@@ -29,7 +34,7 @@ extension View {
     func appListRow(
         insets: EdgeInsets = EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16)
     ) -> some View {
-        listRowBackground(Color.clear)
+        listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
             .listRowInsets(insets)
     }
 }

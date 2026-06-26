@@ -216,15 +216,15 @@ struct AssetDetailView: View {
                 isShowingEditSheet = true
             } label: {
                 Label("Edit", systemImage: "pencil")
-                    .font(.subheadline.weight(.semibold))
+                    .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .strokeBorder(.accent.opacity(0.4), lineWidth: 1)
+                        RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
+                            .strokeBorder(WealthMapDesignTokens.ColorToken.brandPrimary.opacity(0.4), lineWidth: 1)
                     )
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
             }
 
             if asset.displayCategory.supportsManualValueHistory {
@@ -232,15 +232,15 @@ struct AssetDetailView: View {
                     isShowingManualValueEntry = true
                 } label: {
                     Label("Log Value", systemImage: "plus.circle")
-                        .font(.subheadline.weight(.semibold))
+                        .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous))
                         .overlay(
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .strokeBorder(.green.opacity(0.5), lineWidth: 1)
+                            RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
+                                .strokeBorder(WealthMapDesignTokens.ColorToken.success.opacity(0.5), lineWidth: 1)
                         )
-                        .foregroundStyle(.green)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.success)
                 }
             }
 
@@ -248,15 +248,15 @@ struct AssetDetailView: View {
                 isShowingDeleteConfirmation = true
             } label: {
                 Label("Delete", systemImage: "trash")
-                    .font(.subheadline.weight(.semibold))
+                    .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .strokeBorder(.red.opacity(0.4), lineWidth: 1)
+                        RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
+                            .strokeBorder(WealthMapDesignTokens.ColorToken.danger.opacity(0.4), lineWidth: 1)
                     )
-                    .foregroundStyle(.red)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.danger)
             }
         }
         .padding(.horizontal, 16)
@@ -272,23 +272,23 @@ private struct AssetDetailHeaderView: View {
     var body: some View {
         HStack(spacing: 14) {
             Image(systemName: asset.displayCategory.icon)
-                .font(.title2.weight(.semibold))
-                .foregroundStyle(.accent)
+                .font(WealthMapDesignTokens.Typography.amountProminent)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
                 .frame(width: 46, height: 46)
-                .background(.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .background(WealthMapDesignTokens.ColorToken.brandPrimary.opacity(0.12), in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.compactRadius, style: .continuous))
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.title3.weight(.semibold))
+                    .font(WealthMapDesignTokens.Typography.amountProminent)
                     .lineLimit(2)
                 Text(asset.displayCategory.rawValue)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.subheadline)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
 
                 if !asset.participatesInPortfolioCalculations {
                     Label("Marked ignored", systemImage: "eye.slash.fill")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.orange)
+                        .font(WealthMapDesignTokens.Typography.compactLabel)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.warning)
                 }
             }
 
@@ -327,18 +327,18 @@ private struct AssetValueSummaryView: View {
             Text(convertedAmount, format: .currency(code: baseCurrency.rawValue))
         } else {
             Text("Unavailable")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
         }
     }
 
     private func metricRow(title: String, value: some View) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             Text(title)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(WealthMapDesignTokens.Typography.subheadline)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
             Spacer(minLength: 8)
             value
-                .font(.subheadline.weight(.semibold))
+                .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                 .multilineTextAlignment(.trailing)
         }
     }
@@ -372,25 +372,25 @@ private struct AssetAllocationSummaryView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {
                 Text(title)
-                    .font(.subheadline.weight(.medium))
+                    .font(WealthMapDesignTokens.Typography.subheadlineMedium)
                 Spacer()
                 if let share {
                     Text(share, format: .percent.precision(.fractionLength(0)))
-                        .font(.subheadline.weight(.semibold))
+                        .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                 } else {
                     Text("Unavailable")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 }
             }
 
             ProgressView(value: clamped(share ?? 0))
-                .tint(.accent)
+                .tint(WealthMapDesignTokens.ColorToken.brandPrimary)
 
             if let totalAmount {
                 Text("Total: \(totalAmount.formatted(.currency(code: currencyCode)))")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.caption)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
             }
         }
     }
@@ -426,15 +426,15 @@ private struct AssetDetailHistoryView: View {
                 if showLogButton {
                     Button(action: onLogValue) {
                         Label("Log Value", systemImage: "plus.circle")
-                            .font(.subheadline.weight(.semibold))
+                            .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 10)
-                            .background(.green.opacity(0.10), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .background(WealthMapDesignTokens.ColorToken.success.opacity(0.10), in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.controlRadius, style: .continuous))
                             .overlay(
-                                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                    .strokeBorder(.green.opacity(0.4), lineWidth: 1)
+                                RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.controlRadius, style: .continuous)
+                                    .strokeBorder(WealthMapDesignTokens.ColorToken.success.opacity(0.4), lineWidth: 1)
                             )
-                            .foregroundStyle(.green)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.success)
                     }
                     .buttonStyle(.plain)
                 }
@@ -446,21 +446,21 @@ private struct AssetDetailHistoryView: View {
                             y: .value("Value", row.amount)
                         )
                         .symbolSize(70)
-                        .foregroundStyle(.accent)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
                     } else {
                         LineMark(
                             x: .value("Date", row.recordedAt),
                             y: .value("Value", row.amount)
                         )
                         .interpolationMethod(.catmullRom)
-                        .foregroundStyle(.accent)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
 
                         AreaMark(
                             x: .value("Date", row.recordedAt),
                             y: .value("Value", row.amount)
                         )
                         .interpolationMethod(.catmullRom)
-                        .foregroundStyle(.accent.opacity(0.12))
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary.opacity(0.12))
                     }
                 }
                 .frame(height: 160)
@@ -480,15 +480,15 @@ private struct AssetDetailHistoryView: View {
                 if showLogButton {
                     Button(action: onLogValue) {
                         Label("Log Value", systemImage: "plus.circle")
-                            .font(.subheadline.weight(.semibold))
+                            .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 10)
-                            .background(.green.opacity(0.10), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .background(WealthMapDesignTokens.ColorToken.success.opacity(0.10), in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.controlRadius, style: .continuous))
                             .overlay(
-                                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                    .strokeBorder(.green.opacity(0.4), lineWidth: 1)
+                                RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.controlRadius, style: .continuous)
+                                    .strokeBorder(WealthMapDesignTokens.ColorToken.success.opacity(0.4), lineWidth: 1)
                             )
-                            .foregroundStyle(.green)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.success)
                     }
                     .buttonStyle(.plain)
                 }
@@ -506,26 +506,26 @@ private struct AssetHistoryRowView: View {
                 HStack(spacing: 4) {
                     if row.isManual {
                         Image(systemName: "pencil.circle.fill")
-                            .font(.caption)
-                            .foregroundStyle(.green)
+                            .font(WealthMapDesignTokens.Typography.caption)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.success)
                     }
                     // Manual entries show date-only (user picked a day, not a time).
                     // Auto entries show date + time for precision.
                     if row.isManual {
                         Text(row.recordedAt, format: .dateTime.month(.abbreviated).day().year())
-                            .font(.subheadline.weight(.medium))
+                            .font(WealthMapDesignTokens.Typography.subheadlineMedium)
                     } else {
                         Text(row.recordedAt, format: .dateTime.month(.abbreviated).day().hour().minute())
-                            .font(.subheadline.weight(.medium))
+                            .font(WealthMapDesignTokens.Typography.subheadlineMedium)
                     }
                 }
                 Text(row.isManual ? "Manual entry" : row.categoryName)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.caption)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 if let note = row.note, !note.isEmpty {
                     Text(note)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.caption)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         .lineLimit(2)
                 }
             }
@@ -533,7 +533,7 @@ private struct AssetHistoryRowView: View {
             Spacer()
 
             Text(row.amount, format: .currency(code: row.currencyCode.isEmpty ? "USD" : row.currencyCode))
-                .font(.subheadline.weight(.semibold))
+                .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                 .monospacedDigit()
         }
     }
@@ -548,12 +548,12 @@ private struct AssetDetailCard<Content: View>: View {
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
                 .fill(.ultraThinMaterial)
-                .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
 
             content
-                .padding(12)
+                .padding(WealthMapDesignTokens.Spacing.standard)
         }
         .frame(maxWidth: .infinity)
     }
@@ -561,7 +561,7 @@ private struct AssetDetailCard<Content: View>: View {
 
 private extension View {
     func assetDetailListRow() -> some View {
-        listRowBackground(Color.clear)
+        listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
             .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
     }
 }

@@ -13,49 +13,49 @@ struct NetWorthGoalCard: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: progress.isAchieved ? "trophy.fill" : "target")
-                    .font(.title2)
-                    .foregroundStyle(progress.isAchieved ? .green : .accent)
+                    .font(WealthMapDesignTokens.Typography.title2)
+                    .foregroundStyle(progress.isAchieved ? WealthMapDesignTokens.ColorToken.success : WealthMapDesignTokens.ColorToken.brandPrimary)
                     .frame(width: 38, height: 38)
                     .background(
-                        (progress.isAchieved ? Color.green : Color.accentColor).opacity(0.12),
+                        (progress.isAchieved ? WealthMapDesignTokens.ColorToken.success : WealthMapDesignTokens.ColorToken.brandPrimary).opacity(0.12),
                         in: Circle()
                     )
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(progress.isAchieved ? "Goal achieved" : "Net Worth Goal")
-                        .font(.headline)
+                        .font(WealthMapDesignTokens.Typography.headline)
                     Text("Target \(formatted(goal.displayTargetAmount)) by \(goal.displayTargetDate.formatted(date: .abbreviated, time: .omitted))")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.subheadline)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
                 Spacer(minLength: 4)
                 Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.tertiary)
+                    .font(WealthMapDesignTokens.Typography.footnote.weight(.semibold))
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textTertiary)
             }
 
             VStack(alignment: .leading, spacing: 7) {
                 ProgressView(value: progress.visualFraction)
-                    .tint(progress.isAchieved ? .green : .accentColor)
+                    .tint(progress.isAchieved ? WealthMapDesignTokens.ColorToken.success : WealthMapDesignTokens.ColorToken.brandPrimary)
                     .animation(reduceMotion ? nil : .easeOut(duration: 0.35), value: progress.visualFraction)
 
                 HStack(alignment: .firstTextBaseline) {
                     Text(progressLabel)
-                        .font(.subheadline.weight(.semibold))
+                        .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                         .monospacedDigit()
                     Spacer()
                     if let fraction = progress.rawFraction {
                         Text(fraction, format: .percent.precision(.fractionLength(0...1)))
-                            .font(.subheadline.weight(.semibold))
+                            .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                             .monospacedDigit()
                     }
                 }
             }
 
             Label(outlookText, systemImage: outlookSymbol)
-                .font(.caption)
+                .font(WealthMapDesignTokens.Typography.caption)
                 .foregroundStyle(outlookColor)
                 .fixedSize(horizontal: false, vertical: true)
 
@@ -104,9 +104,9 @@ struct NetWorthGoalCard: View {
 
     private var outlookColor: Color {
         switch outlook {
-        case .achieved, .projected(_, .onTrack): .green
-        case .projected(_, .behind), .conversionUnavailable: .orange
-        case .needsHistory, .nonGrowing, .currentValueUnavailable: .secondary
+        case .achieved, .projected(_, .onTrack): WealthMapDesignTokens.ColorToken.success
+        case .projected(_, .behind), .conversionUnavailable: WealthMapDesignTokens.ColorToken.warning
+        case .needsHistory, .nonGrowing, .currentValueUnavailable: WealthMapDesignTokens.ColorToken.textSecondary
         }
     }
 
@@ -122,8 +122,8 @@ struct NetWorthGoalCard: View {
         case .active:
             VStack(alignment: .leading, spacing: 9) {
                 Text("Goal Insights")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.compactLabel)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
 
                 LazyVGrid(
                     columns: [GridItem(.flexible()), GridItem(.flexible())],
@@ -137,18 +137,18 @@ struct NetWorthGoalCard: View {
                 }
 
                 Text("Average net worth increase needed if progress is spread evenly to the target date.")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.caption2)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         case .dueToday:
             Label("The target is due today with \(formatted(achievementPlan.remainingAmount ?? 0)) remaining.", systemImage: "calendar.badge.exclamationmark")
-                .font(.caption)
-                .foregroundStyle(.orange)
+                .font(WealthMapDesignTokens.Typography.caption)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.warning)
         case .overdue:
             Label("The target date has passed with \(formatted(achievementPlan.remainingAmount ?? 0)) remaining.", systemImage: "calendar.badge.exclamationmark")
-                .font(.caption)
-                .foregroundStyle(.orange)
+                .font(WealthMapDesignTokens.Typography.caption)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.warning)
         case .unavailable, .achieved:
             EmptyView()
         }
@@ -157,10 +157,10 @@ struct NetWorthGoalCard: View {
     private func insightMetric(_ label: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+                .font(WealthMapDesignTokens.Typography.caption2)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
             Text(value)
-                .font(.caption.weight(.semibold))
+                .font(WealthMapDesignTokens.Typography.compactLabel)
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
@@ -205,23 +205,23 @@ struct NetWorthGoalInvitationCard: View {
     var body: some View {
         HStack(spacing: 14) {
             Image(systemName: "target")
-                .font(.title2)
-                .foregroundStyle(.accent)
+                .font(WealthMapDesignTokens.Typography.title2)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
                 .frame(width: 42, height: 42)
-                .background(Color.accentColor.opacity(0.12), in: Circle())
+                .background(WealthMapDesignTokens.ColorToken.brandPrimary.opacity(0.12), in: Circle())
             VStack(alignment: .leading, spacing: 4) {
                 Text("Set a Net Worth Goal")
-                    .font(.headline)
-                    .foregroundStyle(.primary)
+                    .font(WealthMapDesignTokens.Typography.headline)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                 Text("Track progress toward a target amount and date")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.subheadline)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer()
             Image(systemName: "chevron.right")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(.tertiary)
+                .font(WealthMapDesignTokens.Typography.footnote.weight(.semibold))
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textTertiary)
         }
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)

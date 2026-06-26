@@ -50,19 +50,19 @@ struct CategoryDetailView: View {
                     Section {
                         HStack {
                             Text("Total (\(settings.baseCurrency.rawValue))")
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                             Spacer()
                             if let total = categoryTotal {
                                 Text(total, format: .currency(code: settings.baseCurrency.rawValue))
-                                    .font(.headline)
+                                    .font(WealthMapDesignTokens.Typography.headline)
                                     .monospacedDigit()
                             } else {
                                 Text("Unavailable")
-                                    .font(.headline)
-                                    .foregroundStyle(.secondary)
+                                    .font(WealthMapDesignTokens.Typography.headline)
+                                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                             }
                         }
-                        .listRowBackground(Color.clear)
+                        .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                     }
 
                     Section(header: Text("\(categoryAssets.count) asset\(categoryAssets.count == 1 ? "" : "s")")) {

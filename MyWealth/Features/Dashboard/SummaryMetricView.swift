@@ -15,19 +15,19 @@ struct SummaryMetricView: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.caption)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
 
                 if let amount {
                     Text(amount, format: .currency(code: currencyCode))
-                        .font(.subheadline.weight(.semibold))
+                        .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                         .monospacedDigit()
                         .lineLimit(1)
                         .minimumScaleFactor(0.72)
                 } else {
                     Text("Unavailable")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         .lineLimit(1)
                 }
             }

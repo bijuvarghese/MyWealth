@@ -26,10 +26,10 @@ struct TransferRateWidgetView: View {
     private var header: some View {
         HStack(spacing: 8) {
             Image(systemName: "arrow.left.arrow.right.circle.fill")
-                .foregroundStyle(.accent)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
             Text("Transfer Rates")
-                .font(.headline)
-                .foregroundStyle(.primary)
+                .font(WealthMapDesignTokens.Typography.headline)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
             Spacer()
         }
     }
@@ -37,16 +37,16 @@ struct TransferRateWidgetView: View {
     private var unavailableState: some View {
         HStack(spacing: 12) {
             Image(systemName: "arrow.left.arrow.right")
-                .foregroundStyle(.accent)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
                 .frame(width: 25)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text("Transfer Rates")
-                    .font(.headline)
-                    .foregroundStyle(.primary)
+                    .font(WealthMapDesignTokens.Typography.headline)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                 Text("Add display currencies in Settings")
-                    .font(.caption)
-                    .foregroundStyle(.gray)
+                    .font(WealthMapDesignTokens.Typography.caption)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.inactive)
             }
 
             Spacer()
@@ -64,30 +64,30 @@ private struct TransferRateRowView: View {
                 HStack(spacing: 6) {
                     Text(row.baseCurrency.rawValue)
                     Image(systemName: "arrow.right")
-                        .font(.subheadline.weight(.semibold))
+                        .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                     Text(row.targetCurrency.rawValue)
                 }
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.primary)
+                .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                 Text(row.targetCurrency.name)
-                    .font(.caption)
-                    .foregroundStyle(.gray)
+                    .font(WealthMapDesignTokens.Typography.caption)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.inactive)
             }
 
             Spacer()
 
             VStack(alignment: .trailing, spacing: 3) {
                 Text("1 \(row.baseCurrency.rawValue)")
-                    .font(.caption)
-                    .foregroundStyle(.gray)
+                    .font(WealthMapDesignTokens.Typography.caption)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.inactive)
                 if let rate = row.rate {
                     Text("\(rate, format: .number.precision(.significantDigits(4...6))) \(row.targetCurrency.rawValue)")
-                        .font(.headline)
-                        .foregroundStyle(.primary)
+                        .font(WealthMapDesignTokens.Typography.headline)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                 } else {
                     Text("Unavailable")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.caption)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 }
             }
         }

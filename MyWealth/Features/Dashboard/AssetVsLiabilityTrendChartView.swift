@@ -12,17 +12,17 @@ struct AssetVsLiabilityTrendChartView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
                 Text("Net Worth")
-                    .font(.headline)
+                    .font(WealthMapDesignTokens.Typography.headline)
                 Spacer()
                 if useSplitData, let latest = portfolioRows.last {
                     Text(latest.assetTotal - latest.liabilityTotal,
                          format: .currency(code: currencyCode))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 } else if let latest = netWorthRows.last {
                     Text(latest.amount, format: .currency(code: currencyCode))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 }
             }
 
@@ -35,7 +35,7 @@ struct AssetVsLiabilityTrendChartView: View {
                             series: .value("Series", "Assets")
                         )
                         .interpolationMethod(.catmullRom)
-                        .foregroundStyle(.green)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.success)
 
                         AreaMark(
                             x: .value("Date", row.recordedAt),
@@ -43,7 +43,7 @@ struct AssetVsLiabilityTrendChartView: View {
                             series: .value("Series", "Assets")
                         )
                         .interpolationMethod(.catmullRom)
-                        .foregroundStyle(.green.opacity(0.10))
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.success.opacity(0.10))
 
                         if portfolioRows.count == 1 {
                             PointMark(
@@ -51,7 +51,7 @@ struct AssetVsLiabilityTrendChartView: View {
                                 y: .value("Amount", row.assetTotal)
                             )
                             .symbolSize(70)
-                            .foregroundStyle(.green)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.success)
                         }
 
                         LineMark(
@@ -60,7 +60,7 @@ struct AssetVsLiabilityTrendChartView: View {
                             series: .value("Series", "Liabilities")
                         )
                         .interpolationMethod(.catmullRom)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.danger)
 
                         AreaMark(
                             x: .value("Date", row.recordedAt),
@@ -68,7 +68,7 @@ struct AssetVsLiabilityTrendChartView: View {
                             series: .value("Series", "Liabilities")
                         )
                         .interpolationMethod(.catmullRom)
-                        .foregroundStyle(.red.opacity(0.10))
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.danger.opacity(0.10))
 
                         if portfolioRows.count == 1 {
                             PointMark(
@@ -76,13 +76,13 @@ struct AssetVsLiabilityTrendChartView: View {
                                 y: .value("Amount", row.liabilityTotal)
                             )
                             .symbolSize(70)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.danger)
                         }
                     }
                 }
                 .chartForegroundStyleScale([
-                    "Assets": Color.green,
-                    "Liabilities": Color.red
+                    "Assets": WealthMapDesignTokens.ColorToken.success,
+                    "Liabilities": WealthMapDesignTokens.ColorToken.danger
                 ])
                 .frame(height: 150)
                 .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }

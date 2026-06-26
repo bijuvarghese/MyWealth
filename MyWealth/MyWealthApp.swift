@@ -139,13 +139,13 @@ private struct AppRootView: View {
                     Spacer().frame(height: 56)
                     HStack(spacing: 10) {
                         Image(systemName: "person.crop.circle.badge.exclamationmark")
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.warning)
                         Text("iCloud account changed — data refreshed for the new account.")
-                            .font(.footnote)
+                            .font(WealthMapDesignTokens.Typography.footnote)
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
-                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.controlRadius))
                     .padding(.horizontal, 16)
                 }
                 .transition(.move(edge: .top).combined(with: .opacity))
@@ -283,7 +283,7 @@ private struct WealthMapSplashView: View {
                         .foregroundStyle(charcoal)
 
                     Text("Mapping your money clearly")
-                        .font(.subheadline.weight(.medium))
+                        .font(WealthMapDesignTokens.Typography.subheadlineMedium)
                         .foregroundStyle(charcoal.opacity(0.62))
                 }
                 .offset(y: hasAppeared && !reduceMotion ? 0 : 10)

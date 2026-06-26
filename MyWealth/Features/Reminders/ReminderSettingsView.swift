@@ -12,11 +12,11 @@ struct ReminderSettingsView: View {
                     Spacer()
                     if reminderManager.isNotificationPermissionGranted {
                         Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
+                            .foregroundColor(WealthMapDesignTokens.ColorToken.success)
                     } else {
                         Button(action: requestPermission) {
                             Text("Enable")
-                                .foregroundColor(.blue)
+                                .foregroundColor(WealthMapDesignTokens.ColorToken.info)
                         }
                     }
                 }
@@ -34,7 +34,7 @@ struct ReminderSettingsView: View {
                             }
                         }
                     ))
-                    .tint(.accentColor)
+                    .tint(WealthMapDesignTokens.ColorToken.brandPrimary)
                 }
 
                 if reminderManager.preference.isEnabled {
@@ -102,14 +102,14 @@ struct ReminderSettingsView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Label {
                                 Text("Smart Reminders")
-                                    .font(.headline)
+                                    .font(WealthMapDesignTokens.Typography.headline)
                             } icon: {
                                 Image(systemName: "sparkles")
                             }
 
                             Text("Reminders will be sent based on your portfolio activity. If you've recently updated your assets, duplicate reminders are skipped to avoid overload.")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                                .font(WealthMapDesignTokens.Typography.caption)
+                                .foregroundColor(WealthMapDesignTokens.ColorToken.textSecondary)
                         }
                         .padding(.vertical, 4)
                     } header: {

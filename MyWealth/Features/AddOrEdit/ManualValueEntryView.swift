@@ -84,16 +84,16 @@ struct ManualValueEntryView: View {
                     .frame(height: 22)
 
                 Text(currencyCode)
-                    .foregroundStyle(.secondary)
-                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
+                    .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                     .fixedSize()
             }
         } header: {
             Text("Appraised Value")
         } footer: {
             Text("Enter the estimated or officially appraised value for this asset.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(WealthMapDesignTokens.Typography.caption)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
         }
     }
 
@@ -121,8 +121,8 @@ struct ManualValueEntryView: View {
             Text("Note (Optional)")
         } footer: {
             Text("Add context about this valuation — who assessed it, why the value changed, etc.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(WealthMapDesignTokens.Typography.caption)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
         }
     }
 
@@ -132,21 +132,21 @@ struct ManualValueEntryView: View {
             Section("Preview") {
                 HStack(spacing: 12) {
                     Image(systemName: "pencil.and.list.clipboard")
-                        .font(.subheadline)
-                        .foregroundStyle(.accent)
+                        .font(WealthMapDesignTokens.Typography.subheadline)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
                         .frame(width: 28)
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text(asset.displayName)
-                            .font(.subheadline.weight(.semibold))
+                            .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                             .lineLimit(1)
                         Text(selectedDate, format: .dateTime.month(.abbreviated).day().year())
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.caption)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         if let n = trimmedNote {
                             Text(n)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .font(WealthMapDesignTokens.Typography.caption)
+                                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                                 .lineLimit(1)
                         }
                     }
@@ -154,7 +154,7 @@ struct ManualValueEntryView: View {
                     Spacer(minLength: 8)
 
                     Text(amount, format: .currency(code: currencyCode))
-                        .font(.subheadline.weight(.semibold))
+                        .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                         .monospacedDigit()
                 }
             }

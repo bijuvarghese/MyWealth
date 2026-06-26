@@ -38,16 +38,16 @@ struct DashboardNetWorthTotalsView: View {
                 } label: {
                     HStack {
                         Text(showsAllTotals ? "Show less" : "View more")
-                            .font(.subheadline.weight(.semibold))
+                            .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                         Spacer()
                         Text(showsAllTotals ? "\(totals.count) shown" : "+\(hiddenTotalCount)")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.compactLabel)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         Image(systemName: showsAllTotals ? "chevron.up" : "chevron.down")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.compactLabel)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     }
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
                     .padding(.vertical, 4)
                 }
                 .buttonStyle(.plain)
@@ -100,16 +100,16 @@ struct NetWorthLivingComfortView: View {
                 } label: {
                     HStack {
                         Text(showsAllRows ? "Show less" : "View more")
-                            .font(.subheadline.weight(.semibold))
+                            .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                         Spacer()
                         Text(showsAllRows ? "\(totals.count) shown" : "+\(hiddenRowCount)")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.compactLabel)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         Image(systemName: showsAllRows ? "chevron.up" : "chevron.down")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.compactLabel)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     }
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
                     .padding(.vertical, 4)
                 }
                 .buttonStyle(.plain)
@@ -121,11 +121,11 @@ struct NetWorthLivingComfortView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Label("Country Comfort", systemImage: "house.and.flag.fill")
-                    .font(.headline)
+                    .font(WealthMapDesignTokens.Typography.headline)
                 Spacer()
                 Text("Estimates")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.compactLabel)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
             }
 
             Stepper(value: Binding(
@@ -136,7 +136,7 @@ struct NetWorthLivingComfortView: View {
                     Text("Household")
                     Spacer()
                     Text("\(assumptions.safeHouseholdMembers)")
-                        .font(.headline.monospacedDigit())
+                        .font(WealthMapDesignTokens.Typography.headlineMonospacedDigit)
                 }
             }
 
@@ -167,8 +167,8 @@ struct NetWorthLivingComfortView: View {
             }
 
             Text("Income and spend are entered in \(baseCurrency.rawValue), then converted for each country. Clear spend to use the currency-country baseline.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(WealthMapDesignTokens.Typography.caption)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
@@ -180,8 +180,8 @@ struct NetWorthLivingComfortView: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
+                .font(WealthMapDesignTokens.Typography.compactLabel)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 .textCase(.uppercase)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
@@ -192,7 +192,7 @@ struct NetWorthLivingComfortView: View {
                 .frame(height: 24)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 9)
-                .background(Color(.secondarySystemFill), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .background(WealthMapDesignTokens.ColorToken.surfaceSecondaryFill, in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.controlRadius, style: .continuous))
         }
     }
 
@@ -226,18 +226,18 @@ struct NetWorthLivingComfortView: View {
                     HStack(alignment: .firstTextBaseline) {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(row.countryName)
-                                .font(.headline)
+                                .font(WealthMapDesignTokens.Typography.headline)
                             Text(row.pppConversionFactor.map {
                                 "\(row.currency.rawValue) PPP \($0.formatted(.number.precision(.fractionLength(2)))) / intl $"
                             } ?? "\(row.currency.rawValue) living estimate")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .font(WealthMapDesignTokens.Typography.caption)
+                                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         }
 
                         Spacer()
 
                         Text(row.level.rawValue)
-                            .font(.caption.weight(.semibold))
+                            .font(WealthMapDesignTokens.Typography.compactLabel)
                             .foregroundStyle(comfortColor(row.level))
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
@@ -265,15 +265,15 @@ struct NetWorthLivingComfortView: View {
                                 $0.formatted(.currency(code: row.currency.rawValue).precision(.fractionLength(0)))
                             } ?? "Set income",
                             alignment: .trailing,
-                            color: (row.monthlySurplus ?? 0) >= 0 ? .green : .red
+                            color: (row.monthlySurplus ?? 0) >= 0 ? WealthMapDesignTokens.ColorToken.success : WealthMapDesignTokens.ColorToken.danger
                         )
                     }
 
                     ProgressView(value: row.runwayMonths.isInfinite ? 1 : min(row.runwayMonths / 120, 1))
                         .tint(comfortColor(row.level))
                 }
-                .padding(12)
-                .background(Color(.secondarySystemFill), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .padding(WealthMapDesignTokens.Spacing.standard)
+                .background(WealthMapDesignTokens.ColorToken.surfaceSecondaryFill, in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous))
             }
         }
     }
@@ -282,15 +282,15 @@ struct NetWorthLivingComfortView: View {
         title: String,
         value: String,
         alignment: HorizontalAlignment = .leading,
-        color: Color = .primary
+        color: Color = WealthMapDesignTokens.ColorToken.textPrimary
     ) -> some View {
         VStack(alignment: alignment, spacing: 2) {
             Text(title)
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(.secondary)
+                .font(WealthMapDesignTokens.Typography.caption2.weight(.semibold))
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 .textCase(.uppercase)
             Text(value)
-                .font(.subheadline.weight(.semibold))
+                .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                 .foregroundStyle(color)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
@@ -299,10 +299,10 @@ struct NetWorthLivingComfortView: View {
 
     private func comfortColor(_ level: LivingComfortLevel) -> Color {
         switch level {
-        case .tight: return .red
-        case .stable: return .orange
-        case .comfortable: return .green
-        case .independent: return .blue
+        case .tight: return WealthMapDesignTokens.ColorToken.danger
+        case .stable: return WealthMapDesignTokens.ColorToken.warning
+        case .comfortable: return WealthMapDesignTokens.ColorToken.success
+        case .independent: return WealthMapDesignTokens.ColorToken.info
         }
     }
 }

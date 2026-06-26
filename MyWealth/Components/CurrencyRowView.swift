@@ -8,19 +8,19 @@ struct CurrencyRowView: View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
                 Text(currency.rawValue)
-                    .font(.headline)
-                    .foregroundStyle(.primary)
+                    .font(WealthMapDesignTokens.Typography.headline)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                 Text(currency.name)
-                    .font(.caption)
-                    .foregroundStyle(.gray)
+                    .font(WealthMapDesignTokens.Typography.caption)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.inactive)
             }
 
             Spacer()
 
             if isSelected {
                 Image(systemName: "checkmark")
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(.accent)
+                    .font(WealthMapDesignTokens.Typography.bodySemibold)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
             }
         }
     }

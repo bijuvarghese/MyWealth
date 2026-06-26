@@ -31,18 +31,18 @@ struct MetalPriceWidgetView: View {
     private var header: some View {
         HStack(spacing: 8) {
             Image(systemName: "chart.bar.fill")
-                .foregroundStyle(.accent)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
             Text("Metal Prices")
-                .font(.headline)
-                .foregroundStyle(.primary)
+                .font(WealthMapDesignTokens.Typography.headline)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
             Spacer()
             if isLoading {
                 ProgressView()
                     .scaleEffect(0.75)
             } else if let lastUpdated {
                 Text(lastUpdated, format: .relative(presentation: .numeric))
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.caption2)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
             }
         }
     }
@@ -52,16 +52,16 @@ struct MetalPriceWidgetView: View {
     private var unavailableState: some View {
         HStack(spacing: 12) {
             Image(systemName: "chart.bar")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 .frame(width: 25)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text("Prices unavailable")
-                    .font(.subheadline)
-                    .foregroundStyle(.primary)
+                    .font(WealthMapDesignTokens.Typography.subheadline)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                 Text("Pull to refresh or check back later")
-                    .font(.caption)
-                    .foregroundStyle(.gray)
+                    .font(WealthMapDesignTokens.Typography.caption)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.inactive)
             }
 
             Spacer()
@@ -79,8 +79,8 @@ private struct MetalGroupSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(group.rawValue.uppercased())
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(.secondary)
+                .font(WealthMapDesignTokens.Typography.caption2.weight(.semibold))
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 .tracking(0.6)
 
             ForEach(rows) { row in
@@ -111,11 +111,11 @@ private struct MetalPriceRowView: View {
             // Name + symbol
             VStack(alignment: .leading, spacing: 2) {
                 Text(row.name)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
+                    .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                 Text(row.symbol)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.caption2)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
             }
 
             Spacer()
@@ -124,16 +124,16 @@ private struct MetalPriceRowView: View {
             VStack(alignment: .trailing, spacing: 2) {
                 if let price = row.priceInBase {
                     Text(price, format: .currency(code: row.baseCurrencyCode))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.primary)
+                        .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                 } else {
                     Text("—")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.subheadline)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 }
                 Text("/ \(row.unit)")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.caption2)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
             }
         }
     }

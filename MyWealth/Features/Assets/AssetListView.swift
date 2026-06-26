@@ -80,8 +80,8 @@ struct AssetListView: View {
                                         AssetRowView(asset: asset, metalRates: metalViewModel.metalRates)
 
                                         Image(systemName: "chevron.right")
-                                            .font(.footnote.weight(.semibold))
-                                            .foregroundStyle(.tertiary)
+                                            .font(WealthMapDesignTokens.Typography.footnote.weight(.semibold))
+                                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textTertiary)
                                     }
                                 }
                                 .contentShape(Rectangle())

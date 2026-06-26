@@ -45,11 +45,11 @@ struct CurrencyTotalsView: View {
                 HStack(spacing: 12) {
                     VStack(alignment: .leading, spacing: 3) {
                         Text(total.currency.rawValue)
-                            .font(.headline)
-                            .foregroundStyle(.primary)
+                            .font(WealthMapDesignTokens.Typography.headline)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                         Text(total.currency.name)
-                            .font(.caption)
-                            .foregroundStyle(.gray)
+                            .font(WealthMapDesignTokens.Typography.caption)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.inactive)
                     }
                     
                     Spacer()
@@ -61,8 +61,8 @@ struct CurrencyTotalsView: View {
                             Text(total.amount, format: .currency(code: total.currency.rawValue))
                         }
                     }
-                    .font(.headline)
-                    .foregroundStyle(.primary)
+                    .font(WealthMapDesignTokens.Typography.headline)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                 }
                 .padding(.vertical, 4)
             }

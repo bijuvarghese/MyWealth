@@ -46,17 +46,17 @@ struct AssetRowView: View {
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
             Image(systemName: asset.displayCategory.icon)
-                .foregroundStyle(.accent)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
                 .frame(width: 25)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(asset.displayName.isEmpty ? "Unnamed Asset" : asset.displayName)
-                    .font(.headline)
+                    .font(WealthMapDesignTokens.Typography.headline)
 
                 if !asset.participatesInPortfolioCalculations {
                     Label("Marked ignored", systemImage: "eye.slash.fill")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.orange)
+                        .font(WealthMapDesignTokens.Typography.caption2.weight(.semibold))
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.warning)
                 }
 
                 if isMetal {
@@ -66,16 +66,16 @@ struct AssetRowView: View {
                 }
 
                 Text(asset.displayCategory.rawValue)
-                    .font(.caption)
-                    .foregroundStyle(.gray)
+                    .font(WealthMapDesignTokens.Typography.caption)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.inactive)
             }
 
             Spacer(minLength: 0)
 
             if isMetal, let usd = estimatedUSD {
                 Text(usd, format: .currency(code: "USD"))
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
+                    .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                     .monospacedDigit()
             }
         }
@@ -93,24 +93,24 @@ struct AssetRowView: View {
                     .frame(width: 7, height: 7)
             }
             Text(weightLabel)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
 
             if estimatedUSD == nil {
                 Text("· price unavailable")
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textTertiary)
             }
         }
-        .font(.subheadline)
+        .font(WealthMapDesignTokens.Typography.subheadline)
     }
 
     /// Standard amount + currency code line for non-metal assets.
     private var standardSubtitle: some View {
         HStack(spacing: 4) {
             Text("\(asset.displayAmount, specifier: "%.0f")")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
             Text(asset.displayCurrency.rawValue)
-                .foregroundStyle(.primary)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
         }
-        .font(.subheadline)
+        .font(WealthMapDesignTokens.Typography.subheadline)
     }
 }

@@ -19,35 +19,35 @@ struct OnboardingReminderStepView: View {
         Form {
             Section {
                 Toggle("Enable Portfolio Reminders", isOn: $remindersEnabled)
-                    .tint(.accentColor)
-                    .padding(12)
+                    .tint(WealthMapDesignTokens.ColorToken.brandPrimary)
+                    .padding(WealthMapDesignTokens.Spacing.standard)
                     .background {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
                             .fill(.ultraThinMaterial)
-                            .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                            .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
                     }
-                    .listRowBackground(Color.clear)
+                    .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                     .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             } header: {
                 VStack(alignment: .leading, spacing: 12) {
                     Label("Stay on Top of Your Wealth", systemImage: "bell.badge")
-                        .font(.title3.bold())
+                        .font(WealthMapDesignTokens.Typography.title)
                         .foregroundStyle(primaryTextColor)
                     
                     Text("Get gentle reminders to keep your portfolio updated and review your wealth regularly.")
-                        .font(.body)
+                        .font(WealthMapDesignTokens.Typography.body)
                         .foregroundStyle(primaryTextColor)
                     
                     Text("You can change this anytime in Settings.")
-                        .font(.footnote)
+                        .font(WealthMapDesignTokens.Typography.footnote)
                         .foregroundStyle(secondaryTextColor)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(16)
+                .padding(WealthMapDesignTokens.Spacing.section)
                 .background {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
                         .fill(.ultraThinMaterial)
-                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                        .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
                 }
             }
 
@@ -58,13 +58,13 @@ struct OnboardingReminderStepView: View {
                             Text(type.displayName).tag(type)
                         }
                     }
-                    .padding(12)
+                    .padding(WealthMapDesignTokens.Spacing.standard)
                     .background {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
                             .fill(.ultraThinMaterial)
-                            .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                            .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
                     }
-                    .listRowBackground(Color.clear)
+                    .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                     .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                 }
 
@@ -74,34 +74,34 @@ struct OnboardingReminderStepView: View {
                             Text(frequency.displayName).tag(frequency)
                         }
                     }
-                    .padding(12)
+                    .padding(WealthMapDesignTokens.Spacing.standard)
                     .background {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
                             .fill(.ultraThinMaterial)
-                            .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                            .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
                     }
-                    .listRowBackground(Color.clear)
+                    .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                     .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                 }
 
                 Section {
                     VStack(alignment: .leading, spacing: 8) {
                         Label("Smart Reminders", systemImage: "sparkles")
-                            .font(.caption.bold())
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.caption.bold())
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         
                         Text("We'll skip reminders if you've recently updated your assets, and remind you if your portfolio hasn't been updated in a while.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.caption)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     }
                     .padding(.vertical, 4)
-                    .padding(12)
+                    .padding(WealthMapDesignTokens.Spacing.standard)
                     .background {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
                             .fill(.ultraThinMaterial)
-                            .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                            .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
                     }
-                    .listRowBackground(Color.clear)
+                    .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                     .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                 }
             }

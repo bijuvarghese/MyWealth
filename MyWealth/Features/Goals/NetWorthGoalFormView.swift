@@ -81,8 +81,8 @@ struct NetWorthGoalFormView: View {
                             VStack(alignment: .trailing, spacing: 2) {
                                 Text(currency.rawValue)
                                 Text(currency.name)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .font(WealthMapDesignTokens.Typography.caption)
+                                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                             }
                         }
                     }
@@ -101,13 +101,13 @@ struct NetWorthGoalFormView: View {
                 Section("Current Net Worth") {
                     LabeledContent("Portfolio") {
                         Text(currentValueText)
-                            .font(.headline)
+                            .font(WealthMapDesignTokens.Typography.headline)
                             .monospacedDigit()
-                            .foregroundStyle(currentValue.amount == nil ? .secondary : .primary)
+                            .foregroundStyle(currentValue.amount == nil ? WealthMapDesignTokens.ColorToken.textSecondary : WealthMapDesignTokens.ColorToken.textPrimary)
                     }
                     if let currentValueNote {
                         Label(currentValueNote.text, systemImage: currentValueNote.symbol)
-                            .font(.caption)
+                            .font(WealthMapDesignTokens.Typography.caption)
                             .foregroundStyle(currentValueNote.color)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -115,8 +115,8 @@ struct NetWorthGoalFormView: View {
 
                 Section {
                     Text("Projections are indicative and use your recorded net worth history. They are not financial advice or a guarantee.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.footnote)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 }
 
                 if goal != nil {
@@ -161,8 +161,8 @@ struct NetWorthGoalFormView: View {
 
     private func validationText(_ text: String) -> some View {
         Text(text)
-            .font(.caption)
-            .foregroundStyle(.red)
+            .font(WealthMapDesignTokens.Typography.caption)
+            .foregroundStyle(WealthMapDesignTokens.ColorToken.danger)
             .accessibilityLabel("Validation error: \(text)")
     }
 
@@ -184,16 +184,16 @@ struct NetWorthGoalFormView: View {
     private var currentValueNote: (text: String, symbol: String, color: Color)? {
         guard currentValue.amount != nil else {
             if assets.isEmpty && liabilities.isEmpty {
-                return ("Add assets or liabilities to calculate your current net worth.", "info.circle", .secondary)
+                return ("Add assets or liabilities to calculate your current net worth.", "info.circle", WealthMapDesignTokens.ColorToken.textSecondary)
             }
             if case .unavailable(let missingCodes) = currentValue.rateState {
                 let suffix = missingCodes.isEmpty ? "" : " Missing: \(missingCodes.joined(separator: ", "))."
-                return ("Current net worth cannot be converted to \(currency.rawValue).\(suffix)", "exclamationmark.triangle", .orange)
+                return ("Current net worth cannot be converted to \(currency.rawValue).\(suffix)", "exclamationmark.triangle", WealthMapDesignTokens.ColorToken.warning)
             }
-            return ("Current net worth is unavailable.", "exclamationmark.triangle", .orange)
+            return ("Current net worth is unavailable.", "exclamationmark.triangle", WealthMapDesignTokens.ColorToken.warning)
         }
         if currentValue.rateState == .stale {
-            return ("Calculated using saved exchange rates.", "clock.badge.exclamationmark", .orange)
+            return ("Calculated using saved exchange rates.", "clock.badge.exclamationmark", WealthMapDesignTokens.ColorToken.warning)
         }
         return nil
     }

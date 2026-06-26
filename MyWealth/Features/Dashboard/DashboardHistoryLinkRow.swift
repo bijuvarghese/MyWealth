@@ -7,13 +7,13 @@ struct DashboardHistoryLinkRow: View {
         Button(action: onTap) {
             HStack {
                 Text("View Full History")
-                    .font(.subheadline)
+                    .font(WealthMapDesignTokens.Typography.subheadline)
                 Spacer()
                 Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .font(WealthMapDesignTokens.Typography.caption)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textTertiary)
             }
-            .foregroundStyle(.accent)
+            .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
         }
