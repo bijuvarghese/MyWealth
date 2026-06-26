@@ -6,12 +6,12 @@ struct RateStatusBannerView: View {
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: status.systemImage)
-                .font(.caption.weight(.semibold))
+                .font(WealthMapDesignTokens.Typography.compactLabel)
                 .foregroundStyle(iconColor)
 
             Text(status.message)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(WealthMapDesignTokens.Typography.caption)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 .lineLimit(2)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -21,11 +21,11 @@ struct RateStatusBannerView: View {
     private var iconColor: Color {
         switch status.style {
         case .loading:
-            .accentColor
+            WealthMapDesignTokens.ColorToken.brandPrimary
         case .neutral:
-            .secondary
+            WealthMapDesignTokens.ColorToken.textSecondary
         case .warning:
-            .orange
+            WealthMapDesignTokens.ColorToken.warning
         }
     }
 }

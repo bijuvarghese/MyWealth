@@ -116,18 +116,18 @@ struct DashboardView: View {
                             AppListCard {
                                 HStack(spacing: 14) {
                                     Image(systemName: "flame.fill")
-                                        .font(.title2)
-                                        .foregroundStyle(.orange)
+                                        .font(WealthMapDesignTokens.Typography.title2)
+                                        .foregroundStyle(WealthMapDesignTokens.ColorToken.warning)
                                         .frame(width: 42, height: 42)
-                                        .background(Color.orange.opacity(0.12), in: Circle())
+                                        .background(WealthMapDesignTokens.ColorToken.warning.opacity(0.12), in: Circle())
 
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text("FIRE Calculator")
-                                            .font(.headline)
-                                            .foregroundStyle(.primary)
+                                            .font(WealthMapDesignTokens.Typography.headline)
+                                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                                         Text("Model your financial independence target and timeline")
-                                            .font(.subheadline)
-                                            .foregroundStyle(.secondary)
+                                            .font(WealthMapDesignTokens.Typography.subheadline)
+                                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                                             .fixedSize(horizontal: false, vertical: true)
                                     }
 
@@ -144,18 +144,18 @@ struct DashboardView: View {
                             AppListCard {
                                 HStack(spacing: 14) {
                                     Image(systemName: "square.and.arrow.up")
-                                        .font(.title2)
-                                        .foregroundStyle(.accent)
+                                        .font(WealthMapDesignTokens.Typography.title2)
+                                        .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
                                         .frame(width: 42, height: 42)
-                                        .background(Color.accentColor.opacity(0.12), in: Circle())
+                                        .background(WealthMapDesignTokens.ColorToken.brandPrimary.opacity(0.12), in: Circle())
 
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text("Share Progress")
-                                            .font(.headline)
-                                            .foregroundStyle(.primary)
+                                            .font(WealthMapDesignTokens.Typography.headline)
+                                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                                         Text(shareProgressSubtitle)
-                                            .font(.subheadline)
-                                            .foregroundStyle(.secondary)
+                                            .font(WealthMapDesignTokens.Typography.subheadline)
+                                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                                             .fixedSize(horizontal: false, vertical: true)
                                     }
 
@@ -248,9 +248,9 @@ struct DashboardView: View {
                             Spacer()
                             HStack(spacing: 6) {
                                 Text("Compact")
-                                    .font(.footnote)
+                                    .font(WealthMapDesignTokens.Typography.footnote)
                                 Toggle("Compact", isOn: $settings.usesCompactCurrencyTotals)
-                                    .tint(.accentColor)
+                                    .tint(WealthMapDesignTokens.ColorToken.brandPrimary)
                                     .labelsHidden()
                             }
                         }
@@ -596,9 +596,9 @@ struct NetWorthView: View {
                                 Spacer()
                                 HStack(spacing: 6) {
                                     Text("Compact")
-                                        .font(.footnote)
+                                        .font(WealthMapDesignTokens.Typography.footnote)
                                     Toggle("Compact", isOn: $settings.usesCompactCurrencyTotals)
-                                        .tint(.accentColor)
+                                        .tint(WealthMapDesignTokens.ColorToken.brandPrimary)
                                         .labelsHidden()
                                 }
                             }

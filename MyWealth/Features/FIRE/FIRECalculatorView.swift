@@ -138,9 +138,9 @@ struct FIRECalculatorView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "flame.fill")
                         .font(.title)
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.warning)
                     Text("Your numbers")
-                        .font(.headline)
+                        .font(WealthMapDesignTokens.Typography.headline)
                     Spacer()
                 }
                 .padding(18)
@@ -156,12 +156,12 @@ struct FIRECalculatorView: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Retire At Age")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(.secondary)
+                                .font(WealthMapDesignTokens.Typography.compactLabel)
+                                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                                 .textCase(.uppercase)
                             Text("Target retirement")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                                .font(WealthMapDesignTokens.Typography.subheadline)
+                                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         }
 
                         Spacer()
@@ -171,9 +171,9 @@ struct FIRECalculatorView: View {
                                 retireAtAge = max(retireAtAge - 1, 35)
                             } label: {
                                 Image(systemName: "minus")
-                                    .font(.headline.weight(.bold))
+                                    .font(WealthMapDesignTokens.Typography.headlineBold)
                                     .frame(width: 44, height: 44)
-                                    .background(Color(.secondarySystemFill), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                    .background(WealthMapDesignTokens.ColorToken.surfaceSecondaryFill, in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous))
                             }
                             .buttonStyle(.plain)
                             .accessibilityLabel("Decrease retirement age")
@@ -188,9 +188,9 @@ struct FIRECalculatorView: View {
                                 retireAtAge = min(retireAtAge + 1, 85)
                             } label: {
                                 Image(systemName: "plus")
-                                    .font(.headline.weight(.bold))
+                                    .font(WealthMapDesignTokens.Typography.headlineBold)
                                     .frame(width: 44, height: 44)
-                                    .background(Color(.secondarySystemFill), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                    .background(WealthMapDesignTokens.ColorToken.surfaceSecondaryFill, in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous))
                             }
                             .buttonStyle(.plain)
                             .accessibilityLabel("Increase retirement age")
@@ -199,8 +199,8 @@ struct FIRECalculatorView: View {
 
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Expected Annual Return")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.compactLabel)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                             .textCase(.uppercase)
 
                         HStack(spacing: 10) {
@@ -210,8 +210,8 @@ struct FIRECalculatorView: View {
                         }
 
                         Text("Real return after inflation. 7% is the long-term stock market average.")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.footnote)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     }
                 }
                 .padding(18)
@@ -222,14 +222,14 @@ struct FIRECalculatorView: View {
     private func currencyField(title: String, value: Binding<Double>, focus: FIREInputField) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
+                .font(WealthMapDesignTokens.Typography.compactLabel)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 .textCase(.uppercase)
 
             HStack {
                 Text(currencySymbol)
-                    .font(.title2.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.amountProminent)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     .frame(width: 36)
 
                 TextField("0", value: value, format: .number.precision(.fractionLength(0)))
@@ -240,7 +240,7 @@ struct FIRECalculatorView: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
-            .background(Color(.secondarySystemFill), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .background(WealthMapDesignTokens.ColorToken.surfaceSecondaryFill, in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous))
         }
     }
 
@@ -250,22 +250,22 @@ struct FIRECalculatorView: View {
         } label: {
             VStack(spacing: 4) {
                 Text(label)
-                    .font(.title2.weight(.bold))
+                    .font(WealthMapDesignTokens.Typography.amountProminent.weight(.bold))
                 Text(subtitle)
-                    .font(.caption)
+                    .font(WealthMapDesignTokens.Typography.caption)
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
-            .foregroundStyle(abs(annualReturn - value) < 0.001 ? .orange : .primary)
+            .foregroundStyle(abs(annualReturn - value) < 0.001 ? WealthMapDesignTokens.ColorToken.warning : WealthMapDesignTokens.ColorToken.textPrimary)
             .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(abs(annualReturn - value) < 0.001 ? Color.orange.opacity(0.12) : Color(.secondarySystemFill))
+                RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
+                    .fill(abs(annualReturn - value) < 0.001 ? WealthMapDesignTokens.ColorToken.warning.opacity(0.12) : WealthMapDesignTokens.ColorToken.surfaceSecondaryFill)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(abs(annualReturn - value) < 0.001 ? Color.orange.opacity(0.55) : Color.clear, lineWidth: 1)
+                RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
+                    .stroke(abs(annualReturn - value) < 0.001 ? WealthMapDesignTokens.ColorToken.warning.opacity(0.55) : WealthMapDesignTokens.ColorToken.surfaceClear, lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
@@ -277,21 +277,21 @@ struct FIRECalculatorView: View {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("FIRE Target")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.compactLabel)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                             .textCase(.uppercase)
                         Text("25x annual spending · 4% rule")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.subheadline)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     }
                     Spacer()
                     if projection.isFIREReached {
                         Label("FIRE Reached", systemImage: "figure.run")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.green)
+                            .font(WealthMapDesignTokens.Typography.compactLabel)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.success)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)
-                            .background(Color.green.opacity(0.12), in: Capsule())
+                            .background(WealthMapDesignTokens.ColorToken.success.opacity(0.12), in: Capsule())
                     }
                 }
 
@@ -301,19 +301,19 @@ struct FIRECalculatorView: View {
                     .lineLimit(1)
 
                 ProgressView(value: projection.progress)
-                    .tint(.green)
+                    .tint(WealthMapDesignTokens.ColorToken.success)
 
                 HStack {
                     Text("\(projection.progress.formatted(.percent.precision(.fractionLength(0)))) of FIRE target")
                     Spacer()
                     Text("\(currentPortfolio.formatted(.currency(code: settings.baseCurrency.rawValue).precision(.fractionLength(0)))) saved")
                 }
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(WealthMapDesignTokens.Typography.subheadline)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
 
                 Label("Spending \(projection.annualExpenses.formatted(.currency(code: settings.baseCurrency.rawValue).precision(.fractionLength(0))))/yr - cutting expenses shrinks both your target and the time it takes to get there.", systemImage: "info.circle")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.footnote)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -323,23 +323,23 @@ struct FIRECalculatorView: View {
         AppListCard {
             VStack(alignment: .leading, spacing: 14) {
                 Text("FIRE Pace")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.compactLabel)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     .textCase(.uppercase)
 
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Savings Rate")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.compactLabel)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                             .textCase(.uppercase)
                         Text(projection.savingsRate, format: .percent.precision(.fractionLength(0)))
                             .font(.system(size: 42, weight: .bold, design: .rounded))
-                            .foregroundStyle(.green)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.success)
                             .monospacedDigit()
                         Text(savingsRateLabel)
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.footnote)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     }
 
                     Divider()
@@ -347,8 +347,8 @@ struct FIRECalculatorView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Monthly Target")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.compactLabel)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                             .textCase(.uppercase)
                         if let target = projection.monthlyTargetToRetireAtAge {
                             Text(target, format: .currency(code: settings.baseCurrency.rawValue).precision(.fractionLength(0)))
@@ -359,22 +359,22 @@ struct FIRECalculatorView: View {
                                 .font(.title.weight(.bold))
                         }
                         Text(currentAge > 0 ? "For age \(retireAtAge)" : "Set current age")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.footnote)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     }
                 }
 
                 ProgressView(value: min(projection.savingsRate, 1))
-                    .tint(.green)
+                    .tint(WealthMapDesignTokens.ColorToken.success)
 
                 Text("Savings rate is the single strongest predictor of FIRE speed. At 50%+ you typically reach FI in under 17 years from scratch.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.subheadline)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Stepper(value: $currentAge, in: 0...85) {
                     Text(currentAge > 0 ? "Current age: \(currentAge)" : "Current age: not set")
-                        .font(.footnote)
+                        .font(WealthMapDesignTokens.Typography.footnote)
                 }
             }
         }
@@ -393,13 +393,13 @@ struct FIRECalculatorView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     Text("Portfolio Trajectory")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.compactLabel)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         .textCase(.uppercase)
                     Spacer()
                     Text("\(Int(annualReturn * 100))% return / yr")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.subheadline)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 }
 
                 Chart {
@@ -408,18 +408,18 @@ struct FIRECalculatorView: View {
                             x: .value("Year", point.yearOffset),
                             y: .value("Portfolio", point.amount)
                         )
-                        .foregroundStyle(Color.orange.opacity(0.18))
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.warning.opacity(0.18))
 
                         LineMark(
                             x: .value("Year", point.yearOffset),
                             y: .value("Portfolio", point.amount)
                         )
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.warning)
                         .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round))
                     }
 
                     RuleMark(y: .value("FIRE Target", projection.fireTarget))
-                        .foregroundStyle(.secondary.opacity(0.45))
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary.opacity(0.45))
                         .lineStyle(StrokeStyle(lineWidth: 1, dash: [5]))
                 }
                 .chartYAxis {
@@ -443,49 +443,49 @@ struct FIRECalculatorView: View {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
                     Text("FI Levels")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.compactLabel)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         .textCase(.uppercase)
                     Spacer()
                     Text("Based on \(projection.annualExpenses.formatted(.currency(code: settings.baseCurrency.rawValue).precision(.fractionLength(0))))/yr")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.subheadline)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 }
 
                 ForEach(projection.levelProgress) { level in
                     VStack(spacing: 8) {
                         HStack(spacing: 12) {
                             Image(systemName: level.kind.systemImage)
-                                .foregroundStyle(level.isAchieved ? .green : .orange)
+                                .foregroundStyle(level.isAchieved ? WealthMapDesignTokens.ColorToken.success : WealthMapDesignTokens.ColorToken.warning)
                                 .frame(width: 34, height: 34)
-                                .background((level.isAchieved ? Color.green : Color.orange).opacity(0.12), in: Circle())
+                                .background((level.isAchieved ? WealthMapDesignTokens.ColorToken.success : WealthMapDesignTokens.ColorToken.warning).opacity(0.12), in: Circle())
 
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(level.kind.rawValue)
-                                    .font(.headline)
+                                    .font(WealthMapDesignTokens.Typography.headline)
                                 Text(level.kind.subtitle)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
+                                    .font(WealthMapDesignTokens.Typography.subheadline)
+                                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                             }
                             Spacer()
                             if level.isAchieved {
                                 Label("Achieved", systemImage: "checkmark.circle.fill")
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(.green)
+                                    .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
+                                    .foregroundStyle(WealthMapDesignTokens.ColorToken.success)
                             } else if let estimatedYear = level.estimatedYear {
                                 VStack(alignment: .trailing, spacing: 2) {
                                     Text("Est. \(estimatedYear)")
-                                        .font(.subheadline.weight(.bold))
-                                        .foregroundStyle(.orange)
+                                        .font(WealthMapDesignTokens.Typography.subheadline.weight(.bold))
+                                        .foregroundStyle(WealthMapDesignTokens.ColorToken.warning)
                                     Text(level.target, format: .currency(code: settings.baseCurrency.rawValue).notation(.compactName).precision(.fractionLength(1)))
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .font(WealthMapDesignTokens.Typography.caption)
+                                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                                 }
                             }
                         }
 
                         ProgressView(value: level.progress)
-                            .tint(level.isAchieved ? .green : .orange)
+                            .tint(level.isAchieved ? WealthMapDesignTokens.ColorToken.success : WealthMapDesignTokens.ColorToken.warning)
                     }
                     if level.kind != projection.levelProgress.last?.kind {
                         Divider()
@@ -500,10 +500,10 @@ struct FIRECalculatorView: View {
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
                     Image(systemName: "lightbulb.fill")
-                        .font(.title2)
-                        .foregroundStyle(.orange)
+                        .font(WealthMapDesignTokens.Typography.title2)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.warning)
                     Text("Savings Explorer")
-                        .font(.headline)
+                        .font(WealthMapDesignTokens.Typography.headline)
                     Spacer()
                 }
 
@@ -511,31 +511,31 @@ struct FIRECalculatorView: View {
 
                 HStack(alignment: .firstTextBaseline) {
                     Text("If I saved")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.compactLabel)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         .textCase(.uppercase)
                     Spacer()
                     Text(savingsExplorer, format: .currency(code: settings.baseCurrency.rawValue).precision(.fractionLength(0)))
                         .font(.title.weight(.bold))
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.warning)
                     Text("/mo")
-                        .font(.headline)
-                        .foregroundStyle(.orange)
+                        .font(WealthMapDesignTokens.Typography.headline)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.warning)
                 }
 
                 Slider(value: $savingsExplorer, in: 0...max(monthlyExpenses, 5_000), step: 100)
-                    .tint(.orange)
+                    .tint(WealthMapDesignTokens.ColorToken.warning)
 
                 HStack {
                     Text("Actual: \(monthlySavings.formatted(.currency(code: settings.baseCurrency.rawValue).precision(.fractionLength(0))))/mo")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     Spacer()
                     Button("Reset") {
                         savingsExplorer = 0
                     }
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.warning)
                 }
-                .font(.subheadline)
+                .font(WealthMapDesignTokens.Typography.subheadline)
             }
         }
     }
@@ -544,43 +544,43 @@ struct FIRECalculatorView: View {
         AppListCard {
             VStack(alignment: .leading, spacing: 14) {
                 Label("One More Year", systemImage: "calendar.badge.plus")
-                    .font(.headline)
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.headline)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
 
                 Text("What one extra year of saving and growth is worth in real spending power.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.subheadline)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
 
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Portfolio After 1 Year")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.compactLabel)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                             .textCase(.uppercase)
                         Text(projection.portfolioAfterOneYear, format: .currency(code: settings.baseCurrency.rawValue).precision(.fractionLength(0)))
-                            .font(.title2.weight(.bold))
+                            .font(WealthMapDesignTokens.Typography.amountProminent.weight(.bold))
                     }
                     Spacer()
                     VStack(alignment: .trailing, spacing: 4) {
                         Text("Extra Spending/Year")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.compactLabel)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                             .textCase(.uppercase)
                         Text(projection.extraAnnualSpendingAfterOneYear, format: .currency(code: settings.baseCurrency.rawValue).precision(.fractionLength(0)))
-                            .font(.title2.weight(.bold))
-                            .foregroundStyle(.green)
+                            .font(WealthMapDesignTokens.Typography.amountProminent.weight(.bold))
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.success)
                     }
                 }
 
                 Divider()
 
                 Text("Retiring today: \((currentPortfolio * 0.04).formatted(.currency(code: settings.baseCurrency.rawValue).precision(.fractionLength(0))))/yr")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 Text("After one more year: \((projection.portfolioAfterOneYear * 0.04).formatted(.currency(code: settings.baseCurrency.rawValue).precision(.fractionLength(0))))/yr")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
             }
-            .font(.subheadline)
+            .font(WealthMapDesignTokens.Typography.subheadline)
         }
     }
 
@@ -606,21 +606,21 @@ struct FIRECalculatorView: View {
                 .padding(.top, 16)
             } label: {
                 Label("What is FIRE?", systemImage: "questionmark.circle")
-                    .font(.headline)
-                    .foregroundStyle(.primary)
+                    .font(WealthMapDesignTokens.Typography.headline)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
             }
-            .tint(.orange)
+            .tint(WealthMapDesignTokens.ColorToken.warning)
         }
     }
 
     private func explainerSection(title: String, body: String) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.orange)
+                .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.warning)
             Text(body)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(WealthMapDesignTokens.Typography.subheadline)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }

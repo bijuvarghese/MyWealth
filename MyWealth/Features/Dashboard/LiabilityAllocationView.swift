@@ -12,7 +12,7 @@ struct LiabilityAllocationView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Debt Breakdown")
-                .font(.headline)
+                .font(WealthMapDesignTokens.Typography.headline)
 
             Chart(rows) { row in
                 SectorMark(
@@ -34,16 +34,16 @@ struct LiabilityAllocationView: View {
                     HStack(spacing: 10) {
                         Image(systemName: row.category.icon)
                             .frame(width: 22)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         Text(row.category.rawValue)
                         Spacer()
                         Text(row.percentage, format: .percent.precision(.fractionLength(0)))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         Text(row.amount, format: .currency(code: currencyCode))
-                            .font(.subheadline.weight(.semibold))
+                            .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                             .monospacedDigit()
                     }
-                    .font(.subheadline)
+                    .font(WealthMapDesignTokens.Typography.subheadline)
                 }
             }
         }

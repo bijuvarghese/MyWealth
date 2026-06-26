@@ -111,7 +111,7 @@ struct NetWorthHistoryView: View {
                             }
                         }
                         .pickerStyle(.segmented)
-                        .listRowBackground(Color.clear)
+                        .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                         .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
                     }
 
@@ -128,11 +128,11 @@ struct NetWorthHistoryView: View {
                             )
                         }
                     }
-                    .listRowBackground(Color.clear)
+                    .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                     .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
 
                     // Main chart
-                    Section(header: Text("Net Worth Over Time").font(.subheadline).foregroundStyle(.secondary)) {
+                    Section(header: Text("Net Worth Over Time").font(WealthMapDesignTokens.Typography.subheadline).foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)) {
                         historyCard {
                             HistoryChartView(
                                 portfolioRows: filteredPortfolioRows,
@@ -141,13 +141,13 @@ struct NetWorthHistoryView: View {
                             )
                         }
                     }
-                    .listRowBackground(Color.clear)
+                    .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                     .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
 
                     // Data points table
                     let snapshotCount = useSplitData ? filteredPortfolioRows.count : filteredNetWorthRows.count
                     if snapshotCount > 0 {
-                        Section(header: Text("\(snapshotCount) snapshot\(snapshotCount == 1 ? "" : "s")").font(.subheadline).foregroundStyle(.secondary)) {
+                        Section(header: Text("\(snapshotCount) snapshot\(snapshotCount == 1 ? "" : "s")").font(WealthMapDesignTokens.Typography.subheadline).foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)) {
                             historyCard {
                                 if useSplitData {
                                     PortfolioSnapshotTableView(
@@ -162,7 +162,7 @@ struct NetWorthHistoryView: View {
                                 }
                             }
                         }
-                        .listRowBackground(Color.clear)
+                        .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                     }
                 }
@@ -176,14 +176,14 @@ struct NetWorthHistoryView: View {
 
     private func historyCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
                 .fill(.ultraThinMaterial)
-                .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
             content()
                 .padding(14)
         }
         .frame(maxWidth: .infinity)
-        .listRowBackground(Color.clear)
+        .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
     }
 }
@@ -233,33 +233,33 @@ private struct NetWorthStatsView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Net Worth")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.caption)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     if let current = currentNetWorth {
                         Text(current, format: .currency(code: currencyCode))
-                            .font(.title2.weight(.bold))
+                            .font(WealthMapDesignTokens.Typography.amountProminent.weight(.bold))
                             .monospacedDigit()
                     } else {
                         Text("Unavailable")
-                            .font(.title2.weight(.bold))
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.amountProminent.weight(.bold))
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     }
                 }
                 Spacer()
                 if let change, let pct = changePercent {
                     VStack(alignment: .trailing, spacing: 4) {
                         Text(rangeLabel + " change")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.caption)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         HStack(spacing: 4) {
                             Image(systemName: isPositive ? "arrow.up.right" : "arrow.down.right")
                             Text(pct, format: .percent.precision(.fractionLength(1)))
                         }
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(isPositive ? .green : .red)
+                        .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
+                        .foregroundStyle(isPositive ? WealthMapDesignTokens.ColorToken.success : WealthMapDesignTokens.ColorToken.danger)
                         Text(change, format: .currency(code: currencyCode).sign(strategy: .always()))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.caption)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                             .monospacedDigit()
                     }
                 }
@@ -271,11 +271,11 @@ private struct NetWorthStatsView: View {
             if let peak = peak {
                 HStack {
                     Label("Peak", systemImage: "chart.line.uptrend.xyaxis")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.caption)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     Spacer()
                     Text(peak, format: .currency(code: currencyCode))
-                        .font(.caption.weight(.semibold))
+                        .font(WealthMapDesignTokens.Typography.compactLabel)
                         .monospacedDigit()
                 }
             }
@@ -302,7 +302,7 @@ private struct HistoryChartView: View {
                         series: .value("Series", "Assets")
                     )
                     .interpolationMethod(.catmullRom)
-                    .foregroundStyle(.green)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.success)
 
                     AreaMark(
                         x: .value("Date", row.recordedAt),
@@ -310,7 +310,7 @@ private struct HistoryChartView: View {
                         series: .value("Series", "Assets")
                     )
                     .interpolationMethod(.catmullRom)
-                    .foregroundStyle(.green.opacity(0.10))
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.success.opacity(0.10))
 
                     LineMark(
                         x: .value("Date", row.recordedAt),
@@ -318,7 +318,7 @@ private struct HistoryChartView: View {
                         series: .value("Series", "Liabilities")
                     )
                     .interpolationMethod(.catmullRom)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.danger)
 
                     AreaMark(
                         x: .value("Date", row.recordedAt),
@@ -326,12 +326,12 @@ private struct HistoryChartView: View {
                         series: .value("Series", "Liabilities")
                     )
                     .interpolationMethod(.catmullRom)
-                    .foregroundStyle(.red.opacity(0.10))
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.danger.opacity(0.10))
                 }
             }
             .chartForegroundStyleScale([
-                "Assets": Color.green,
-                "Liabilities": Color.red
+                "Assets": WealthMapDesignTokens.ColorToken.success,
+                "Liabilities": WealthMapDesignTokens.ColorToken.danger
             ])
             .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
             .chartYAxis { AxisMarks(position: .leading) }
@@ -384,8 +384,8 @@ private struct PortfolioSnapshotTableView: View {
                 Text("Net Worth")
                     .frame(width: 90, alignment: .trailing)
             }
-            .font(.caption)
-            .foregroundStyle(.secondary)
+            .font(WealthMapDesignTokens.Typography.caption)
+            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
 
             Divider()
 
@@ -407,9 +407,9 @@ private struct PortfolioSnapshotTableView: View {
             Text(netWorth, format: .currency(code: currencyCode).precision(.fractionLength(0)))
                 .frame(width: 90, alignment: .trailing)
                 .monospacedDigit()
-                .foregroundStyle(netWorth >= 0 ? Color.primary : Color.red)
+                .foregroundStyle(netWorth >= 0 ? WealthMapDesignTokens.ColorToken.textPrimary : WealthMapDesignTokens.ColorToken.danger)
         }
-        .font(.caption)
+        .font(WealthMapDesignTokens.Typography.caption)
     }
 }
 
@@ -427,8 +427,8 @@ private struct NetWorthSnapshotTableView: View {
                 Text("Net Worth")
                     .frame(width: 120, alignment: .trailing)
             }
-            .font(.caption)
-            .foregroundStyle(.secondary)
+            .font(WealthMapDesignTokens.Typography.caption)
+            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
 
             Divider()
 
@@ -439,9 +439,9 @@ private struct NetWorthSnapshotTableView: View {
                     Text(row.amount, format: .currency(code: currencyCode).precision(.fractionLength(0)))
                         .frame(width: 120, alignment: .trailing)
                         .monospacedDigit()
-                        .foregroundStyle(row.amount >= 0 ? Color.primary : Color.red)
+                        .foregroundStyle(row.amount >= 0 ? WealthMapDesignTokens.ColorToken.textPrimary : WealthMapDesignTokens.ColorToken.danger)
                 }
-                .font(.caption)
+                .font(WealthMapDesignTokens.Typography.caption)
             }
         }
     }

@@ -16,10 +16,40 @@ import SwiftUI
 
 // MARK: - Shared background
 
+private enum WidgetDesignTokens {
+    static let brandPrimary = Color(red: 0.62, green: 0.08, blue: 0.53)
+    static let brandPrimaryStrong = Color(red: 0.38, green: 0.04, blue: 0.34)
+    static let brandDot = Color(red: 166/255, green: 23/255, blue: 142/255)
+    static let textPrimary = Color.primary
+    static let textSecondary = Color.secondary
+    static let textTertiary = Color(.tertiaryLabel)
+    static let surfaceClear = Color.clear
+    static let success = Color.green
+    static let danger = Color.red
+    static let badgeOpacity = 0.1
+    static let badgeHorizontalPadding: CGFloat = 6
+    static let badgeVerticalPadding: CGFloat = 2
+    static let compactTopPadding: CGFloat = 4
+
+    enum Typography {
+        static let caption = Font.caption
+        static let caption2 = Font.caption2
+        static let headline = Font.headline
+        static let widgetAmount = Font.title2
+        static let widgetSecondaryAmount = Font.title3
+        static let lockScreenAmount = Font.system(size: 14, weight: .bold, design: .rounded)
+        static let compactTimestamp = Font.system(size: 9)
+        static let compactValue = Font.system(size: 9, weight: .medium)
+        static let compactIcon = Font.system(size: 8)
+        static let compactLabel = Font.system(size: 9, weight: .semibold)
+        static let rectangularAmount = Font.system(.title3, design: .rounded, weight: .bold)
+    }
+}
+
 private let wealthGradient = LinearGradient(
     colors: [
-        Color(red: 0.62, green: 0.08, blue: 0.53),
-        Color(red: 0.38, green: 0.04, blue: 0.34)
+        WidgetDesignTokens.brandPrimary,
+        WidgetDesignTokens.brandPrimaryStrong
     ],
     startPoint: .topLeading,
     endPoint: .bottomTrailing
@@ -29,7 +59,7 @@ private let wealthGradient = LinearGradient(
 /// Drawn with Canvas so it works in widget extensions without animation.
 /// On a white background, use a lower opacity so the dots are subtle.
 private struct WidgetDotBackground: View {
-    var dotColor: Color = Color(red: 166/255, green: 23/255, blue: 142/255).opacity(0.18)
+    var dotColor: Color = WidgetDesignTokens.brandDot.opacity(0.18)
     var dotRadius: CGFloat = 1
     var spacing: CGFloat = 16
 
@@ -103,7 +133,7 @@ struct MyWealthWidgetEntryView: View {
 }
 
 // MARK: - Accent color (matches app AccentColor asset)
-private let widgetAccent = Color(red: 0.62, green: 0.08, blue: 0.53)
+private let widgetAccent = WidgetDesignTokens.brandPrimary
 
 // MARK: - Small Widget
 
@@ -117,10 +147,10 @@ struct SmallWidgetView: View {
             // Accent header strip
             HStack(spacing: 4) {
                 Image(systemName: "chart.line.uptrend.xyaxis")
-                    .font(.caption2)
+                    .font(WidgetDesignTokens.Typography.caption2)
                     .foregroundStyle(widgetAccent)
                 Text("NET WORTH")
-                    .font(.caption2)
+                    .font(WidgetDesignTokens.Typography.caption2)
                     .fontWeight(.semibold)
                     .foregroundStyle(widgetAccent)
                     .tracking(0.5)
@@ -130,28 +160,28 @@ struct SmallWidgetView: View {
 
             // Primary amount
             Text(snapshot.netWorth.compactCurrencyString(code: snapshot.baseCurrency))
-                .font(.title2)
+                .font(WidgetDesignTokens.Typography.widgetAmount)
                 .fontWeight(.bold)
-                .foregroundStyle(.primary)
+                .foregroundStyle(WidgetDesignTokens.textPrimary)
                 .minimumScaleFactor(0.5)
                 .lineLimit(2)
 
             // Currency code badge
             Text(snapshot.baseCurrency)
-                .font(.caption2)
+                .font(WidgetDesignTokens.Typography.caption2)
                 .fontWeight(.semibold)
                 .foregroundStyle(widgetAccent)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(widgetAccent.opacity(0.1), in: Capsule())
-                .padding(.top, 4)
+                .padding(.horizontal, WidgetDesignTokens.badgeHorizontalPadding)
+                .padding(.vertical, WidgetDesignTokens.badgeVerticalPadding)
+                .background(widgetAccent.opacity(WidgetDesignTokens.badgeOpacity), in: Capsule())
+                .padding(.top, WidgetDesignTokens.compactTopPadding)
 
             Spacer()
 
             // Footer: transfer-rate last updated
             Text(snapshot.transferRatesUpdatedLabel)
-                .font(.system(size: 9))
-                .foregroundStyle(.tertiary)
+                .font(WidgetDesignTokens.Typography.compactTimestamp)
+                .foregroundStyle(WidgetDesignTokens.textTertiary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
         }
@@ -174,10 +204,10 @@ struct MediumWidgetView: View {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(spacing: 4) {
                     Image(systemName: "chart.line.uptrend.xyaxis")
-                        .font(.caption2)
+                        .font(WidgetDesignTokens.Typography.caption2)
                         .foregroundStyle(widgetAccent)
                     Text("NET WORTH")
-                        .font(.caption2)
+                        .font(WidgetDesignTokens.Typography.caption2)
                         .fontWeight(.semibold)
                         .foregroundStyle(widgetAccent)
                         .tracking(0.5)
@@ -186,9 +216,9 @@ struct MediumWidgetView: View {
                 Spacer()
 
                 Text(snapshot.netWorth.compactCurrencyString(code: snapshot.baseCurrency))
-                    .font(.title3)
+                    .font(WidgetDesignTokens.Typography.widgetSecondaryAmount)
                     .fontWeight(.bold)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(WidgetDesignTokens.textPrimary)
                     .minimumScaleFactor(0.5)
                     .lineLimit(2)
 
@@ -197,13 +227,13 @@ struct MediumWidgetView: View {
                     liabilityTotal: snapshot.liabilityTotal,
                     currency: snapshot.baseCurrency
                 )
-                .padding(.top, 4)
+                .padding(.top, WidgetDesignTokens.compactTopPadding)
 
                 Spacer()
 
                 Text(snapshot.transferRatesUpdatedLabel)
-                    .font(.system(size: 9))
-                    .foregroundStyle(.tertiary)
+                    .font(WidgetDesignTokens.Typography.compactTimestamp)
+                    .foregroundStyle(WidgetDesignTokens.textTertiary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
             }
@@ -222,8 +252,8 @@ struct MediumWidgetView: View {
                 } else {
                     Spacer()
                     Text("Add display\ncurrencies\nin Settings")
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .font(WidgetDesignTokens.Typography.caption2)
+                        .foregroundStyle(WidgetDesignTokens.textTertiary)
                         .multilineTextAlignment(.leading)
                     Spacer()
                 }
@@ -250,16 +280,16 @@ struct CircularLockScreenView: View {
 
             VStack(spacing: 1) {
                 Text(snapshot.baseCurrency)
-                    .font(.system(size: 9, weight: .semibold))
-                    .foregroundStyle(.secondary)
+                    .font(WidgetDesignTokens.Typography.compactLabel)
+                    .foregroundStyle(WidgetDesignTokens.textSecondary)
 
                 Text(snapshot.netWorth.abbreviatedString)
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .font(WidgetDesignTokens.Typography.lockScreenAmount)
                     .minimumScaleFactor(0.6)
                     .lineLimit(1)
             }
         }
-        .containerBackground(for: .widget) { Color.clear }
+        .containerBackground(for: .widget) { WidgetDesignTokens.surfaceClear }
         .redacted(reason: entry.isPlaceholder ? .placeholder : [])
     }
 }
@@ -275,23 +305,23 @@ struct RectangularLockScreenView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Label("Net Worth", systemImage: "chart.line.uptrend.xyaxis")
-                .font(.caption2)
+                .font(WidgetDesignTokens.Typography.caption2)
                 .fontWeight(.semibold)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(WidgetDesignTokens.textSecondary)
 
             Text(snapshot.netWorth.compactCurrencyString(code: snapshot.baseCurrency))
-                .font(.system(.title3, design: .rounded, weight: .bold))
+                .font(WidgetDesignTokens.Typography.rectangularAmount)
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
 
             Text(snapshot.transferRatesUpdatedLabel)
-                .font(.system(size: 9))
-                .foregroundStyle(.tertiary)
+                .font(WidgetDesignTokens.Typography.compactTimestamp)
+                .foregroundStyle(WidgetDesignTokens.textTertiary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .containerBackground(for: .widget) { Color.clear }
+        .containerBackground(for: .widget) { WidgetDesignTokens.surfaceClear }
         .redacted(reason: entry.isPlaceholder ? .placeholder : [])
     }
 }
@@ -306,14 +336,14 @@ private struct PreferredCurrencySummary: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Also in")
-                .font(.caption2)
+                .font(WidgetDesignTokens.Typography.caption2)
                 .fontWeight(.semibold)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(WidgetDesignTokens.textSecondary)
 
             Text(entry.amount.compactCurrencyString(code: entry.code))
-                .font(.headline)
+                .font(WidgetDesignTokens.Typography.headline)
                 .fontWeight(.bold)
-                .foregroundStyle(.primary)
+                .foregroundStyle(WidgetDesignTokens.textPrimary)
                 .minimumScaleFactor(0.55)
                 .lineLimit(1)
 
@@ -321,32 +351,32 @@ private struct PreferredCurrencySummary: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 Text("Transfer rate")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .font(WidgetDesignTokens.Typography.caption2)
+                    .foregroundStyle(WidgetDesignTokens.textSecondary)
 
                 if let transferRate = entry.transferRate {
                     Text("1 \(baseCurrency) = \(transferRate, format: .number.precision(.significantDigits(4...6))) \(entry.code)")
-                        .font(.caption)
+                        .font(WidgetDesignTokens.Typography.caption)
                         .fontWeight(.semibold)
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(WidgetDesignTokens.textPrimary)
                         .minimumScaleFactor(0.55)
                         .lineLimit(1)
                 } else {
                     Text("Unavailable")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .font(WidgetDesignTokens.Typography.caption)
+                        .foregroundStyle(WidgetDesignTokens.textTertiary)
                 }
             }
 
             Spacer()
 
             Text(entry.code)
-                .font(.caption2)
+                .font(WidgetDesignTokens.Typography.caption2)
                 .fontWeight(.semibold)
                 .foregroundStyle(widgetAccent)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(widgetAccent.opacity(0.1), in: Capsule())
+                .padding(.horizontal, WidgetDesignTokens.badgeHorizontalPadding)
+                .padding(.vertical, WidgetDesignTokens.badgeVerticalPadding)
+                .background(widgetAccent.opacity(WidgetDesignTokens.badgeOpacity), in: Capsule())
                 .lineLimit(1)
         }
     }
@@ -363,13 +393,13 @@ private struct AssetLiabilityMiniBadge: View {
             MiniStatBadge(
                 icon: "arrow.up.circle.fill",
                 value: assetTotal.abbreviatedString,
-                tint: .green.opacity(0.85)
+                tint: WidgetDesignTokens.success.opacity(0.85)
             )
             if liabilityTotal > 0 {
                 MiniStatBadge(
                     icon: "arrow.down.circle.fill",
                     value: liabilityTotal.abbreviatedString,
-                    tint: .red.opacity(0.75)
+                    tint: WidgetDesignTokens.danger.opacity(0.75)
                 )
             }
         }
@@ -384,11 +414,11 @@ private struct MiniStatBadge: View {
     var body: some View {
         HStack(spacing: 2) {
             Image(systemName: icon)
-                .font(.system(size: 8))
+                .font(WidgetDesignTokens.Typography.compactIcon)
                 .foregroundStyle(tint)
             Text(value)
-                .font(.system(size: 9, weight: .medium))
-                .foregroundStyle(.secondary)
+                .font(WidgetDesignTokens.Typography.compactValue)
+                .foregroundStyle(WidgetDesignTokens.textSecondary)
         }
     }
 }

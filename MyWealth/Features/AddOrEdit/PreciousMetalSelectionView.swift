@@ -42,19 +42,19 @@ struct PreciousMetalSelectionView: View {
 
                             VStack(alignment: .leading, spacing: 3) {
                                 Text(metal.name)
-                                    .font(.headline)
-                                    .foregroundStyle(.primary)
+                                    .font(WealthMapDesignTokens.Typography.headline)
+                                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                                 Text("\(metal.symbol) · \(metal.unit)")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .font(WealthMapDesignTokens.Typography.caption)
+                                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                             }
 
                             Spacer()
 
                             if selection == metal.currency {
                                 Image(systemName: "checkmark")
-                                    .font(.body.weight(.semibold))
-                                    .foregroundStyle(.accent)
+                                    .font(WealthMapDesignTokens.Typography.bodySemibold)
+                                    .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
                             }
                         }
                     }

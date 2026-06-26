@@ -27,27 +27,27 @@ struct PillLabelStyle {
 extension PillLabelStyle {
     
     static let accent = PillLabelStyle(
-        foreground: .accentColor,
-        background: .accentColor.opacity(0.15),
-        border: .accentColor.opacity(0.25)
+        foreground: WealthMapDesignTokens.ColorToken.brandPrimary,
+        background: WealthMapDesignTokens.ColorToken.brandPrimary.opacity(0.15),
+        border: WealthMapDesignTokens.ColorToken.brandPrimary.opacity(0.25)
     )
 
     static let success = PillLabelStyle(
-        foreground: .green,
-        background: .green.opacity(0.15),
-        border: .green.opacity(0.25)
+        foreground: WealthMapDesignTokens.ColorToken.success,
+        background: WealthMapDesignTokens.ColorToken.success.opacity(0.15),
+        border: WealthMapDesignTokens.ColorToken.success.opacity(0.25)
     )
 
     static let warning = PillLabelStyle(
-        foreground: .orange,
-        background: .orange.opacity(0.15),
-        border: .orange.opacity(0.25)
+        foreground: WealthMapDesignTokens.ColorToken.warning,
+        background: WealthMapDesignTokens.ColorToken.warning.opacity(0.15),
+        border: WealthMapDesignTokens.ColorToken.warning.opacity(0.25)
     )
 
     static let danger = PillLabelStyle(
-        foreground: .red,
-        background: .red.opacity(0.15),
-        border: .red.opacity(0.25)
+        foreground: WealthMapDesignTokens.ColorToken.danger,
+        background: WealthMapDesignTokens.ColorToken.danger.opacity(0.15),
+        border: WealthMapDesignTokens.ColorToken.danger.opacity(0.25)
     )
 }
 
@@ -69,8 +69,8 @@ struct PillLabel: View {
             .font(style.font)
             .foregroundStyle(style.foreground)
             .lineLimit(1)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 7)
+            .padding(.horizontal, WealthMapDesignTokens.Spacing.pillHorizontalPadding)
+            .padding(.vertical, WealthMapDesignTokens.Spacing.pillVerticalPadding)
             .background(
                 Capsule(style: .continuous)
                     .fill(style.background)

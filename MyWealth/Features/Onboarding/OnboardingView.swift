@@ -71,7 +71,7 @@ struct OnboardingView: View {
         HStack {
             ForEach(OnboardingStep.allCases, id: \.self) { step in
                 Capsule()
-                    .fill(step.rawValue <= currentStep.rawValue ? Color.accentColor : Color.gray.opacity(0.25))
+                    .fill(step.rawValue <= currentStep.rawValue ? WealthMapDesignTokens.ColorToken.brandPrimary : WealthMapDesignTokens.ColorToken.inactive.opacity(0.25))
                     .frame(height: 6)
             }
         }
@@ -84,7 +84,7 @@ struct OnboardingView: View {
             handlePrimaryAction()
         } label: {
             Text(currentStep == .iCloudSync ? "Finish Setup" : "Continue")
-                .font(.headline)
+                .font(WealthMapDesignTokens.Typography.headline)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
         }
@@ -162,38 +162,38 @@ private struct OnboardingBaseCurrencyStepView: View {
                         CurrencySummaryView(currency: baseCurrency)
                     }
                 }
-                .padding(12)
+                .padding(WealthMapDesignTokens.Spacing.standard)
                 .background {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
                         .fill(.ultraThinMaterial)
-                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                        .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
                 }
-                .listRowBackground(Color.clear)
+                .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             } header: {
                 VStack(alignment: .leading, spacing: 12) {
                     Label("Start with your home currency", systemImage: "globe")
-                            .font(.title3.bold())
+                            .font(WealthMapDesignTokens.Typography.title)
                             .foregroundStyle(primaryTextColor)
 
                         Text("Wealth Map uses this currency as the anchor for your private net worth view.")
-                            .font(.headline)
+                            .font(WealthMapDesignTokens.Typography.headline)
                             .foregroundStyle(primaryTextColor)
 
                         Text("Assets and liabilities can still use other currencies; totals are converted back here when rates are available.")
-                            .font(.body)
+                            .font(WealthMapDesignTokens.Typography.body)
                             .foregroundStyle(primaryTextColor)
 
                         Text("You can change this later in Settings.")
-                            .font(.footnote)
+                            .font(WealthMapDesignTokens.Typography.footnote)
                             .foregroundStyle(secondaryTextColor)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(16)
+                .padding(WealthMapDesignTokens.Spacing.section)
                 .background {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
                         .fill(.ultraThinMaterial)
-                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                        .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
                 }
             }
         }
@@ -225,16 +225,16 @@ private struct OnboardingDisplayCurrencyStepView: View {
                 } label: {
                     LabeledContent("Display Currencies") {
                         Text(displayCurrencies.map(\.rawValue).joined(separator: ", "))
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                     }
                 }
-                .padding(12)
+                .padding(WealthMapDesignTokens.Spacing.standard)
                 .background {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
                         .fill(.ultraThinMaterial)
-                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                        .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
                 }
-                .listRowBackground(Color.clear)
+                .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
 
                 NavigationLink {
@@ -245,35 +245,35 @@ private struct OnboardingDisplayCurrencyStepView: View {
                 } label: {
                     LabeledContent("Arrange Selected") {
                         Text(displayCurrencies.map(\.rawValue).joined(separator: ", "))
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                     }
                 }
-                .padding(12)
+                .padding(WealthMapDesignTokens.Spacing.standard)
                 .background {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
                         .fill(.ultraThinMaterial)
-                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                        .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
                 }
-                .listRowBackground(Color.clear)
+                .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             } header: {
                 VStack(alignment: .leading, spacing: 12) {
                     Label("See wealth across currencies", systemImage: "globe")
-                        .font(.title3.bold())
+                        .font(WealthMapDesignTokens.Typography.title)
                         .foregroundStyle(primaryTextColor)
                     Text("Choose the currencies you want to see on totals, rates, widgets, and net worth views.")
-                        .font(.body)
+                        .font(WealthMapDesignTokens.Typography.body)
                         .foregroundStyle(primaryTextColor)
                     Text("Your base currency is always included, and you can reorder the rest anytime.")
-                        .font(.footnote)
+                        .font(WealthMapDesignTokens.Typography.footnote)
                         .foregroundStyle(secondaryTextColor)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(16)
+                .padding(WealthMapDesignTokens.Spacing.section)
                 .background {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
                         .fill(.ultraThinMaterial)
-                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                        .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
                 }
             }
         }

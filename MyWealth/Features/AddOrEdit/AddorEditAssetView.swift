@@ -138,10 +138,10 @@ struct AddorEditAssetView: View {
             LabeledContent("Currency") {
                 VStack(alignment: .trailing, spacing: 2) {
                     Text(currency.rawValue)
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                     Text(currency.name)
-                        .font(.caption)
-                        .foregroundStyle(.gray)
+                        .font(WealthMapDesignTokens.Typography.caption)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.inactive)
                 }
             }
         }
@@ -172,30 +172,30 @@ struct AddorEditAssetView: View {
                     HStack(spacing: 6) {
                         ProgressView().scaleEffect(0.7)
                         Text("Loading price…")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.caption)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     }
                 } else if let value = estimatedValueUSD {
                     Text(value, format: .currency(code: "USD"))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.primary)
+                        .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                 } else if metalViewModel.metalRates.isEmpty {
                     Text("Price unavailable")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.caption)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 } else {
                     Text("Enter weight above")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.caption)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 }
             }
-            .listRowBackground(estimatedValueUSD != nil ? Color.yellow.opacity(0.12) : nil)
+            .listRowBackground(estimatedValueUSD != nil ? WealthMapDesignTokens.ColorToken.attention.opacity(0.12) : nil)
         } header: {
             Text("Weight")
         } footer: {
             Text("Amount is stored in troy oz. Estimated value uses live metal prices (USD).")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(WealthMapDesignTokens.Typography.caption)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
         }
     }
 
@@ -208,10 +208,10 @@ struct AddorEditAssetView: View {
                         .frame(width: 10, height: 10)
                     VStack(alignment: .trailing, spacing: 2) {
                         Text(metal.name)
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                         Text("\(metal.symbol) · troy oz")
-                            .font(.caption)
-                            .foregroundStyle(.gray)
+                            .font(WealthMapDesignTokens.Typography.caption)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.inactive)
                     }
                 }
             }
@@ -219,8 +219,8 @@ struct AddorEditAssetView: View {
             if let rate = metalViewModel.metalRates[metal.symbol], rate > 0 {
                 LabeledContent("Spot Price") {
                     Text(1.0 / rate, format: .currency(code: "USD"))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.subheadline)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 }
             }
         }
@@ -240,7 +240,7 @@ struct AddorEditAssetView: View {
             Toggle(isOn: $includeInPortfolio) {
                 Label("Include in Portfolio", systemImage: "chart.pie.fill")
             }
-            .tint(.accentColor)
+            .tint(WealthMapDesignTokens.ColorToken.brandPrimary)
         } footer: {
             Text("Ignored assets stay in your list and history, but are left out of portfolio totals unless Settings includes ignored assets.")
         }

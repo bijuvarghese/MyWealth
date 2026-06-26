@@ -17,10 +17,10 @@ struct IPadRootView: View {
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(selection == section ? .accent : .primary)
+                    .foregroundStyle(selection == section ? WealthMapDesignTokens.ColorToken.brandPrimary : WealthMapDesignTokens.ColorToken.textPrimary)
                     .listRowBackground(
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
-                            .fill(selection == section ? Color.accentColor.opacity(0.14) : Color.clear)
+                        RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.compactRadius, style: .continuous)
+                            .fill(selection == section ? WealthMapDesignTokens.ColorToken.brandPrimary.opacity(0.14) : WealthMapDesignTokens.ColorToken.surfaceClear)
                     )
                 }
             }

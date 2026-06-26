@@ -74,6 +74,21 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func designTokenCatalogHasRequiredCrossPlatformMappings() async throws {
+        let data = try Data(contentsOf: Self.designTokenCatalogURL)
+        let report = try WealthMapTokenValidation.validateCatalog(data: data)
+
+        #expect(report.tokenCount >= WealthMapTokenValidation.requiredCategories.count)
+        #expect(report.categories.isSuperset(of: WealthMapTokenValidation.requiredCategories))
+        #expect(report.duplicateNames.isEmpty)
+        #expect(report.missingCategories.isEmpty)
+        #expect(report.tokensMissingPlatformMappings.isEmpty)
+        #expect(report.tokensMissingAccessibilityNotes.isEmpty)
+        #expect(report.tokensWithSensitiveContent.isEmpty)
+        #expect(report.isValid)
+    }
+
+    @MainActor
     @Test func netWorthGoalDraftValidationRejectsInvalidValues() async throws {
         let today = Date(timeIntervalSince1970: 1_800_000_000)
         let invalid = NetWorthGoalDraft(
@@ -1511,6 +1526,13 @@ struct MyWealthTests {
         let defaults = try #require(UserDefaults(suiteName: suiteName))
         defaults.removePersistentDomain(forName: suiteName)
         return defaults
+    }
+
+    private static var designTokenCatalogURL: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("tokens/wealth-map.tokens.json")
     }
 
     @MainActor

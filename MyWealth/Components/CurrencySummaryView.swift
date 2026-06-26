@@ -6,10 +6,10 @@ struct CurrencySummaryView: View {
     var body: some View {
         VStack(alignment: .trailing, spacing: 2) {
             Text(currency.rawValue)
-                .foregroundStyle(.primary)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
             Text(currency.name)
-                .font(.caption)
-                .foregroundStyle(.gray)
+                .font(WealthMapDesignTokens.Typography.caption)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.inactive)
         }
     }
 }

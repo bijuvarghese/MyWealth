@@ -26,48 +26,48 @@ struct OnboardingICloudStepView: View {
         Form {
             Section {
                 Toggle("Enable iCloud Backup and Sync", isOn: $iCloudSyncEnabled)
-                    .tint(.accentColor)
+                    .tint(WealthMapDesignTokens.ColorToken.brandPrimary)
                     .disabled(!iCloudAvailable)
-                    .padding(12)
+                    .padding(WealthMapDesignTokens.Spacing.standard)
                     .background {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
                             .fill(.ultraThinMaterial)
-                            .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                            .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
                     }
-                    .listRowBackground(Color.clear)
+                    .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                     .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
 
                 if !iCloudAvailable {
                     Text("Sign in to iCloud in Settings to enable.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .listRowBackground(Color.clear)
+                        .font(WealthMapDesignTokens.Typography.caption)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
+                        .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                         .listRowInsets(EdgeInsets(top: 0, leading: 28, bottom: 6, trailing: 16))
                 }
             } header: {
                 VStack(alignment: .leading, spacing: 12) {
                     Label("Choose local-only or iCloud", systemImage: "icloud.fill")
-                        .font(.title3.bold())
+                        .font(WealthMapDesignTokens.Typography.title)
                         .foregroundStyle(primaryTextColor)
 
                     Text("Wealth Map keeps your financial records on this device by default.")
-                        .font(.body)
+                        .font(WealthMapDesignTokens.Typography.body)
                         .foregroundStyle(primaryTextColor)
 
                     Text("Turn on iCloud only if you want Apple iCloud backup and sync through your personal account.")
-                        .font(.footnote)
+                        .font(WealthMapDesignTokens.Typography.footnote)
                         .foregroundStyle(secondaryTextColor)
 
                     Text("Wealth Map does not require a separate account or bank login, and you can change this anytime in Settings.")
-                        .font(.footnote)
+                        .font(WealthMapDesignTokens.Typography.footnote)
                         .foregroundStyle(secondaryTextColor)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(16)
+                .padding(WealthMapDesignTokens.Spacing.section)
                 .background {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
                         .fill(.ultraThinMaterial)
-                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                        .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
                 }
             }
         }

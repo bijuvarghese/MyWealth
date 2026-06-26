@@ -6,23 +6,23 @@ struct LiabilityRowView: View {
     var body: some View {
         HStack {
             Image(systemName: liability.displayCategory.icon)
-                .foregroundStyle(.red)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.danger)
                 .frame(width: 25)
 
             VStack(alignment: .leading) {
                 Text(liability.displayName)
-                    .font(.headline)
+                    .font(WealthMapDesignTokens.Typography.headline)
 
                 HStack {
                     Text(liability.displayAmount, format: .number.precision(.fractionLength(0)))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     Text(liability.displayCurrency.rawValue)
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                 }
 
                 Text(liability.displayCategory.rawValue)
-                    .font(.caption)
-                    .foregroundStyle(.gray)
+                    .font(WealthMapDesignTokens.Typography.caption)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.inactive)
             }
 
             Spacer()

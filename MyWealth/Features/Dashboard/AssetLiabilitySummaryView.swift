@@ -14,7 +14,7 @@ struct AssetLiabilitySummaryView: View {
                     systemImage: "plus.circle.fill",
                     amount: assetTotal,
                     currencyCode: currencyCode,
-                    tint: .green
+                    tint: WealthMapDesignTokens.ColorToken.success
                 )
 
                 Divider()
@@ -25,7 +25,7 @@ struct AssetLiabilitySummaryView: View {
                     systemImage: "minus.circle.fill",
                     amount: liabilityTotal,
                     currencyCode: currencyCode,
-                    tint: .red
+                    tint: WealthMapDesignTokens.ColorToken.danger
                 )
             }
             .padding(.horizontal, 12)
@@ -35,12 +35,12 @@ struct AssetLiabilitySummaryView: View {
                 Spacer()
                 amountText(netWorthTotal)
             }
-            .font(.title3.weight(.semibold))
+            .font(WealthMapDesignTokens.Typography.amountProminent)
             .foregroundStyle(.black)
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
-            .background(Color.yellow)
+            .background(WealthMapDesignTokens.ColorToken.attention)
             .clipShape(.rect(bottomLeadingRadius: 12, bottomTrailingRadius: 12))
         }
     }
@@ -54,7 +54,7 @@ struct AssetLiabilitySummaryView: View {
                 .minimumScaleFactor(0.75)
         } else {
             Text("Unavailable")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
         }
     }
 }

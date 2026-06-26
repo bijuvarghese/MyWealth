@@ -94,7 +94,7 @@ struct SettingsView: View {
                 NavigationLink(value: SettingsRoute.reminders) {
                     HStack {
                         Image(systemName: "bell.badge.fill")
-                            .foregroundColor(.accent)
+                            .foregroundColor(WealthMapDesignTokens.ColorToken.brandPrimary)
                         Text("Reminders")
                     }
                 }
@@ -102,9 +102,9 @@ struct SettingsView: View {
 
             Section("Totals") {
                 Toggle("Compact Amounts", isOn: $settings.usesCompactCurrencyTotals)
-                    .tint(.accentColor)
+                    .tint(WealthMapDesignTokens.ColorToken.brandPrimary)
                 Toggle("Include Ignored Assets", isOn: $settings.includeIgnoredAssetsInPortfolio)
-                    .tint(.accentColor)
+                    .tint(WealthMapDesignTokens.ColorToken.brandPrimary)
                 NavigationLink(value: SettingsRoute.baseCurrency) {
                     baseCurrencyContent
                 }
@@ -120,8 +120,8 @@ struct SettingsView: View {
 
             Section("Data Controls") {
                 Text("Wealth Map keeps records on this device unless you enable iCloud sync or export a backup.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.caption)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 cleanupButton
                 exportButton
                 importButton
@@ -178,7 +178,7 @@ struct SettingsView: View {
                                     systemImage: "textformat.size"
                                 )
                             }
-                            .tint(.accent)
+                            .tint(WealthMapDesignTokens.ColorToken.brandPrimary)
 
                             Divider()
                                 .padding(.leading, 44)
@@ -191,7 +191,7 @@ struct SettingsView: View {
                                     systemImage: "eye.slash"
                                 )
                             }
-                            .tint(.accent)
+                            .tint(WealthMapDesignTokens.ColorToken.brandPrimary)
 
                             Divider()
                                 .padding(.leading, 44)
@@ -485,10 +485,10 @@ struct SettingsView: View {
         LabeledContent("Base Currency") {
             VStack(alignment: .trailing, spacing: 2) {
                 Text(settings.baseCurrency.rawValue)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                 Text(settings.baseCurrency.name)
-                    .font(.caption)
-                    .foregroundStyle(.gray)
+                    .font(WealthMapDesignTokens.Typography.caption)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.inactive)
             }
         }
     }
@@ -496,7 +496,7 @@ struct SettingsView: View {
     private var displayCurrenciesContent: some View {
         LabeledContent("Display Currencies") {
             Text(settings.totalCurrencies.map(\.rawValue).joined(separator: ", "))
-                .foregroundStyle(.primary)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
         }
     }
 }
@@ -510,30 +510,30 @@ private struct ICloudSyncRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "icloud.fill")
-                .font(.body.weight(.semibold))
-                .foregroundStyle(iCloudAvailable ? .accent : .secondary)
+                .font(WealthMapDesignTokens.Typography.bodySemibold)
+                .foregroundStyle(iCloudAvailable ? WealthMapDesignTokens.ColorToken.brandPrimary : WealthMapDesignTokens.ColorToken.textSecondary)
                 .frame(width: 32, height: 32)
                 .background(
-                    (iCloudAvailable ? Color.accent : Color.secondary).opacity(0.12),
-                    in: RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    (iCloudAvailable ? WealthMapDesignTokens.ColorToken.brandPrimary : WealthMapDesignTokens.ColorToken.textSecondary).opacity(0.12),
+                    in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.compactRadius, style: .continuous)
                 )
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Sync with iCloud")
-                    .font(.body.weight(.medium))
-                    .foregroundStyle(.primary)
+                    .font(WealthMapDesignTokens.Typography.body.weight(.medium))
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                 Text(iCloudAvailable
                      ? "Optional backup and sync through your personal iCloud account."
                      : "Sign in to iCloud in Settings to enable.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(WealthMapDesignTokens.Typography.caption)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
             }
 
             Spacer(minLength: 8)
 
             Toggle("", isOn: $settings.iCloudSyncEnabled)
                 .labelsHidden()
-                .tint(.accent)
+                .tint(WealthMapDesignTokens.ColorToken.brandPrimary)
                 .disabled(!iCloudAvailable)
         }
         .frame(minHeight: 40)
@@ -577,19 +577,19 @@ private struct ChatGPTAnalysisResultView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     if let model = result.model {
                         Label(model, systemImage: "sparkles")
-                            .font(.footnote.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                            .font(WealthMapDesignTokens.Typography.footnote.weight(.semibold))
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     }
 
                     Text(LocalizedStringKey(result.analysis))
-                        .font(.body)
+                        .font(WealthMapDesignTokens.Typography.body)
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                     if let responseId = result.responseId {
                         Text("Response ID: \(responseId)")
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
+                            .font(WealthMapDesignTokens.Typography.caption2)
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textTertiary)
                             .textSelection(.enabled)
                     }
                 }
@@ -613,19 +613,19 @@ private struct ChatGPTExportProgressOverlay: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.18)
+            WealthMapDesignTokens.ColorToken.scrim
                 .ignoresSafeArea()
 
             VStack(spacing: 14) {
                 ProgressView()
                     .controlSize(.large)
                 Text(message)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
+                    .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 22)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous))
             .shadow(color: .black.opacity(0.14), radius: 18, x: 0, y: 10)
         }
         .transition(.opacity)
@@ -642,20 +642,20 @@ private struct SettingsRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: systemImage)
-                .font(.body.weight(.semibold))
-                .foregroundStyle(.accent)
+                .font(WealthMapDesignTokens.Typography.bodySemibold)
+                .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
                 .frame(width: 32, height: 32)
-                .background(.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .background(WealthMapDesignTokens.ColorToken.brandPrimary.opacity(0.12), in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.compactRadius, style: .continuous))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.body.weight(.medium))
-                    .foregroundStyle(.primary)
+                    .font(WealthMapDesignTokens.Typography.body.weight(.medium))
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
 
                 if let subtitle {
                     Text(subtitle)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.caption)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 }
             }
 
@@ -666,8 +666,8 @@ private struct SettingsRow: View {
                     .controlSize(.small)
             } else if showsDisclosureIndicator {
                 Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.tertiary)
+                    .font(WealthMapDesignTokens.Typography.footnote.weight(.semibold))
+                    .foregroundStyle(WealthMapDesignTokens.ColorToken.textTertiary)
             }
         }
         .frame(minHeight: 40)
@@ -695,23 +695,23 @@ private struct SettingsValueRow: View {
             HStack(spacing: 8) {
                 VStack(alignment: .trailing, spacing: 2) {
                     Text(value)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.75)
 
                     if let secondaryValue {
                         Text(secondaryValue)
-                            .font(.caption2.weight(.medium))
-                            .foregroundStyle(.tertiary)
+                            .font(WealthMapDesignTokens.Typography.caption2.weight(.medium))
+                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textTertiary)
                             .lineLimit(1)
                     }
                 }
 
                 if !hidesDisclosureIndicator {
                     Image(systemName: "chevron.right")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(.tertiary)
+                        .font(WealthMapDesignTokens.Typography.footnote.weight(.semibold))
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textTertiary)
                 }
             }
         }
@@ -965,19 +965,19 @@ private struct BaseCurrencySelectionView: View {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(currency.rawValue)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
+                        .font(WealthMapDesignTokens.Typography.headline)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                     Text(currency.name)
-                        .font(.caption)
-                        .foregroundStyle(.gray)
+                        .font(WealthMapDesignTokens.Typography.caption)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.inactive)
                 }
 
                 Spacer()
 
                 if settings.baseCurrency == currency {
                     Image(systemName: "checkmark")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(.accent)
+                        .font(WealthMapDesignTokens.Typography.bodySemibold)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
                 }
             }
         }
@@ -1035,13 +1035,13 @@ private struct TotalCurrencySelectionView: View {
                     } label: {
                         HStack(spacing: 12) {
                             Label("Arrange Selected", systemImage: "arrow.up.arrow.down")
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
 
                             Spacer(minLength: 8)
 
                             Text(selectedCurrencySummary)
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(.secondary)
+                                .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
+                                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.75)
                         }

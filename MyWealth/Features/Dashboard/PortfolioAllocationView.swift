@@ -16,7 +16,7 @@ struct PortfolioAllocationView: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .firstTextBaseline) {
                 Text("Portfolio")
-                    .font(.headline)
+                    .font(WealthMapDesignTokens.Typography.headline)
 
                 Spacer()
             }
@@ -44,21 +44,21 @@ struct PortfolioAllocationView: View {
                         HStack(spacing: 10) {
                             Image(systemName: row.category.icon)
                                 .frame(width: 22)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                             Text(row.category.rawValue)
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                             Spacer()
                             Text(row.percentage, format: .percent.precision(.fractionLength(0)))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                             Text(row.amount, format: .currency(code: currencyCode))
-                                .font(.subheadline.weight(.semibold))
+                                .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                                 .monospacedDigit()
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                             Image(systemName: "chevron.right")
-                                .font(.caption)
-                                .foregroundStyle(.tertiary)
+                                .font(WealthMapDesignTokens.Typography.caption)
+                                .foregroundStyle(WealthMapDesignTokens.ColorToken.textTertiary)
                         }
-                        .font(.subheadline)
+                        .font(WealthMapDesignTokens.Typography.subheadline)
                     }
                     .buttonStyle(.plain)
                     .disabled(onCategoryTap == nil)

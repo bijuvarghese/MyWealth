@@ -71,15 +71,15 @@ struct CurrencySelectionView: View {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(currency.rawValue)
-                        .font(.headline)
+                        .font(WealthMapDesignTokens.Typography.headline)
                     Text(currency.name)
-                        .font(.caption)
+                        .font(WealthMapDesignTokens.Typography.caption)
                 }
                 Spacer()
                 if selection == currency {
                     Image(systemName: "checkmark")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(.accent)
+                        .font(WealthMapDesignTokens.Typography.bodySemibold)
+                        .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
                 }
             }
         }
