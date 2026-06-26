@@ -6,7 +6,7 @@
 
 ## Summary
 
-Create a shared Wealth Map design token foundation for iOS, Android, and web while preserving all shipped financial behavior. The first implementation slice defines reusable token decisions, documents platform mappings, adds iOS presentation-only token accessors, and migrates high-reuse visual primitives so existing screens and widgets can align without changing calculations, persistence, sync, export, server, widget payload, notification, or telemetry behavior.
+Create a shared Wealth Map design token foundation for iOS, Android, and web while preserving all shipped financial behavior. The current implementation defines reusable token decisions, documents platform mappings, adds a local Swift package with generic token/component names, and keeps app-facing compatibility facades so existing screens and widgets can align without changing calculations, persistence, sync, export, server, widget payload, notification, or telemetry behavior.
 
 ## Requirements Traceability
 
@@ -22,13 +22,13 @@ Create a shared Wealth Map design token foundation for iOS, Android, and web whi
 | NFR3.1-NFR3.4 | Preserve interactive performance by keeping tokens static and presentation-only. | `MyWealth/Core/Design/`, shared components | Inspect for no network, persistence, or heavy runtime parsing in tokenized UI paths. |
 | NFR4.1-NFR4.8 | Preserve reliable empty/error/stale/unavailable states and keep status cues semantic. | `RateStatusBannerView`, dashboard status surfaces, goal states if adopted | State inspection for stale, unavailable, warning, success, and destructive treatments. |
 | NFR5.1-NFR5.7, SFR-010 | Preserve privacy and secret handling. | `tokens/`, generated artifacts, source review | Inspect token files for no secrets, credentials, personal financial data, user-entered labels, or payload values. |
-| NFR6.1-NFR6.9 | Extend architecture with presentation-only visual tokens while preserving business/service boundaries. | `MyWealth/Core/Design/`, `MyWealth/Components/`, `MyWealthWidget/` | Code review confirms financial logic, persistence, networking, widgets, portability, and analytics boundaries stay isolated. |
+| NFR6.1-NFR6.9 | Extend architecture with presentation-only visual tokens while preserving business/service boundaries. | `https://github.com/bijuvarghese/wealth-map-design-system`, `MyWealth/Core/Design/`, `MyWealth/Components/`, `MyWealthWidget/` | Code review confirms financial logic, persistence, networking, widgets, portability, and analytics boundaries stay isolated. |
 
 ## Technical Context
 
 **Language/Version**: Swift 6.0 for the current iOS app and widget; platform-neutral token documentation for Android and web handoff
 
-**Primary Dependencies**: SwiftUI and WidgetKit for the current implementation slice; no Firebase, persistence, or server dependency changes
+**Primary Dependencies**: SwiftUI and WidgetKit for the current implementation slice; the remote `DesignSystem` Swift package at `https://github.com/bijuvarghese/wealth-map-design-system.git` pinned to version `0.1.0`; no Firebase, persistence, or server dependency changes
 
 **Storage**: Source-controlled token catalog and documentation only; no SwiftData, UserDefaults, App Group UserDefaults, CloudKit, backup, or server storage changes
 
@@ -42,7 +42,7 @@ Create a shared Wealth Map design token foundation for iOS, Android, and web whi
 
 **Constraints**: Local-first privacy; no secrets or financial data in tokens; graceful stale/missing status treatment; stable identifiers and persisted-data compatibility; native iOS/iPadOS and widget behavior
 
-**Scale/Scope**: Shared token catalog, platform mapping docs, iOS token accessors, `AppListCard`, `PillLabel`, selected status/card accents, and widget accent alignment; full-screen migration remains incremental
+**Scale/Scope**: Shared token catalog, platform mapping docs, remote `DesignSystem` Swift package, generic reusable SwiftUI components, app compatibility facades, `AppListCard`, `PillLabel`, selected status/card accents, and widget accent alignment; full-screen migration remains incremental
 
 ## Constitution Check
 
@@ -100,7 +100,9 @@ MyWealthTests/
 └── MyWealthTests.swift      # token validation tests if code generation is not added
 ```
 
-**Structure Decision**: A root `tokens/` directory keeps the shared cross-platform source visible outside the iOS target. `MyWealth/Core/Design/` owns iOS presentation tokens because they are app-wide visual infrastructure, while reusable components consume those tokens first. Widget styling remains inside the widget target with no payload-model changes. Android and web receive documented mappings until their codebases are available in this workspace.
+**External Package Repository**: `https://github.com/bijuvarghese/wealth-map-design-system` owns the reusable SwiftUI token and component APIs under generic names such as `DesignTokens`, `Card`, `StatusBadge`, `MetricRow`, `MetricCard`, `AmountText`, `SectionHeader`, and `EmptyState`. The app currently consumes the published `0.1.0` package tag.
+
+**Structure Decision**: A root `tokens/` directory keeps the shared cross-platform source visible in the app repo for Android/web handoff. The app consumes the `DesignSystem` Swift package from GitHub instead of vendoring the package source. `MyWealth/Core/Design/` keeps Wealth Map compatibility facades so existing screens can migrate incrementally. Widget styling imports the package directly with no payload-model changes. Android and web receive documented mappings until their codebases are available in this workspace.
 
 ## Data and Migration Design
 
@@ -130,4 +132,4 @@ MyWealthTests/
 
 | Violation or addition | Why needed | Simpler alternative rejected because | Approval/migration |
 |-----------------------|------------|--------------------------------------|--------------------|
-| N/A | No constitution violations or new runtime dependencies are required. | N/A | N/A |
+| Remote `DesignSystem` Swift package | Needed to separate reusable UI tokens/components from the app target and support generic names in a standalone GitHub repo. | App-only helpers or vendored package source would keep UI infrastructure coupled to the app repo. | No user-data migration; Xcode project links the remote package into the app and widget targets. |

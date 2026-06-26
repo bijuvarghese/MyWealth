@@ -547,14 +547,9 @@ private struct AssetDetailCard<Content: View>: View {
     }
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
-
-            content
-                .padding(WealthMapDesignTokens.Spacing.standard)
-        }
+        content
+            .padding(WealthMapDesignTokens.Spacing.standard)
+            .wealthMapCardBackground()
         .frame(maxWidth: .infinity)
     }
 }

@@ -175,13 +175,9 @@ struct NetWorthHistoryView: View {
     }
 
     private func historyCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
-            content()
-                .padding(14)
-        }
+        content()
+            .padding(14)
+            .wealthMapCardBackground()
         .frame(maxWidth: .infinity)
         .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))

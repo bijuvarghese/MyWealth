@@ -30,6 +30,11 @@
 - [x] T004 [SFR-001-SFR-004,SFR-009] Create the shared token catalog in `tokens/wealth-map.tokens.json`
 - [x] T005 [SFR-001-SFR-004,NFR6.1-NFR6.9] Add iOS presentation token accessors in `MyWealth/Core/Design/WealthMapDesignTokens.swift`
 - [x] T006 [P] [SFR-001-SFR-004,SFR-009-SFR-012,NFR5.1-NFR5.7] Add token catalog validation coverage in `MyWealthTests/MyWealthTests.swift`
+- [x] T021 [SFR-001-SFR-008,NFR6.1-NFR6.9] Publish the reusable UI package to `https://github.com/bijuvarghese/wealth-map-design-system`
+- [x] T022 [SFR-001-SFR-008,NFR6.1-NFR6.9] Move shared token and token validation APIs into generic package files in the external `DesignSystem` repository
+- [x] T023 [SFR-005-SFR-008,NFR2.1-NFR2.7,NFR6.1-NFR6.9] Add generic reusable UI components in the external `DesignSystem` repository
+- [x] T024 [SFR-005-SFR-008,NFR6.1-NFR6.9] Link the remote `DesignSystem` package to the app and widget targets in `MyWealth.xcodeproj/project.pbxproj`
+- [x] T025 [SFR-005-SFR-008,NFR6.1-NFR6.9] Tag and publish `DesignSystem` version `0.1.0` and update the app package dependency from branch to exact version
 
 **Checkpoint**: Token catalog is validated before component adoption.
 

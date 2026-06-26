@@ -163,11 +163,7 @@ private struct OnboardingBaseCurrencyStepView: View {
                     }
                 }
                 .padding(WealthMapDesignTokens.Spacing.standard)
-                .background {
-                    RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
-                        .fill(.ultraThinMaterial)
-                        .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
-                }
+                .wealthMapCardBackground()
                 .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             } header: {
@@ -190,11 +186,7 @@ private struct OnboardingBaseCurrencyStepView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(WealthMapDesignTokens.Spacing.section)
-                .background {
-                    RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
-                        .fill(.ultraThinMaterial)
-                        .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
-                }
+                .wealthMapCardBackground()
             }
         }
         .scrollContentBackground(.hidden)
@@ -229,11 +221,7 @@ private struct OnboardingDisplayCurrencyStepView: View {
                     }
                 }
                 .padding(WealthMapDesignTokens.Spacing.standard)
-                .background {
-                    RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
-                        .fill(.ultraThinMaterial)
-                        .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
-                }
+                .wealthMapCardBackground()
                 .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
 
@@ -249,11 +237,7 @@ private struct OnboardingDisplayCurrencyStepView: View {
                     }
                 }
                 .padding(WealthMapDesignTokens.Spacing.standard)
-                .background {
-                    RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
-                        .fill(.ultraThinMaterial)
-                        .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
-                }
+                .wealthMapCardBackground()
                 .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             } header: {
@@ -270,11 +254,7 @@ private struct OnboardingDisplayCurrencyStepView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(WealthMapDesignTokens.Spacing.section)
-                .background {
-                    RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
-                        .fill(.ultraThinMaterial)
-                        .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
-                }
+                .wealthMapCardBackground()
             }
         }
         .scrollContentBackground(.hidden)

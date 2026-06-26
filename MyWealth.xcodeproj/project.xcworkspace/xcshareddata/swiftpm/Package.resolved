@@ -1,5 +1,5 @@
 {
-  "originHash" : "c63c63846d9c539229e96de38d6af51417e28c0ee9a0bc48bd0f0f19d923c329",
+  "originHash" : "2795489a850a5c7f2d979330ea4ab20159a2ce415b4863b12f8952a63cacae7f",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -116,6 +116,15 @@
       "state" : {
         "revision" : "f4a19a3c313dc2616c70bb49d29a799fb16be837",
         "version" : "2.4.1"
+      }
+    },
+    {
+      "identity" : "wealth-map-design-system",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/bijuvarghese/wealth-map-design-system.git",
+      "state" : {
+        "revision" : "6488daa751e1cca4b13556b0fcd77a24eebff332",
+        "version" : "0.1.0"
       }
     }
   ],
