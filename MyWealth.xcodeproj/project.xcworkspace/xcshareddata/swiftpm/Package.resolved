@@ -123,8 +123,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/bijuvarghese/wealth-map-design-system.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "6488daa751e1cca4b13556b0fcd77a24eebff332"
+        "revision" : "6488daa751e1cca4b13556b0fcd77a24eebff332",
+        "version" : "0.1.0"
       }
     }
   ],

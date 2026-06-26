@@ -28,7 +28,7 @@ Create a shared Wealth Map design token foundation for iOS, Android, and web whi
 
 **Language/Version**: Swift 6.0 for the current iOS app and widget; platform-neutral token documentation for Android and web handoff
 
-**Primary Dependencies**: SwiftUI and WidgetKit for the current implementation slice; the remote `DesignSystem` Swift package at `https://github.com/bijuvarghese/wealth-map-design-system.git`; no Firebase, persistence, or server dependency changes
+**Primary Dependencies**: SwiftUI and WidgetKit for the current implementation slice; the remote `DesignSystem` Swift package at `https://github.com/bijuvarghese/wealth-map-design-system.git` pinned to version `0.1.0`; no Firebase, persistence, or server dependency changes
 
 **Storage**: Source-controlled token catalog and documentation only; no SwiftData, UserDefaults, App Group UserDefaults, CloudKit, backup, or server storage changes
 
@@ -100,7 +100,7 @@ MyWealthTests/
 └── MyWealthTests.swift      # token validation tests if code generation is not added
 ```
 
-**External Package Repository**: `https://github.com/bijuvarghese/wealth-map-design-system` owns the reusable SwiftUI token and component APIs under generic names such as `DesignTokens`, `Card`, `StatusBadge`, `MetricRow`, `MetricCard`, `AmountText`, `SectionHeader`, and `EmptyState`.
+**External Package Repository**: `https://github.com/bijuvarghese/wealth-map-design-system` owns the reusable SwiftUI token and component APIs under generic names such as `DesignTokens`, `Card`, `StatusBadge`, `MetricRow`, `MetricCard`, `AmountText`, `SectionHeader`, and `EmptyState`. The app currently consumes the published `0.1.0` package tag.
 
 **Structure Decision**: A root `tokens/` directory keeps the shared cross-platform source visible in the app repo for Android/web handoff. The app consumes the `DesignSystem` Swift package from GitHub instead of vendoring the package source. `MyWealth/Core/Design/` keeps Wealth Map compatibility facades so existing screens can migrate incrementally. Widget styling imports the package directly with no payload-model changes. Android and web receive documented mappings until their codebases are available in this workspace.
 
