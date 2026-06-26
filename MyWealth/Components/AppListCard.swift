@@ -1,3 +1,4 @@
+import DesignSystem
 import SwiftUI
 
 struct AppListCard<Content: View>: View {
@@ -13,20 +14,9 @@ struct AppListCard<Content: View>: View {
     }
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .shadow(
-                    color: WealthMapDesignTokens.Elevation.cardShadowColor,
-                    radius: WealthMapDesignTokens.Elevation.cardShadowRadius,
-                    x: WealthMapDesignTokens.Elevation.cardShadowX,
-                    y: WealthMapDesignTokens.Elevation.cardShadowY
-                )
-
+        DesignSystem.Card(contentPadding: contentPadding) {
             content
-                .padding(contentPadding)
         }
-        .frame(maxWidth: .infinity)
     }
 }
 

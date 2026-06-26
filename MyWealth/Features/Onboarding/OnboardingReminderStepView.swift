@@ -21,11 +21,7 @@ struct OnboardingReminderStepView: View {
                 Toggle("Enable Portfolio Reminders", isOn: $remindersEnabled)
                     .tint(WealthMapDesignTokens.ColorToken.brandPrimary)
                     .padding(WealthMapDesignTokens.Spacing.standard)
-                    .background {
-                        RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
-                            .fill(.ultraThinMaterial)
-                            .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
-                    }
+                    .wealthMapCardBackground()
                     .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                     .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             } header: {
@@ -44,11 +40,7 @@ struct OnboardingReminderStepView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(WealthMapDesignTokens.Spacing.section)
-                .background {
-                    RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
-                        .fill(.ultraThinMaterial)
-                        .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
-                }
+                .wealthMapCardBackground()
             }
 
             if remindersEnabled {
@@ -59,11 +51,7 @@ struct OnboardingReminderStepView: View {
                         }
                     }
                     .padding(WealthMapDesignTokens.Spacing.standard)
-                    .background {
-                        RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
-                            .fill(.ultraThinMaterial)
-                            .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
-                    }
+                    .wealthMapCardBackground()
                     .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                     .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                 }
@@ -75,11 +63,7 @@ struct OnboardingReminderStepView: View {
                         }
                     }
                     .padding(WealthMapDesignTokens.Spacing.standard)
-                    .background {
-                        RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
-                            .fill(.ultraThinMaterial)
-                            .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
-                    }
+                    .wealthMapCardBackground()
                     .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                     .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                 }
@@ -96,11 +80,7 @@ struct OnboardingReminderStepView: View {
                     }
                     .padding(.vertical, 4)
                     .padding(WealthMapDesignTokens.Spacing.standard)
-                    .background {
-                        RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous)
-                            .fill(.ultraThinMaterial)
-                            .shadow(color: WealthMapDesignTokens.Elevation.cardShadowColor, radius: WealthMapDesignTokens.Elevation.cardShadowRadius, x: WealthMapDesignTokens.Elevation.cardShadowX, y: WealthMapDesignTokens.Elevation.cardShadowY)
-                    }
+                    .wealthMapCardBackground()
                     .listRowBackground(WealthMapDesignTokens.ColorToken.surfaceClear)
                     .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                 }

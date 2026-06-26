@@ -13,38 +13,11 @@
 
 import WidgetKit
 import SwiftUI
+import DesignSystem
 
 // MARK: - Shared background
 
-private enum WidgetDesignTokens {
-    static let brandPrimary = Color(red: 0.62, green: 0.08, blue: 0.53)
-    static let brandPrimaryStrong = Color(red: 0.38, green: 0.04, blue: 0.34)
-    static let brandDot = Color(red: 166/255, green: 23/255, blue: 142/255)
-    static let textPrimary = Color.primary
-    static let textSecondary = Color.secondary
-    static let textTertiary = Color(.tertiaryLabel)
-    static let surfaceClear = Color.clear
-    static let success = Color.green
-    static let danger = Color.red
-    static let badgeOpacity = 0.1
-    static let badgeHorizontalPadding: CGFloat = 6
-    static let badgeVerticalPadding: CGFloat = 2
-    static let compactTopPadding: CGFloat = 4
-
-    enum Typography {
-        static let caption = Font.caption
-        static let caption2 = Font.caption2
-        static let headline = Font.headline
-        static let widgetAmount = Font.title2
-        static let widgetSecondaryAmount = Font.title3
-        static let lockScreenAmount = Font.system(size: 14, weight: .bold, design: .rounded)
-        static let compactTimestamp = Font.system(size: 9)
-        static let compactValue = Font.system(size: 9, weight: .medium)
-        static let compactIcon = Font.system(size: 8)
-        static let compactLabel = Font.system(size: 9, weight: .semibold)
-        static let rectangularAmount = Font.system(.title3, design: .rounded, weight: .bold)
-    }
-}
+private typealias WidgetDesignTokens = DesignTokens
 
 private let wealthGradient = LinearGradient(
     colors: [
