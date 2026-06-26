@@ -11,10 +11,10 @@
 		C6E4BBF62FC3B964002737D2 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C63A09AF2EC5824F005CDAAE /* SwiftUI.framework */; };
 		C6E4BC012FC3B964002737D2 /* MyWealthWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C6E4BBF42FC3B964002737D2 /* MyWealthWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C6E4BC0C2FC3BB1E002737D2 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6E4BBD82FC3B85D002737D2 /* WidgetKit.framework */; };
-		C7D500012FD1000000000001 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = C7D500042FD1000000000001 /* DesignSystem */; };
-		C7D500022FD1000000000001 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = C7D500052FD1000000000001 /* DesignSystem */; };
 		C7A000012FD0000000000001 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = C7A000032FD0000000000001 /* FirebaseAnalytics */; };
 		C7A000022FD0000000000001 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = C7A000042FD0000000000001 /* FirebaseCrashlytics */; };
+		C7D500012FD1000000000001 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = C7D500042FD1000000000001 /* DesignSystem */; };
+		C7D500022FD1000000000001 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = C7D500052FD1000000000001 /* DesignSystem */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -277,7 +277,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				C7A000052FD0000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				C7D500032FD1000000000001 /* XCLocalSwiftPackageReference "Packages/DesignSystem" */,
+				C7D500032FD1000000000001 /* XCRemoteSwiftPackageReference "wealth-map-design-system" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C6FF48672EBE5C0A00A528A7 /* Products */;
@@ -753,14 +753,15 @@
 				version = 12.11.0;
 			};
 		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCLocalSwiftPackageReference section */
-		C7D500032FD1000000000001 /* XCLocalSwiftPackageReference "Packages/DesignSystem" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = Packages/DesignSystem;
+		C7D500032FD1000000000001 /* XCRemoteSwiftPackageReference "wealth-map-design-system" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/bijuvarghese/wealth-map-design-system.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
 		};
-/* End XCLocalSwiftPackageReference section */
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		C7A000032FD0000000000001 /* FirebaseAnalytics */ = {
@@ -775,12 +776,12 @@
 		};
 		C7D500042FD1000000000001 /* DesignSystem */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C7D500032FD1000000000001 /* XCLocalSwiftPackageReference "Packages/DesignSystem" */;
+			package = C7D500032FD1000000000001 /* XCRemoteSwiftPackageReference "wealth-map-design-system" */;
 			productName = DesignSystem;
 		};
 		C7D500052FD1000000000001 /* DesignSystem */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C7D500032FD1000000000001 /* XCLocalSwiftPackageReference "Packages/DesignSystem" */;
+			package = C7D500032FD1000000000001 /* XCRemoteSwiftPackageReference "wealth-map-design-system" */;
 			productName = DesignSystem;
 		};
 /* End XCSwiftPackageProductDependency section */
