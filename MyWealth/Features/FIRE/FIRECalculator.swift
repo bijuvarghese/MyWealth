@@ -17,9 +17,21 @@ enum FIRELevelKind: String, CaseIterable, Identifiable {
 
     var subtitle: String {
         switch self {
-        case .lean: return AppLocalization.string("Lean lifestyle · 5% withdrawal rate")
-        case .standard: return AppLocalization.string("Standard FIRE · 4% withdrawal rate")
-        case .fat: return AppLocalization.string("Comfortable lifestyle · 3% withdrawal rate")
+        case .lean:
+            return AppLocalization.formatted(
+                "Lean lifestyle · %@ withdrawal rate",
+                arguments: [AppLocalization.percent(0.05)]
+            )
+        case .standard:
+            return AppLocalization.formatted(
+                "Standard FIRE · %@ withdrawal rate",
+                arguments: [AppLocalization.percent(0.04)]
+            )
+        case .fat:
+            return AppLocalization.formatted(
+                "Comfortable lifestyle · %@ withdrawal rate",
+                arguments: [AppLocalization.percent(0.03)]
+            )
         }
     }
 

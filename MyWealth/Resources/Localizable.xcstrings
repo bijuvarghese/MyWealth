@@ -5,7 +5,7 @@
 
     },
     " and %lld more" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -524,7 +524,7 @@
       }
     },
     "%@ in %@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -571,7 +571,7 @@
       }
     },
     "%@ left. %@ remaining. Average needed per month %@; per year %@." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -664,7 +664,7 @@
       }
     },
     "%@ makes up %@ of your portfolio (%@)." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -711,7 +711,7 @@
       }
     },
     "%@ of %@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -753,6 +753,194 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ 之 %2$@"
+          }
+        }
+      }
+    },
+    "%@ of assets are in %@ alone." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ الأصول موجودة في %2$@ وحدها."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ der Vermögenswerte befinden sich allein in %2$@."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ de los activos están solo en %2$@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ d'actifs se trouvent uniquement dans %2$@."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ संपत्ति अकेले %2$@ में है।"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ dos ativos estão apenas em %2$@."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 的资产仅在 %2$@ 中。"
+          }
+        }
+      }
+    },
+    "%@ of assets are in %@." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ الأصول موجودة في %2$@."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ der Vermögenswerte befinden sich in %2$@."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ de los activos están en %2$@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ des actifs se trouvent dans %2$@."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ संपत्ति %2$@ में है।"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ dos ativos estão em %2$@."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 资产位于 %2$@ 中。"
+          }
+        }
+      }
+    },
+    "%@ of assets are in %@. Consider diversifying." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ الأصول موجودة في %2$@. النظر في التنويع."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ der Vermögenswerte befinden sich in %2$@. Erwägen Sie eine Diversifizierung."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ de los activos están en %2$@. Considere la posibilidad de diversificar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ des actifs se trouvent dans %2$@. Pensez à vous diversifier."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ संपत्ति %2$@ में है। विविधता लाने पर विचार करें."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ dos ativos estão em %2$@. Considere diversificar."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 资产位于 %2$@ 中。考虑多元化。"
+          }
+        }
+      }
+    },
+    "%@ of assets are in precious metals." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ الأصول موجودة في المعادن الثمينة."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ der Vermögenswerte sind in Edelmetallen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ de los activos están en metales preciosos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ des actifs sont en métaux précieux."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ संपत्ति कीमती धातुओं में है।"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ dos ativos estão em metais preciosos."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 的资产为贵金属。"
           }
         }
       }
@@ -855,6 +1043,53 @@
         }
       }
     },
+    "%@ return / yr" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ عودة / سنة"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Rückgabe / Jahr"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ retorno / año"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ retour / an"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ रिटर्न / वर्ष"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ retorno / ano"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 返回/年"
+          }
+        }
+      }
+    },
     "%@ saved" : {
       "localizations" : {
         "ar" : {
@@ -902,7 +1137,7 @@
       }
     },
     "%@ Share" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -949,7 +1184,7 @@
       }
     },
     "%@ to %@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -996,7 +1231,7 @@
       }
     },
     "%@ yrs to FI" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1043,7 +1278,7 @@
       }
     },
     "%@%@ hasn't been updated in 60+ days." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1090,7 +1325,7 @@
       }
     },
     "%@%@ haven't been updated in 60+ days." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1183,7 +1418,7 @@
       }
     },
     "%lld asset" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1230,7 +1465,7 @@
       }
     },
     "%lld asset categories tracked" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1277,7 +1512,7 @@
       }
     },
     "%lld asset history entries" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1324,7 +1559,7 @@
       }
     },
     "%lld asset updates are stale" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1371,7 +1606,7 @@
       }
     },
     "%lld asset value needs a refresh." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1418,7 +1653,7 @@
       }
     },
     "%lld asset values need a refresh." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1517,7 +1752,7 @@
       }
     },
     "%lld assets" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1564,7 +1799,7 @@
       }
     },
     "%lld liabilities" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1611,7 +1846,7 @@
       }
     },
     "%lld liability" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1658,7 +1893,7 @@
       }
     },
     "%lld months" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1705,7 +1940,7 @@
       }
     },
     "%lld net worth goal" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1752,7 +1987,7 @@
       }
     },
     "%lld net worth snapshots" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1799,7 +2034,7 @@
       }
     },
     "%lld portfolio snapshots" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1995,240 +2230,6 @@
         }
       }
     },
-    "%lld%% of assets are in %@ alone." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% الأصول موجودة في %3$@ وحدها."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% der Vermögenswerte befinden sich allein in %3$@."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% de los activos están solo en %3$@."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% d'actifs se trouvent uniquement dans %3$@."
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% संपत्ति अकेले %3$@ में है।"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% dos ativos estão apenas em %3$@."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% 的资产仅在 %3$@ 中。"
-          }
-        }
-      }
-    },
-    "%lld%% of assets are in %@." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% الأصول موجودة في %3$@."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% der Vermögenswerte befinden sich in %3$@."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% de los activos están en %3$@."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% des actifs se trouvent dans %3$@."
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% संपत्ति %3$@ में है।"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% dos ativos estão em %3$@."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% 资产位于 %3$@ 中。"
-          }
-        }
-      }
-    },
-    "%lld%% of assets are in %@. Consider diversifying." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% الأصول موجودة في %3$@. النظر في التنويع."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% der Vermögenswerte befinden sich in %3$@. Erwägen Sie eine Diversifizierung."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% de los activos están en %3$@. Considere la posibilidad de diversificar."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% des actifs se trouvent dans %3$@. Pensez à vous diversifier."
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% संपत्ति %3$@ में है। विविधता लाने पर विचार करें."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% dos ativos estão em %3$@. Considere diversificar."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld%% 资产位于 %3$@ 中。考虑多元化。"
-          }
-        }
-      }
-    },
-    "%lld%% of assets are in precious metals." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld%% الأصول موجودة في المعادن الثمينة."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld%% der Vermögenswerte sind in Edelmetallen."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld%% de los activos están en metales preciosos."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld%% des actifs sont en métaux précieux."
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld%% संपत्ति कीमती धातुओं में है।"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld%% dos ativos estão em metais preciosos."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld%% 的资产为贵金属。"
-          }
-        }
-      }
-    },
-    "%lld%% return / yr" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld%% عودة / سنة"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld%% Rückgabe / Jahr"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld%% retorno / año"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld%% retour / an"
-          }
-        },
-        "hi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld%% रिटर्न / वर्ष"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld%% retorno / ano"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld%% 返回/年"
-          }
-        }
-      }
-    },
     "+%lld" : {
       "localizations" : {
         "ar" : {
@@ -2276,7 +2277,7 @@
       }
     },
     "+%lld more" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2415,7 +2416,7 @@
       }
     },
     "1 month" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2461,54 +2462,55 @@
         }
       }
     },
-    "25x annual spending · 4% rule" : {
+    "25x annual spending · %@ rule" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "25 ضعف الإنفاق السنوي · قاعدة 4%"
+            "value" : "25 ضعف الإنفاق السنوي · قاعدة %@"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "25-fache jährliche Ausgaben · 4 %-Regel"
+            "value" : "25-fache jährliche Ausgaben · %@-Regel"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gasto anual 25x · Regla del 4%"
+            "value" : "Gasto anual 25x · Regla del %@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "25x les dépenses annuelles · Règle des 4 %"
+            "value" : "25x les dépenses annuelles · Règle des %@"
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "25x वार्षिक खर्च · 4% नियम"
+            "value" : "25x वार्षिक खर्च · %@ नियम"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "25x gastos anuais · Regra dos 4%"
+            "value" : "25x gastos anuais · Regra dos %@"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "25x 年度支出 · 4% 规则"
+            "value" : "25x 年度支出 · %@ 规则"
           }
         }
       }
     },
     "A classic FIRE target is 25x your annual expenses. Spending %@/yr implies a target of %@." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2739,7 +2741,7 @@
       }
     },
     "Add assets and liabilities to unlock portfolio intelligence." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2924,7 +2926,7 @@
       }
     },
     "Add assets or update values to unlock portfolio insights." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3017,7 +3019,7 @@
       }
     },
     "Add assets to unlock a stronger read." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3202,7 +3204,7 @@
       }
     },
     "Add Portfolio Data" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3249,7 +3251,7 @@
       }
     },
     "Add portfolio data to calculate progress." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3296,7 +3298,7 @@
       }
     },
     "Add savings to estimate FI" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3343,7 +3345,7 @@
       }
     },
     "Add your latest investments to Wealth Map." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3528,7 +3530,7 @@
       }
     },
     "All assets are in one category. Adding more categories reduces risk." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3575,7 +3577,7 @@
       }
     },
     "All assets in one category" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3622,7 +3624,7 @@
       }
     },
     "All assets updated recently" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3715,7 +3717,7 @@
       }
     },
     "Already FI" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3762,7 +3764,7 @@
       }
     },
     "Aluminum" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3947,7 +3949,7 @@
       }
     },
     "Analyze In App" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3994,7 +3996,7 @@
       }
     },
     "Analyze with ChatGPT" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4041,7 +4043,7 @@
       }
     },
     "Analyzing portfolio..." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4088,7 +4090,7 @@
       }
     },
     "App Version" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4365,7 +4367,7 @@
       }
     },
     "Asset Concentration" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4550,7 +4552,7 @@
       }
     },
     "Auto Loan" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4643,7 +4645,7 @@
       }
     },
     "Backup version %lld is not supported by this app version." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4736,7 +4738,7 @@
       }
     },
     "Bank Deposits" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4875,7 +4877,7 @@
       }
     },
     "Base Metals" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4922,7 +4924,7 @@
       }
     },
     "Base Value" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5015,7 +5017,7 @@
       }
     },
     "Baseline history started" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5062,7 +5064,7 @@
       }
     },
     "Behind pace. Indicative date: %@." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5155,7 +5157,7 @@
       }
     },
     "Buy" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5202,7 +5204,7 @@
       }
     },
     "Buying adds exposure. The health impact depends on whether the new asset improves diversification or adds concentration." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5295,7 +5297,7 @@
       }
     },
     "Cars" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5341,55 +5343,55 @@
         }
       }
     },
-    "Cash & deposits are under 5% of assets. A small buffer helps cover liabilities." : {
-      "extractionState" : "stale",
+    "Cash & deposits are under %@ of assets. A small buffer helps cover liabilities." : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "النقد والودائع أقل من 5% من الأصول. يساعد المخزن المؤقت الصغير على تغطية الالتزامات."
+            "value" : "النقد والودائع أقل من %@ من الأصول. يساعد المخزن المؤقت الصغير على تغطية الالتزامات."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bargeld und Einlagen machen weniger als 5 % des Vermögens aus. Ein kleiner Puffer hilft, Verbindlichkeiten abzudecken."
+            "value" : "Bargeld und Einlagen machen weniger als %@ des Vermögens aus. Ein kleiner Puffer hilft, Verbindlichkeiten abzudecken."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El efectivo y los depósitos están por debajo del 5% de los activos. Un pequeño colchón ayuda a cubrir los pasivos."
+            "value" : "El efectivo y los depósitos están por debajo del %@ de los activos. Un pequeño colchón ayuda a cubrir los pasivos."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les liquidités et les dépôts représentent moins de 5 % des actifs. Un petit tampon permet de couvrir les dettes."
+            "value" : "Les liquidités et les dépôts représentent moins de %@ des actifs. Un petit tampon permet de couvrir les dettes."
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "नकद और जमा संपत्ति के 5% से कम हैं। एक छोटा बफर देनदारियों को कवर करने में मदद करता है।"
+            "value" : "नकद और जमा संपत्ति के %@ से कम हैं। एक छोटा बफर देनदारियों को कवर करने में मदद करता है।"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dinheiro e depósitos representam menos de 5% dos ativos. Um pequeno buffer ajuda a cobrir passivos."
+            "value" : "Dinheiro e depósitos representam menos de %@ dos ativos. Um pequeno buffer ajuda a cobrir passivos."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "现金和存款占资产的比例低于5%。较小的缓冲有助于弥补负债。"
+            "value" : "现金和存款占资产的比例低于%@。较小的缓冲有助于弥补负债。"
           }
         }
       }
     },
     "Cash and deposits represent %@ of assets." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5436,7 +5438,7 @@
       }
     },
     "Cash buffer is balanced" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5483,7 +5485,7 @@
       }
     },
     "Cashflow" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5576,7 +5578,7 @@
       }
     },
     "Choose currencies shown in totals and widgets" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5715,7 +5717,7 @@
       }
     },
     "Clean Up History" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5808,7 +5810,7 @@
       }
     },
     "Cleanup failed: %@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5855,7 +5857,7 @@
       }
     },
     "Cobalt" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5902,7 +5904,7 @@
       }
     },
     "Comfortable" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5948,49 +5950,49 @@
         }
       }
     },
-    "Comfortable lifestyle · 3% withdrawal rate" : {
-      "extractionState" : "stale",
+    "Comfortable lifestyle · %@ withdrawal rate" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "أسلوب حياة مريح · معدل سحب 3%"
+            "value" : "أسلوب حياة مريح · معدل سحب %@"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Komfortabler Lebensstil · 3 % Abhebungsrate"
+            "value" : "Komfortabler Lebensstil · %@ Abhebungsrate"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estilo de vida cómodo · Tasa de retiro del 3%"
+            "value" : "Estilo de vida cómodo · Tasa de retiro del %@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mode de vie confortable · Taux de retrait de 3 %"
+            "value" : "Mode de vie confortable · Taux de retrait de %@"
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "आरामदायक जीवनशैली · 3% निकासी दर"
+            "value" : "आरामदायक जीवनशैली · %@ निकासी दर"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estilo de vida confortável · Taxa de abstinência de 3%"
+            "value" : "Estilo de vida confortável · Taxa de abstinência de %@"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "舒适的生活方式 · 3% 提现率"
+            "value" : "舒适的生活方式 · %@ 提现率"
           }
         }
       }
@@ -6134,7 +6136,7 @@
       }
     },
     "Conservative" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6227,7 +6229,7 @@
       }
     },
     "Copper" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6274,7 +6276,7 @@
       }
     },
     "Count ignored assets in portfolio totals" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6367,7 +6369,7 @@
       }
     },
     "Create a local backup file you choose where to share or store" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6414,7 +6416,7 @@
       }
     },
     "Credit Card" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6461,7 +6463,7 @@
       }
     },
     "Crypto" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6646,7 +6648,7 @@
       }
     },
     "Current history does not support an achievement estimate." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6739,7 +6741,7 @@
       }
     },
     "Current Value" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6786,7 +6788,7 @@
       }
     },
     "Current value unavailable" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6833,7 +6835,7 @@
       }
     },
     "Cutting expenses lowers the target and frees up more cash to invest, creating a double impact on the timeline." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6880,7 +6882,7 @@
       }
     },
     "Daily" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -7295,7 +7297,7 @@
       }
     },
     "Debt Free" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -7388,7 +7390,7 @@
       }
     },
     "Debt Ratio" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -7435,7 +7437,7 @@
       }
     },
     "Debt with no assets recorded" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -7481,55 +7483,55 @@
         }
       }
     },
-    "Debt-to-asset ratio is %lld%% — %@." : {
-      "extractionState" : "stale",
+    "Debt-to-asset ratio is %@ — %@." : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "نسبة الدين إلى الأصول هي %1$lld%% — %3$@."
+            "value" : "نسبة الدين إلى الأصول هي %1$@ — %2$@."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das Verhältnis von Schulden zu Vermögenswerten beträgt %1$lld%% — %3$@."
+            "value" : "Das Verhältnis von Schulden zu Vermögenswerten beträgt %1$@ — %2$@."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La relación deuda-activos es %1$lld%% — %3$@."
+            "value" : "La relación deuda-activos es %1$@ — %2$@."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le ratio dette/actif est %1$lld%% — %3$@."
+            "value" : "Le ratio dette/actif est %1$@ — %2$@."
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ऋण-से-संपत्ति अनुपात %1$lld%% - %3$@ है।"
+            "value" : "ऋण-से-संपत्ति अनुपात %1$@ - %2$@ है।"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A relação dívida/ativos é %1$lld%% — %3$@."
+            "value" : "A relação dívida/ativos é %1$@ — %2$@."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "资产负债率为%1$lld%% — %3$@。"
+            "value" : "资产负债率为%1$@ — %2$@。"
           }
         }
       }
     },
     "Declining trend" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8036,7 +8038,7 @@
       }
     },
     "Diversification" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8359,7 +8361,7 @@
       }
     },
     "elevated" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8406,7 +8408,7 @@
       }
     },
     "Elevated debt load" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8729,7 +8731,7 @@
       }
     },
     "Enter a positive target amount, supported currency, and valid target date." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9052,7 +9054,7 @@
       }
     },
     "Exchange rates are from %@." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9099,7 +9101,7 @@
       }
     },
     "Exchange rates have not been refreshed yet." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9192,7 +9194,7 @@
       }
     },
     "Export Backup" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9331,7 +9333,7 @@
       }
     },
     "Failed to decode the response: %@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9378,7 +9380,7 @@
       }
     },
     "FatFIRE" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9563,7 +9565,7 @@
       }
     },
     "FIRE" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9748,7 +9750,7 @@
       }
     },
     "FIRE stands for Financially Independent, Retire Early. The goal is to build a portfolio large enough that investment returns alone cover living expenses, making work optional." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -9841,7 +9843,7 @@
       }
     },
     "Flat trend" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10072,7 +10074,7 @@
       }
     },
     "Freshness" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10119,7 +10121,7 @@
       }
     },
     "Gallium" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10212,7 +10214,7 @@
       }
     },
     "Get AI insights inside Wealth Map" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10443,7 +10445,7 @@
       }
     },
     "Goal progress: %@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10490,7 +10492,7 @@
       }
     },
     "Goal target: %@ by %@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10537,7 +10539,7 @@
       }
     },
     "Gold" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10584,7 +10586,7 @@
       }
     },
     "grams" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10631,7 +10633,7 @@
       }
     },
     "Growth" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10678,7 +10680,7 @@
       }
     },
     "healthy" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10725,7 +10727,7 @@
       }
     },
     "high" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10772,7 +10774,7 @@
       }
     },
     "High debt load" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10819,7 +10821,7 @@
       }
     },
     "High liquidity" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11188,7 +11190,7 @@
       }
     },
     "Import Backup" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11327,7 +11329,7 @@
       }
     },
     "Imported: %@." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11558,7 +11560,7 @@
       }
     },
     "Independent" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11605,7 +11607,7 @@
       }
     },
     "Indium" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11652,7 +11654,7 @@
       }
     },
     "Iron Ore" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11745,7 +11747,7 @@
       }
     },
     "Keep your wealth journey updated." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11792,7 +11794,7 @@
       }
     },
     "kg" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11885,7 +11887,7 @@
       }
     },
     "lb" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11932,7 +11934,7 @@
       }
     },
     "Lead" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11978,55 +11980,55 @@
         }
       }
     },
-    "Lean lifestyle · 5% withdrawal rate" : {
-      "extractionState" : "stale",
+    "Lean lifestyle · %@ withdrawal rate" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "أسلوب حياة بسيط · معدل سحب 5%"
+            "value" : "أسلوب حياة بسيط · معدل سحب %@"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schlanker Lebensstil · 5 % Entzugsquote"
+            "value" : "Schlanker Lebensstil · %@ Entzugsquote"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estilo de vida ajustado · Tasa de retiro del 5%"
+            "value" : "Estilo de vida ajustado · Tasa de retiro del %@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mode de vie Lean · Taux de retrait de 5 %"
+            "value" : "Mode de vie Lean · Taux de retrait de %@"
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "दुबली जीवनशैली · 5% निकासी दर"
+            "value" : "दुबली जीवनशैली · %@ निकासी दर"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estilo de vida enxuto · Taxa de abstinência de 5%"
+            "value" : "Estilo de vida enxuto · Taxa de abstinência de %@"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "精益生活方式 · 5% 提款率"
+            "value" : "精益生活方式 · %@ 提款率"
           }
         }
       }
     },
     "LeanFIRE" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12073,7 +12075,7 @@
       }
     },
     "Liabilities" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12120,7 +12122,7 @@
       }
     },
     "Liabilities equal %@ of tracked assets." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12167,7 +12169,7 @@
       }
     },
     "Line of Credit" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12214,7 +12216,7 @@
       }
     },
     "Liquidity" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12261,7 +12263,7 @@
       }
     },
     "Lithium" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12446,7 +12448,7 @@
       }
     },
     "Low debt load" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12493,7 +12495,7 @@
       }
     },
     "Low liquid reserve" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12586,7 +12588,7 @@
       }
     },
     "Manageable debt load" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12817,7 +12819,7 @@
       }
     },
     "Metal prices are from %@." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12864,7 +12866,7 @@
       }
     },
     "Metal prices have not been loaded yet." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12911,7 +12913,7 @@
       }
     },
     "Milestone reached! Net worth crossed %@." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13004,7 +13006,7 @@
       }
     },
     "Moderate" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13051,7 +13053,7 @@
       }
     },
     "Molybdenum" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13098,7 +13100,7 @@
       }
     },
     "Monthly" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13145,7 +13147,7 @@
       }
     },
     "Monthly Expenses" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13192,7 +13194,7 @@
       }
     },
     "Monthly Need" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13285,7 +13287,7 @@
       }
     },
     "Monthly Savings" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13378,7 +13380,7 @@
       }
     },
     "More history is needed for a projection." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13425,7 +13427,7 @@
       }
     },
     "More history needed" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13472,7 +13474,7 @@
       }
     },
     "Mortgage" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13519,7 +13521,7 @@
       }
     },
     "MT" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13566,7 +13568,7 @@
       }
     },
     "Mutual Funds" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13659,7 +13661,7 @@
       }
     },
     "Needed / Month" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13706,7 +13708,7 @@
       }
     },
     "Needed / Year" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13753,7 +13755,7 @@
       }
     },
     "Neodymium" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13846,7 +13848,7 @@
       }
     },
     "Net worth decreased by %@ over recorded history." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13893,7 +13895,7 @@
       }
     },
     "Net worth down %@ over the last %@." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13986,7 +13988,7 @@
       }
     },
     "Net Worth Goal. %@. Progress %@. %@ %@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14125,7 +14127,7 @@
       }
     },
     "Net worth increased by %@ over recorded history." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14218,7 +14220,7 @@
       }
     },
     "Net Worth Trend" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14265,7 +14267,7 @@
       }
     },
     "Net worth up %@ over the last %@." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14312,7 +14314,7 @@
       }
     },
     "Net worth: %@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14405,7 +14407,7 @@
       }
     },
     "Nickel" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14452,7 +14454,7 @@
       }
     },
     "no allocation history" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14499,7 +14501,7 @@
       }
     },
     "No asset categories yet" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14546,7 +14548,7 @@
       }
     },
     "No asset updates yet" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14777,7 +14779,7 @@
       }
     },
     "No data was returned by the server." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14824,7 +14826,7 @@
       }
     },
     "No debt recorded" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14871,7 +14873,7 @@
       }
     },
     "No duplicates found — your history is already clean." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15010,7 +15012,7 @@
       }
     },
     "No liabilities are currently reducing net worth." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15057,7 +15059,7 @@
       }
     },
     "No meaningful debt" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15150,7 +15152,7 @@
       }
     },
     "None" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15243,7 +15245,7 @@
       }
     },
     "Nothing new to import — all records already exist." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15382,7 +15384,7 @@
       }
     },
     "On track. Indicative date: %@." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15429,7 +15431,7 @@
       }
     },
     "one asset" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15522,7 +15524,7 @@
       }
     },
     "Opening share sheet..." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15661,7 +15663,7 @@
       }
     },
     "Optimistic" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15754,7 +15756,7 @@
       }
     },
     "Other Debt" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15801,7 +15803,7 @@
       }
     },
     "Others" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15848,7 +15850,7 @@
       }
     },
     "oz" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15895,7 +15897,7 @@
       }
     },
     "Palladium" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15942,7 +15944,7 @@
       }
     },
     "Pay Debt" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15989,7 +15991,7 @@
       }
     },
     "Paying off debt directly improves net worth and the debt-ratio component of portfolio health." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -16082,7 +16084,7 @@
       }
     },
     "Personal Loan" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -16129,7 +16131,7 @@
       }
     },
     "Platinum" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -16314,7 +16316,7 @@
       }
     },
     "Portfolio health is %@ at %lld/100, with %@ in tracked assets and %@. Allocation is currently led by %@. %@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -16407,7 +16409,7 @@
       }
     },
     "Portfolio Share" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -16454,7 +16456,7 @@
       }
     },
     "Portfolio spans %lld categories — well diversified." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -16547,7 +16549,7 @@
       }
     },
     "Positive trend" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -16640,7 +16642,7 @@
       }
     },
     "Preparing ChatGPT report..." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -16825,7 +16827,7 @@
       }
     },
     "Private by Default" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -16872,7 +16874,7 @@
       }
     },
     "Progress is unavailable until the required exchange rates are available." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -17149,7 +17151,7 @@
       }
     },
     "Real Estate" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -17195,54 +17197,55 @@
         }
       }
     },
-    "Real return after inflation. 7% is the long-term stock market average." : {
+    "Real return after inflation. %@ is the long-term stock market average." : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "العائد الحقيقي بعد التضخم. 7% هو متوسط ​​سوق الأسهم على المدى الطويل."
+            "value" : "العائد الحقيقي بعد التضخم. %@ هو متوسط ​​سوق الأسهم على المدى الطويل."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reale Rendite nach Inflation. 7 % ist der langfristige Börsendurchschnitt."
+            "value" : "Reale Rendite nach Inflation. %@ ist der langfristige Börsendurchschnitt."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rentabilidad real después de la inflación. El 7% es el promedio bursátil a largo plazo."
+            "value" : "Rentabilidad real después de la inflación. El %@ es el promedio bursátil a largo plazo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rendement réel après inflation. 7% est la moyenne boursière à long terme."
+            "value" : "Rendement réel après inflation. %@ est la moyenne boursière à long terme."
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "मुद्रास्फीति के बाद वास्तविक रिटर्न। 7% दीर्घकालिक शेयर बाज़ार का औसत है।"
+            "value" : "मुद्रास्फीति के बाद वास्तविक रिटर्न। %@ दीर्घकालिक शेयर बाज़ार का औसत है।"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Retorno real após inflação. 7% é a média do mercado de ações de longo prazo."
+            "value" : "Retorno real após inflação. %@ é a média do mercado de ações de longo prazo."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "扣除通货膨胀后的实际回报。 7%是长期股市平均水平。"
+            "value" : "扣除通货膨胀后的实际回报。%@ 是长期股市平均水平。"
           }
         }
       }
     },
     "Received an unexpected status code: %lld" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -17335,7 +17338,7 @@
       }
     },
     "recorded debt" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -17382,7 +17385,7 @@
       }
     },
     "Records stay on this device unless you enable iCloud sync or export a backup" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -17521,7 +17524,7 @@
       }
     },
     "Refreshing exchange rates..." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -17568,7 +17571,7 @@
       }
     },
     "Refreshing metal prices..." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -17661,7 +17664,7 @@
       }
     },
     "Remaining" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18030,7 +18033,7 @@
       }
     },
     "Remove duplicate snapshot entries" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18123,7 +18126,7 @@
       }
     },
     "Removed %lld duplicate entries." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18170,7 +18173,7 @@
       }
     },
     "Removed %lld duplicate entry." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18401,7 +18404,7 @@
       }
     },
     "Restore records from a Wealth Map backup file" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18586,7 +18589,7 @@
       }
     },
     "Review Portfolio" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18633,7 +18636,7 @@
       }
     },
     "Review your Wealth Map portfolio." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18680,7 +18683,7 @@
       }
     },
     "Rhodium" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18727,7 +18730,7 @@
       }
     },
     "Risk" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18774,7 +18777,7 @@
       }
     },
     "Runway" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18958,48 +18961,49 @@
         }
       }
     },
-    "Savings rate is the single strongest predictor of FIRE speed. At 50%+ you typically reach FI in under 17 years from scratch." : {
+    "Savings rate is the single strongest predictor of FIRE speed. At %@ or higher you typically reach FI in under 17 years from scratch." : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "معدل الادخار هو أقوى مؤشر منفرد لسرعة الحريق. عند نسبة 50%+، عادةً ما تصل إلى FI في أقل من 17 عامًا من الصفر."
+            "value" : "معدل الادخار هو أقوى مؤشر منفرد لسرعة الحريق. عند نسبة %@ أو أكثر، عادةً ما تصل إلى FI في أقل من 17 عامًا من الصفر."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Sparquote ist der stärkste Indikator für die FIRE-Geschwindigkeit. Bei 50 %+ erreichen Sie FI in der Regel in weniger als 17 Jahren von Grund auf."
+            "value" : "Die Sparquote ist der stärkste Indikator für die FIRE-Geschwindigkeit. Bei %@ oder mehr erreichen Sie FI in der Regel in weniger als 17 Jahren von Grund auf."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La tasa de ahorro es el predictor más fuerte de la velocidad de FUEGO. Con un 50 % o más, normalmente se llega a FI en menos de 17 años desde cero."
+            "value" : "La tasa de ahorro es el predictor más fuerte de la velocidad de FUEGO. Con un %@ o más, normalmente se llega a FI en menos de 17 años desde cero."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le taux d'épargne est le prédicteur le plus puissant de la vitesse du FIRE. À 50 %+, vous atteignez généralement FI en moins de 17 ans à partir de zéro."
+            "value" : "Le taux d'épargne est le prédicteur le plus puissant de la vitesse du FIRE. À %@ ou plus, vous atteignez généralement FI en moins de 17 ans à partir de zéro."
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "बचत दर FIRE गति का सबसे मजबूत भविष्यवक्ता है। 50%+ पर आप आम तौर पर 17 साल से कम उम्र में एफआई तक पहुंच जाते हैं।"
+            "value" : "बचत दर FIRE गति का सबसे मजबूत भविष्यवक्ता है। %@ या अधिक पर आप आम तौर पर 17 साल से कम उम्र में एफआई तक पहुंच जाते हैं।"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A taxa de poupança é o preditor mais forte da velocidade do FIRE. Com mais de 50%, você normalmente alcança o FI em menos de 17 anos do zero."
+            "value" : "A taxa de poupança é o preditor mais forte da velocidade do FIRE. Com %@ ou mais, você normalmente alcança o FI em menos de 17 anos do zero."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "储蓄率是火速的最强预测指标。如果达到 50% 以上，您通常会在 17 年内从零开始达到 FI。"
+            "value" : "储蓄率是火速的最强预测指标。如果达到 %@ 以上，您通常会在 17 年内从零开始达到 FI。"
           }
         }
       }
@@ -19189,7 +19193,7 @@
       }
     },
     "Sell" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -19236,7 +19240,7 @@
       }
     },
     "Selling reduces assets in the simulation. If the sale lowers concentration, the portfolio may become more balanced." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -19513,7 +19517,7 @@
       }
     },
     "Share a sanitized portfolio snapshot" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -19606,7 +19610,7 @@
       }
     },
     "Shorten large totals" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -19745,7 +19749,7 @@
       }
     },
     "Silver" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -19838,7 +19842,7 @@
       }
     },
     "Slight decline" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -19931,7 +19935,7 @@
       }
     },
     "Solid" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -19978,7 +19982,7 @@
       }
     },
     "Specialty Metals" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20117,7 +20121,7 @@
       }
     },
     "Stable" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20164,7 +20168,7 @@
       }
     },
     "Stale Values" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20210,49 +20214,49 @@
         }
       }
     },
-    "Standard FIRE · 4% withdrawal rate" : {
-      "extractionState" : "stale",
+    "Standard FIRE · %@ withdrawal rate" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Standard FIRE · معدل سحب 4%"
+            "value" : "Standard FIRE · معدل سحب %@"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Standard FIRE · 4 % Auszahlungsrate"
+            "value" : "Standard FIRE · %@ Auszahlungsrate"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FUEGO estándar · Tasa de retiro del 4%"
+            "value" : "FUEGO estándar · Tasa de retiro del %@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FEU Standard · Taux de retrait de 4%"
+            "value" : "FEU Standard · Taux de retrait de %@"
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "मानक आग · 4% निकासी दर"
+            "value" : "मानक आग · %@ निकासी दर"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FIRE padrão · Taxa de retirada de 4%"
+            "value" : "FIRE padrão · Taxa de retirada de %@"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "标准 FIRE · 4% 提现率"
+            "value" : "标准 FIRE · %@ 提现率"
           }
         }
       }
@@ -20350,7 +20354,7 @@
       }
     },
     "Stocks" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20397,7 +20401,7 @@
       }
     },
     "Strong" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20444,7 +20448,7 @@
       }
     },
     "Strong positive trend" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20491,7 +20495,7 @@
       }
     },
     "Student Loan" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20866,7 +20870,7 @@
       }
     },
     "Target date has passed." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20913,7 +20917,7 @@
       }
     },
     "Target is due today." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21006,7 +21010,7 @@
       }
     },
     "Tellurium" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21052,55 +21056,55 @@
         }
       }
     },
-    "The 4% Rule" : {
-      "extractionState" : "stale",
+    "The %@ Rule" : {
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "قاعدة الـ 4%"
+            "value" : "قاعدة الـ %@"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die 4 %-Regel"
+            "value" : "Die %@-Regel"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La regla del 4%"
+            "value" : "La regla del %@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La règle des 4 %"
+            "value" : "La règle des %@"
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "4% नियम"
+            "value" : "%@ नियम"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A regra dos 4%"
+            "value" : "A regra dos %@"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "4% 规则"
+            "value" : "%@ 规则"
           }
         }
       }
     },
     "The backup contains a different net worth goal. Choose whether to keep or replace your current goal." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21147,7 +21151,7 @@
       }
     },
     "The backup contains an invalid net worth goal." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21194,7 +21198,7 @@
       }
     },
     "The Concept" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21241,7 +21245,7 @@
       }
     },
     "The main focus area is %@: %@." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21288,7 +21292,7 @@
       }
     },
     "The network request failed: %@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21335,7 +21339,7 @@
       }
     },
     "The portfolio is highly liquid, with most assets available as cash or deposits." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21474,7 +21478,7 @@
       }
     },
     "Thin cash buffer" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21659,7 +21663,7 @@
       }
     },
     "Tight" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21752,7 +21756,7 @@
       }
     },
     "Time for a quick financial check-in." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21799,7 +21803,7 @@
       }
     },
     "Time Left" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21892,7 +21896,7 @@
       }
     },
     "Tin" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22123,7 +22127,7 @@
       }
     },
     "Tracked privately with Wealth Map." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22216,7 +22220,7 @@
       }
     },
     "troy oz" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22401,7 +22405,7 @@
       }
     },
     "Unable to refresh exchange rates. Showing the last saved rates." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22448,7 +22452,7 @@
       }
     },
     "Unable to refresh metal prices. Showing the last saved prices." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22541,7 +22545,7 @@
       }
     },
     "unavailable" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22680,7 +22684,7 @@
       }
     },
     "Unnamed" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22773,7 +22777,7 @@
       }
     },
     "Update Assets" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22820,7 +22824,7 @@
       }
     },
     "Update your asset values today." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22867,7 +22871,7 @@
       }
     },
     "Updated %@" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22914,7 +22918,7 @@
       }
     },
     "Uranium" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -23145,7 +23149,7 @@
       }
     },
     "Very liquid, but may limit growth" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -23284,7 +23288,7 @@
       }
     },
     "Watch" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -23561,7 +23565,7 @@
       }
     },
     "Wealth Map update" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -23654,7 +23658,7 @@
       }
     },
     "Weekly" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -23931,7 +23935,7 @@
       }
     },
     "Why Expenses Matter" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24162,7 +24166,7 @@
       }
     },
     "You have reached this goal." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24301,7 +24305,7 @@
       }
     },
     "Your portfolio snapshot is waiting." : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24348,7 +24352,7 @@
       }
     },
     "zero debt" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -24395,7 +24399,7 @@
       }
     },
     "Zinc" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
