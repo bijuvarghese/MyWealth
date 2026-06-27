@@ -14,7 +14,7 @@ struct SummaryMetricView: View {
                 .frame(width: 22)
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(title)
+                Text(AppLocalization.string(title, fallback: title))
                     .font(WealthMapDesignTokens.Typography.caption)
                     .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
 

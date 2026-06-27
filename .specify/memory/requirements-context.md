@@ -33,6 +33,7 @@ behavior.
 | Persistence and portability | FR10.1-FR10.13 | SwiftData container, settings stores, `DataPortability.swift`, iCloud helpers |
 | Widgets | FR11.1-FR11.6 | `MyWealth/Core/Widget/`, `MyWealthWidget/` |
 | Net worth goals | FR12.1-FR12.16 | `MyWealth/Core/NetWorthGoal.swift`, `MyWealth/Core/NetWorthGoalStore.swift`, `MyWealth/Features/Goals/`, Dashboard and Net Worth surfaces |
+| Localization | FR14.1-FR14.8 | `MyWealth/Resources/Localizable.xcstrings`, `MyWealth/Core/Localization/`, localized feature display boundaries, `MyWealthWidget/Resources/Localizable.xcstrings` |
 | Platform and tooling | NFR1.1-NFR1.4 | Xcode project and all Swift targets |
 | Usability | NFR2.1-NFR2.7 | all user-facing SwiftUI flows |
 | Performance | NFR3.1-NFR3.4 | networking, calculations, persistence, dashboard rendering |

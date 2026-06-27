@@ -221,7 +221,7 @@ struct FIRECalculatorView: View {
 
     private func currencyField(title: String, value: Binding<Double>, focus: FIREInputField) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title)
+            Text(AppLocalization.string(title, fallback: title))
                 .font(WealthMapDesignTokens.Typography.compactLabel)
                 .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 .textCase(.uppercase)
@@ -251,7 +251,7 @@ struct FIRECalculatorView: View {
             VStack(spacing: 4) {
                 Text(label)
                     .font(WealthMapDesignTokens.Typography.amountProminent.weight(.bold))
-                Text(subtitle)
+                Text(AppLocalization.string(subtitle, fallback: subtitle))
                     .font(WealthMapDesignTokens.Typography.caption)
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
@@ -382,10 +382,13 @@ struct FIRECalculatorView: View {
 
     private var savingsRateLabel: String {
         if let years = projection.yearsToFIRE {
-            if years == 0 { return "Already FI" }
-            return "\(years.formatted(.number.precision(.fractionLength(1)))) yrs to FI"
+            if years == 0 { return AppLocalization.string("Already FI") }
+            return AppLocalization.formatted(
+                "%@ yrs to FI",
+                arguments: [years.formatted(.number.precision(.fractionLength(1)))]
+            )
         }
-        return "Add savings to estimate FI"
+        return AppLocalization.string("Add savings to estimate FI")
     }
 
     private var trajectoryCard: some View {
@@ -461,7 +464,7 @@ struct FIRECalculatorView: View {
                                 .background((level.isAchieved ? WealthMapDesignTokens.ColorToken.success : WealthMapDesignTokens.ColorToken.warning).opacity(0.12), in: Circle())
 
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(level.kind.rawValue)
+                                Text(level.kind.displayName)
                                     .font(WealthMapDesignTokens.Typography.headline)
                                 Text(level.kind.subtitle)
                                     .font(WealthMapDesignTokens.Typography.subheadline)
@@ -595,7 +598,19 @@ struct FIRECalculatorView: View {
                     Divider()
                     explainerSection(
                         title: "The 4% Rule",
-                        body: "A classic FIRE target is 25x your annual expenses. Spending \(projection.annualExpenses.formatted(.currency(code: settings.baseCurrency.rawValue).precision(.fractionLength(0))))/yr implies a target of \(projection.fireTarget.formatted(.currency(code: settings.baseCurrency.rawValue).precision(.fractionLength(0))))."
+                        body: AppLocalization.formatted(
+                            "A classic FIRE target is 25x your annual expenses. Spending %@/yr implies a target of %@.",
+                            arguments: [
+                                projection.annualExpenses.formatted(
+                                    .currency(code: settings.baseCurrency.rawValue)
+                                        .precision(.fractionLength(0))
+                                ),
+                                projection.fireTarget.formatted(
+                                    .currency(code: settings.baseCurrency.rawValue)
+                                        .precision(.fractionLength(0))
+                                )
+                            ]
+                        )
                     )
                     Divider()
                     explainerSection(
@@ -615,10 +630,10 @@ struct FIRECalculatorView: View {
 
     private func explainerSection(title: String, body: String) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(title)
+            Text(AppLocalization.string(title, fallback: title))
                 .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                 .foregroundStyle(WealthMapDesignTokens.ColorToken.warning)
-            Text(body)
+            Text(AppLocalization.string(body, fallback: body))
                 .font(WealthMapDesignTokens.Typography.subheadline)
                 .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)

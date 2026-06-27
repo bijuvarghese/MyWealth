@@ -20,7 +20,7 @@ struct LiabilityAllocationView: View {
                     innerRadius: .ratio(0.62),
                     angularInset: 1.5
                 )
-                .foregroundStyle(by: .value("Category", row.category.rawValue))
+                .foregroundStyle(by: .value("Category", row.category.localizedName))
             }
             .opacity(chartProgress)
             .frame(height: 180)
@@ -35,7 +35,7 @@ struct LiabilityAllocationView: View {
                         Image(systemName: row.category.icon)
                             .frame(width: 22)
                             .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
-                        Text(row.category.rawValue)
+                        Text(row.category.localizedName)
                         Spacer()
                         Text(row.percentage, format: .percent.precision(.fractionLength(0)))
                             .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)

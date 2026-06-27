@@ -8,13 +8,17 @@ enum ReminderFrequency: String, Codable, CaseIterable {
     case monthly
     
     var displayName: String {
+        localizedDisplayName()
+    }
+
+    func localizedDisplayName(locale: Locale = .current) -> String {
         switch self {
         case .daily:
-            return "Daily"
+            return AppLocalization.string("Daily", locale: locale)
         case .weekly:
-            return "Weekly"
+            return AppLocalization.string("Weekly", locale: locale)
         case .monthly:
-            return "Monthly"
+            return AppLocalization.string("Monthly", locale: locale)
         }
     }
     
@@ -42,7 +46,9 @@ enum ReminderWeekday: Int, Codable, CaseIterable, Identifiable {
     var id: Int { rawValue }
 
     var displayName: String {
-        DateFormatter().weekdaySymbols[rawValue - 1]
+        let formatter = DateFormatter()
+        formatter.locale = .current
+        return formatter.weekdaySymbols[rawValue - 1]
     }
 }
 
@@ -52,32 +58,40 @@ enum ReminderType: String, Codable, CaseIterable {
     case reviewPortfolio
     
     var displayName: String {
+        localizedDisplayName()
+    }
+
+    func localizedDisplayName(locale: Locale = .current) -> String {
         switch self {
         case .addAsset:
-            return "Add Asset"
+            return AppLocalization.string("Add Asset", locale: locale)
         case .updateAssets:
-            return "Update Assets"
+            return AppLocalization.string("Update Assets", locale: locale)
         case .reviewPortfolio:
-            return "Review Portfolio"
+            return AppLocalization.string("Review Portfolio", locale: locale)
         }
     }
     
     var notificationMessages: [String] {
+        localizedNotificationMessages()
+    }
+
+    func localizedNotificationMessages(locale: Locale = .current) -> [String] {
         switch self {
         case .addAsset:
             return [
-                "Add your latest investments to Wealth Map.",
-                "Keep your wealth journey updated."
+                AppLocalization.string("Add your latest investments to Wealth Map.", locale: locale),
+                AppLocalization.string("Keep your wealth journey updated.", locale: locale)
             ]
         case .updateAssets:
             return [
-                "Update your asset values today.",
-                "Your portfolio snapshot is waiting."
+                AppLocalization.string("Update your asset values today.", locale: locale),
+                AppLocalization.string("Your portfolio snapshot is waiting.", locale: locale)
             ]
         case .reviewPortfolio:
             return [
-                "Review your Wealth Map portfolio.",
-                "Time for a quick financial check-in."
+                AppLocalization.string("Review your Wealth Map portfolio.", locale: locale),
+                AppLocalization.string("Time for a quick financial check-in.", locale: locale)
             ]
         }
     }

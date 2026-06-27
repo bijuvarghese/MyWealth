@@ -65,7 +65,7 @@ struct AssetRowView: View {
                     standardSubtitle
                 }
 
-                Text(asset.displayCategory.rawValue)
+                Text(asset.displayCategory.localizedName)
                     .font(WealthMapDesignTokens.Typography.caption)
                     .foregroundStyle(WealthMapDesignTokens.ColorToken.inactive)
             }

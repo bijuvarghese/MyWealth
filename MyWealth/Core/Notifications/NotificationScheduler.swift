@@ -3,10 +3,7 @@ import UserNotifications
 
 class NotificationScheduler {
     static let shared = NotificationScheduler()
-
-    private enum ReminderNotification {
-        static let identifier = "com.mywealth.reminder.portfolio-review"
-    }
+    static let reminderNotificationIdentifier = "com.mywealth.reminder.portfolio-review"
     
     private init() {}
     
@@ -34,7 +31,7 @@ class NotificationScheduler {
         }
         
         let content = UNMutableNotificationContent()
-        content.title = "Wealth Map"
+        content.title = AppLocalization.string("Wealth Map")
         content.body = preference.reminderType.randomMessage
         content.sound = .default
         content.badge = NSNumber(value: 1)
@@ -48,7 +45,7 @@ class NotificationScheduler {
         // Calculate trigger time
         let trigger = createTrigger(from: preference)
         let request = UNNotificationRequest(
-            identifier: ReminderNotification.identifier,
+            identifier: Self.reminderNotificationIdentifier,
             content: content,
             trigger: trigger
         )
@@ -66,10 +63,10 @@ class NotificationScheduler {
     
     func cancelReminder() {
         UNUserNotificationCenter.current().removePendingNotificationRequests(
-            withIdentifiers: [ReminderNotification.identifier]
+            withIdentifiers: [Self.reminderNotificationIdentifier]
         )
         UNUserNotificationCenter.current().removeDeliveredNotifications(
-            withIdentifiers: [ReminderNotification.identifier]
+            withIdentifiers: [Self.reminderNotificationIdentifier]
         )
     }
 
@@ -77,7 +74,7 @@ class NotificationScheduler {
         let notificationCenter = UNUserNotificationCenter.current()
 
         notificationCenter.removeDeliveredNotifications(
-            withIdentifiers: [ReminderNotification.identifier]
+            withIdentifiers: [Self.reminderNotificationIdentifier]
         )
         notificationCenter.setBadgeCount(0) { error in
             if let error = error {

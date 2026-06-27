@@ -1,4 +1,13 @@
 *xcuser*
+.DS_Store
+.build/
+DerivedData/
+*.swiftpm/
+Packages/
+*.tmp
+*.swp
+.vscode/
+.idea/
 functions/node_modules/
 functions/.env
 functions/.env.*

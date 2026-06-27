@@ -6,6 +6,10 @@ enum MetalGroup: String, CaseIterable {
     case precious  = "Precious Metals"
     case base      = "Base Metals"
     case specialty = "Specialty Metals"
+
+    var localizedName: String {
+        AppLocalization.string(rawValue, fallback: rawValue)
+    }
 }
 
 // MARK: - Display model
@@ -96,7 +100,9 @@ final class MetalPricesViewModel {
             userDefaults.set(rates, forKey: DefaultsKeys.rates)
             userDefaults.set(lastUpdatedAt.timeIntervalSince1970, forKey: DefaultsKeys.lastUpdated)
         } catch {
-            errorMessage = "Unable to refresh metal prices. Showing the last saved prices."
+            errorMessage = AppLocalization.string(
+                "Unable to refresh metal prices. Showing the last saved prices."
+            )
         }
     }
 
@@ -131,8 +137,8 @@ final class MetalPricesViewModel {
 
             return MetalPriceRow(
                 symbol: info.symbol,
-                name: info.name,
-                unit: info.unit,
+                name: AppLocalization.string(info.name, fallback: info.name),
+                unit: AppLocalization.string(info.unit, fallback: info.unit),
                 color: info.color,
                 group: info.group,
                 priceInBase: priceInBase,
@@ -159,7 +165,7 @@ final class MetalPricesViewModel {
         if isLoading {
             return RateStatusModel(
                 systemImage: "arrow.triangle.2.circlepath",
-                message: "Refreshing metal prices...",
+                message: AppLocalization.string("Refreshing metal prices..."),
                 style: .loading
             )
         }
@@ -173,21 +179,27 @@ final class MetalPricesViewModel {
         guard let lastUpdated else {
             return RateStatusModel(
                 systemImage: "clock",
-                message: "Metal prices have not been loaded yet.",
+                message: AppLocalization.string("Metal prices have not been loaded yet."),
                 style: .neutral
             )
         }
         if !Calendar.current.isDateInToday(lastUpdated) {
             return RateStatusModel(
                 systemImage: "clock.badge.exclamationmark",
-                message: "Metal prices are from \(lastUpdated.formatted(date: .abbreviated, time: .shortened)).",
+                message: AppLocalization.formatted(
+                    "Metal prices are from %@.",
+                    arguments: [lastUpdated.formatted(date: .abbreviated, time: .shortened)]
+                ),
                 style: .warning
             )
         }
         // Happy path — always show a freshness indicator so the banner is visible.
         return RateStatusModel(
             systemImage: "checkmark.circle",
-            message: "Updated \(lastUpdated.formatted(.relative(presentation: .numeric)))",
+            message: AppLocalization.formatted(
+                "Updated %@",
+                arguments: [lastUpdated.formatted(.relative(presentation: .numeric))]
+            ),
             style: .neutral
         )
     }

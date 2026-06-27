@@ -27,7 +27,7 @@ struct PortfolioAllocationView: View {
                     innerRadius: .ratio(0.62),
                     angularInset: 1.5
                 )
-                .foregroundStyle(by: .value("Category", row.category.rawValue))
+                .foregroundStyle(by: .value("Category", row.category.localizedName))
             }
             .opacity(chartProgress)
             .frame(height: 180)
@@ -45,7 +45,7 @@ struct PortfolioAllocationView: View {
                             Image(systemName: row.category.icon)
                                 .frame(width: 22)
                                 .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
-                            Text(row.category.rawValue)
+                            Text(row.category.localizedName)
                                 .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                             Spacer()
                             Text(row.percentage, format: .percent.precision(.fractionLength(0)))

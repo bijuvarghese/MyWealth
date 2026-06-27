@@ -1521,6 +1521,136 @@ struct MyWealthTests {
         #expect(latePreference.monthDay == ReminderPreference.maximumMonthlyReminderDay)
     }
 
+    @Test func localizationCatalogSupportsEveryMVPLocale() {
+        let expected: [String: String] = [
+            "en": "Net Worth",
+            "hi": "नेट वर्थ",
+            "es": "Valor neto",
+            "pt-BR": "Patrimônio Líquido",
+            "fr": "Valeur nette",
+            "de": "Vermögen",
+            "zh-Hans": "净资产",
+            "ar": "صافي القيمة"
+        ]
+
+        #expect(Set(AppLocalization.supportedLanguageIdentifiers) == Set(expected.keys))
+        for (identifier, value) in expected {
+            #expect(
+                AppLocalization.string(
+                    "Net Worth",
+                    locale: Locale(identifier: identifier)
+                ) == value
+            )
+        }
+    }
+
+    @Test func unsupportedLocaleFallsBackToEnglish() {
+        #expect(
+            AppLocalization.string(
+                "Net Worth",
+                locale: Locale(identifier: "zu")
+            ) == "Net Worth"
+        )
+    }
+
+    @MainActor
+    @Test func localizedDisplayLabelsPreserveStableRawValues() {
+        #expect(Asset.CategoryType.realEstate.rawValue == "Real Estate")
+        #expect(Liability.CategoryType.lineOfCredit.rawValue == "Line of Credit")
+        #expect(ReminderFrequency.weekly.rawValue == "weekly")
+        #expect(ReminderType.reviewPortfolio.rawValue == "reviewPortfolio")
+        #expect(FIRELevelKind.lean.rawValue == "LeanFIRE")
+
+        #expect(!Asset.CategoryType.realEstate.localizedName.isEmpty)
+        #expect(!Liability.CategoryType.lineOfCredit.localizedName.isEmpty)
+        #expect(!ReminderFrequency.weekly.displayName.isEmpty)
+        #expect(!ReminderType.reviewPortfolio.randomMessage.isEmpty)
+        #expect(!FIRELevelKind.lean.subtitle.isEmpty)
+    }
+
+    @Test func localizedFormattingPreservesArguments() {
+        let result = AppLocalization.formatted(
+            "Goal target: %@ by %@",
+            arguments: ["USD 10,000", "Dec 31, 2030"],
+            locale: Locale(identifier: "es")
+        )
+
+        #expect(result.contains("USD 10,000"))
+        #expect(result.contains("Dec 31, 2030"))
+    }
+
+    @MainActor
+    @Test func reminderLocalizationPreservesIdentifierAndRawValues() {
+        let locale = Locale(identifier: "pt-BR")
+        let messages = ReminderType.reviewPortfolio.localizedNotificationMessages(locale: locale)
+
+        #expect(NotificationScheduler.reminderNotificationIdentifier == "com.mywealth.reminder.portfolio-review")
+        #expect(ReminderType.reviewPortfolio.rawValue == "reviewPortfolio")
+        #expect(ReminderFrequency.weekly.rawValue == "weekly")
+        #expect(ReminderFrequency.weekly.localizedDisplayName(locale: locale) != "Weekly")
+        #expect(messages.count == 2)
+        #expect(messages.allSatisfy { !$0.isEmpty })
+        #expect(!messages.contains("Review your Wealth Map portfolio."))
+    }
+
+    @Test func localizationCatalogsHaveCompleteMVPCoverage() throws {
+        for url in Self.localizationCatalogURLs {
+            let data = try Data(contentsOf: url)
+            let root = try #require(
+                JSONSerialization.jsonObject(with: data) as? [String: Any]
+            )
+            let strings = try #require(root["strings"] as? [String: Any])
+
+            for (key, value) in strings where !key.isEmpty {
+                let definition = try #require(value as? [String: Any])
+                let localizations = try #require(
+                    definition["localizations"] as? [String: Any]
+                )
+                for identifier in AppLocalization.supportedLanguageIdentifiers where identifier != "en" {
+                    let localization = try #require(
+                        localizations[identifier] as? [String: Any]
+                    )
+                    let unit = try #require(
+                        localization["stringUnit"] as? [String: Any]
+                    )
+                    let translated = try #require(unit["value"] as? String)
+
+                    #expect(!translated.isEmpty)
+                    #expect(Self.formatArguments(in: translated) == Self.formatArguments(in: key))
+                }
+            }
+        }
+    }
+
+    @Test func widgetSnapshotContractRemainsStable() throws {
+        let snapshot = WidgetSnapshot(
+            netWorth: 750,
+            assetTotal: 1_000,
+            liabilityTotal: 250,
+            baseCurrency: "USD",
+            currencyTotals: [
+                .init(code: "EUR", amount: 700, transferRate: 0.9)
+            ],
+            lastUpdated: Date(timeIntervalSince1970: 1_800_000_000),
+            transferRatesLastUpdated: Date(timeIntervalSince1970: 1_799_000_000)
+        )
+        let data = try JSONEncoder().encode(snapshot)
+        let json = try #require(
+            JSONSerialization.jsonObject(with: data) as? [String: Any]
+        )
+
+        #expect(WidgetDataStore.appGroupID == "group.com.bv.MyWealth")
+        #expect(Set(json.keys) == [
+            "netWorth",
+            "assetTotal",
+            "liabilityTotal",
+            "baseCurrency",
+            "currencyTotals",
+            "lastUpdated",
+            "transferRatesLastUpdated"
+        ])
+    }
+
     private func makeIsolatedDefaults() throws -> UserDefaults {
         let suiteName = "MyWealthTests.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suiteName))
@@ -1533,6 +1663,37 @@ struct MyWealthTests {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .appendingPathComponent("tokens/wealth-map.tokens.json")
+    }
+
+    private static var localizationCatalogURLs: [URL] {
+        let repository = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        return [
+            repository.appendingPathComponent("MyWealth/Resources/Localizable.xcstrings"),
+            repository.appendingPathComponent("MyWealthWidget/Resources/Localizable.xcstrings")
+        ]
+    }
+
+    private static func formatArguments(in value: String) -> [String] {
+        let pattern = #"%(\d+\$)?(lld|ld|d|f|@|%)"#
+        guard let expression = try? NSRegularExpression(pattern: pattern) else {
+            return []
+        }
+        let range = NSRange(value.startIndex..., in: value)
+        return expression.matches(in: value, range: range).compactMap { match in
+            guard let tokenRange = Range(match.range, in: value) else { return nil }
+            let token = String(value[tokenRange])
+            if token == "%%" {
+                return token
+            }
+            return token.replacingOccurrences(
+                of: #"^%\d+\$"#,
+                with: "%",
+                options: .regularExpression
+            )
+        }
+        .sorted()
     }
 
     @MainActor

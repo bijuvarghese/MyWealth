@@ -61,15 +61,15 @@ private enum IPadSection: String, CaseIterable, Hashable, Identifiable {
     var title: String {
         switch self {
         case .dashboard:
-            return "Dashboard"
+            return AppLocalization.string("Dashboard")
         case .assets:
-            return "Assets"
+            return AppLocalization.string("Assets")
         case .netWorth:
-            return "Net Worth"
+            return AppLocalization.string("Net Worth")
         case .rates:
-            return "Rates"
+            return AppLocalization.string("Rates")
         case .briefing:
-            return "Briefing"
+            return AppLocalization.string("Briefing")
         }
     }
 

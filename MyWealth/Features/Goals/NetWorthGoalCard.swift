@@ -68,26 +68,37 @@ struct NetWorthGoalCard: View {
     }
 
     private var progressLabel: String {
-        guard let current = progress.currentAmount else { return "Current value unavailable" }
-        return "\(formatted(current)) of \(formatted(goal.displayTargetAmount))"
+        guard let current = progress.currentAmount else {
+            return AppLocalization.string("Current value unavailable")
+        }
+        return AppLocalization.formatted(
+            "%@ of %@",
+            arguments: [formatted(current), formatted(goal.displayTargetAmount)]
+        )
     }
 
     private var outlookText: String {
         switch outlook {
         case .achieved:
-            return "You have reached this goal."
+            return AppLocalization.string("You have reached this goal.")
         case .projected(let date, .onTrack):
-            return "On track. Indicative date: \(date.formatted(date: .abbreviated, time: .omitted))."
+            return AppLocalization.formatted(
+                "On track. Indicative date: %@.",
+                arguments: [date.formatted(date: .abbreviated, time: .omitted)]
+            )
         case .projected(let date, .behind):
-            return "Behind pace. Indicative date: \(date.formatted(date: .abbreviated, time: .omitted))."
+            return AppLocalization.formatted(
+                "Behind pace. Indicative date: %@.",
+                arguments: [date.formatted(date: .abbreviated, time: .omitted)]
+            )
         case .needsHistory:
-            return "More history is needed for a projection."
+            return AppLocalization.string("More history is needed for a projection.")
         case .nonGrowing:
-            return "Current history does not support an achievement estimate."
+            return AppLocalization.string("Current history does not support an achievement estimate.")
         case .conversionUnavailable:
-            return "Progress is unavailable until the required exchange rates are available."
+            return AppLocalization.string("Progress is unavailable until the required exchange rates are available.")
         case .currentValueUnavailable:
-            return "Add portfolio data to calculate progress."
+            return AppLocalization.string("Add portfolio data to calculate progress.")
         }
     }
 
@@ -112,8 +123,11 @@ struct NetWorthGoalCard: View {
 
     private var accessibilitySummary: String {
         let percent = progress.rawFraction?.formatted(.percent.precision(.fractionLength(0...1)))
-            ?? "unavailable"
-        return "Net Worth Goal. \(progressLabel). Progress \(percent). \(outlookText) \(achievementAccessibilitySummary)"
+            ?? AppLocalization.string("unavailable")
+        return AppLocalization.formatted(
+            "Net Worth Goal. %@. Progress %@. %@ %@",
+            arguments: [progressLabel, percent, outlookText, achievementAccessibilitySummary]
+        )
     }
 
     @ViewBuilder
@@ -130,10 +144,10 @@ struct NetWorthGoalCard: View {
                     alignment: .leading,
                     spacing: 10
                 ) {
-                    insightMetric("Remaining", value: formatted(achievementPlan.remainingAmount ?? 0))
-                    insightMetric("Time Left", value: monthsLabel)
-                    insightMetric("Needed / Month", value: formatted(achievementPlan.requiredMonthlyIncrease ?? 0))
-                    insightMetric("Needed / Year", value: formatted(achievementPlan.requiredYearlyIncrease ?? 0))
+                    insightMetric(AppLocalization.string("Remaining"), value: formatted(achievementPlan.remainingAmount ?? 0))
+                    insightMetric(AppLocalization.string("Time Left"), value: monthsLabel)
+                    insightMetric(AppLocalization.string("Needed / Month"), value: formatted(achievementPlan.requiredMonthlyIncrease ?? 0))
+                    insightMetric(AppLocalization.string("Needed / Year"), value: formatted(achievementPlan.requiredYearlyIncrease ?? 0))
                 }
 
                 Text("Average net worth increase needed if progress is spread evenly to the target date.")
@@ -169,18 +183,30 @@ struct NetWorthGoalCard: View {
     }
 
     private var monthsLabel: String {
-        guard let months = achievementPlan.monthsRemaining else { return "Unavailable" }
-        return months == 1 ? "1 month" : "\(months) months"
+        guard let months = achievementPlan.monthsRemaining else {
+            return AppLocalization.string("Unavailable")
+        }
+        return months == 1
+            ? AppLocalization.string("1 month")
+            : AppLocalization.formatted("%lld months", arguments: [months])
     }
 
     private var achievementAccessibilitySummary: String {
         switch achievementPlan.status {
         case .active:
-            return "\(monthsLabel) left. \(formatted(achievementPlan.remainingAmount ?? 0)) remaining. Average needed per month \(formatted(achievementPlan.requiredMonthlyIncrease ?? 0)); per year \(formatted(achievementPlan.requiredYearlyIncrease ?? 0))."
+            return AppLocalization.formatted(
+                "%@ left. %@ remaining. Average needed per month %@; per year %@.",
+                arguments: [
+                    monthsLabel,
+                    formatted(achievementPlan.remainingAmount ?? 0),
+                    formatted(achievementPlan.requiredMonthlyIncrease ?? 0),
+                    formatted(achievementPlan.requiredYearlyIncrease ?? 0)
+                ]
+            )
         case .dueToday:
-            return "Target is due today."
+            return AppLocalization.string("Target is due today.")
         case .overdue:
-            return "Target date has passed."
+            return AppLocalization.string("Target date has passed.")
         case .unavailable, .achieved:
             return ""
         }

@@ -236,7 +236,7 @@ struct NetWorthLivingComfortView: View {
 
                         Spacer()
 
-                        Text(row.level.rawValue)
+                        Text(row.level.localizedName)
                             .font(WealthMapDesignTokens.Typography.compactLabel)
                             .foregroundStyle(comfortColor(row.level))
                             .padding(.horizontal, 10)

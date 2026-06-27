@@ -27,6 +27,10 @@ enum PortfolioHealthGrade: String, Equatable {
         default: self = .risk
         }
     }
+
+    var localizedName: String {
+        AppLocalization.string(rawValue, fallback: rawValue)
+    }
 }
 
 struct PortfolioObservation: Identifiable, Equatable {
@@ -60,7 +64,11 @@ struct PortfolioIntelligenceReport {
 
     var gradeMovementLabel: String? {
         guard let previousGrade, previousGrade != grade else { return nil }
-        return "\(previousGrade.rawValue) to \(grade.rawValue)"
+        return AppLocalization.formatted(
+            "%@ to %@",
+            arguments: [previousGrade.localizedName, grade.localizedName],
+            fallback: "\(previousGrade.localizedName) to \(grade.localizedName)"
+        )
     }
 }
 
@@ -113,8 +121,8 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
             grade: grade,
             previousGrade: previousGrade,
             metrics: metrics,
-            focusArea: focus?.title ?? "Portfolio",
-            focusDetail: focus?.detail ?? "Add assets to unlock a stronger read.",
+            focusArea: focus?.title ?? AppLocalization.string("Portfolio"),
+            focusDetail: focus?.detail ?? AppLocalization.string("Add assets to unlock a stronger read."),
             summary: makeSummary(
                 score: score,
                 grade: grade,
@@ -156,10 +164,10 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
         guard !allocation.isEmpty else {
             return PortfolioHealthMetric(
                 id: "diversification",
-                title: "Diversification",
+                title: AppLocalization.string("Diversification"),
                 score: 0,
                 maxScore: 25,
-                detail: "No asset categories yet"
+                detail: AppLocalization.string("No asset categories yet")
             )
         }
 
@@ -182,12 +190,15 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
 
         let score = min(categoryScore, concentrationCap)
         let detail = allocation.count == 1
-            ? "All assets in one category"
-            : "\(allocation.count) asset categories tracked"
+            ? AppLocalization.string("All assets in one category")
+            : AppLocalization.formatted(
+                "%lld asset categories tracked",
+                arguments: [allocation.count]
+            )
 
         return PortfolioHealthMetric(
             id: "diversification",
-            title: "Diversification",
+            title: AppLocalization.string("Diversification"),
             score: score,
             maxScore: 25,
             detail: detail
@@ -205,24 +216,24 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
         switch cashShare {
         case 0.10...0.35:
             score = 20
-            detail = "Cash buffer is balanced"
+            detail = AppLocalization.string("Cash buffer is balanced")
         case 0.35..<0.80:
             score = 16
-            detail = "High liquidity"
+            detail = AppLocalization.string("High liquidity")
         case 0.80...:
             score = 14
-            detail = "Very liquid, but may limit growth"
+            detail = AppLocalization.string("Very liquid, but may limit growth")
         case 0.05..<0.10:
             score = liabilities.isEmpty ? 14 : 10
-            detail = "Thin cash buffer"
+            detail = AppLocalization.string("Thin cash buffer")
         default:
             score = liabilities.isEmpty ? 10 : 6
-            detail = "Low liquid reserve"
+            detail = AppLocalization.string("Low liquid reserve")
         }
 
         return PortfolioHealthMetric(
             id: "liquidity",
-            title: "Liquidity",
+            title: AppLocalization.string("Liquidity"),
             score: score,
             maxScore: 20,
             detail: detail
@@ -233,10 +244,12 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
         guard assetTotal > 0 else {
             return PortfolioHealthMetric(
                 id: "debtRatio",
-                title: "Debt Ratio",
+                title: AppLocalization.string("Debt Ratio"),
                 score: liabilityTotal > 0 ? 0 : 20,
                 maxScore: 20,
-                detail: liabilityTotal > 0 ? "Debt with no assets recorded" : "No debt recorded"
+                detail: liabilityTotal > 0
+                    ? AppLocalization.string("Debt with no assets recorded")
+                    : AppLocalization.string("No debt recorded")
             )
         }
 
@@ -246,24 +259,24 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
         switch ratio {
         case ..<0.01:
             score = 20
-            detail = "No meaningful debt"
+            detail = AppLocalization.string("No meaningful debt")
         case ..<0.20:
             score = 18
-            detail = "Low debt load"
+            detail = AppLocalization.string("Low debt load")
         case ..<0.40:
             score = 12
-            detail = "Manageable debt load"
+            detail = AppLocalization.string("Manageable debt load")
         case ..<0.65:
             score = 7
-            detail = "Elevated debt load"
+            detail = AppLocalization.string("Elevated debt load")
         default:
             score = 3
-            detail = "High debt load"
+            detail = AppLocalization.string("High debt load")
         }
 
         return PortfolioHealthMetric(
             id: "debtRatio",
-            title: "Debt Ratio",
+            title: AppLocalization.string("Debt Ratio"),
             score: score,
             maxScore: 20,
             detail: detail
@@ -281,20 +294,20 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
         guard let first = snapshots.first, let last = snapshots.last, first.displayRecordedAt < last.displayRecordedAt else {
             return PortfolioHealthMetric(
                 id: "growth",
-                title: "Growth",
+                title: AppLocalization.string("Growth"),
                 score: 10,
                 maxScore: 20,
-                detail: "More history needed"
+                detail: AppLocalization.string("More history needed")
             )
         }
 
         guard abs(first.displayAmount) > 0.01 else {
             return PortfolioHealthMetric(
                 id: "growth",
-                title: "Growth",
+                title: AppLocalization.string("Growth"),
                 score: 10,
                 maxScore: 20,
-                detail: "Baseline history started"
+                detail: AppLocalization.string("Baseline history started")
             )
         }
 
@@ -304,24 +317,24 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
         switch change {
         case 0.15...:
             score = 20
-            detail = "Strong positive trend"
+            detail = AppLocalization.string("Strong positive trend")
         case 0.03..<0.15:
             score = 16
-            detail = "Positive trend"
+            detail = AppLocalization.string("Positive trend")
         case -0.03..<0.03:
             score = 10
-            detail = "Flat trend"
+            detail = AppLocalization.string("Flat trend")
         case -0.10..<(-0.03):
             score = 6
-            detail = "Slight decline"
+            detail = AppLocalization.string("Slight decline")
         default:
             score = 2
-            detail = "Declining trend"
+            detail = AppLocalization.string("Declining trend")
         }
 
         return PortfolioHealthMetric(
             id: "growth",
-            title: "Growth",
+            title: AppLocalization.string("Growth"),
             score: score,
             maxScore: 20,
             detail: detail
@@ -332,10 +345,10 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
         guard !assets.isEmpty else {
             return PortfolioHealthMetric(
                 id: "freshness",
-                title: "Freshness",
+                title: AppLocalization.string("Freshness"),
                 score: 0,
                 maxScore: 15,
-                detail: "No asset updates yet"
+                detail: AppLocalization.string("No asset updates yet")
             )
         }
 
@@ -347,12 +360,15 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
         let ratio = Double(freshCount) / Double(assets.count)
         let score = Int((ratio * 15).rounded())
         let detail = freshCount == assets.count
-            ? "All assets updated recently"
-            : "\(assets.count - freshCount) asset updates are stale"
+            ? AppLocalization.string("All assets updated recently")
+            : AppLocalization.formatted(
+                "%lld asset updates are stale",
+                arguments: [assets.count - freshCount]
+            )
 
         return PortfolioHealthMetric(
             id: "freshness",
-            title: "Freshness",
+            title: AppLocalization.string("Freshness"),
             score: score,
             maxScore: 15,
             detail: detail
@@ -369,14 +385,37 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
         baseCurrency: Asset.CurrencyType
     ) -> String {
         let total = assetTotal.formatted(.currency(code: baseCurrency.rawValue).precision(.fractionLength(0)))
-        let debtPhrase = liabilityTotal <= 0 ? "zero debt" : "recorded debt"
+        let debtPhrase = liabilityTotal <= 0
+            ? AppLocalization.string("zero debt")
+            : AppLocalization.string("recorded debt")
         let dominant = allocation.first
         let concentration = dominant.map {
-            "\(($0.percentage).formatted(.percent.precision(.fractionLength(0)))) in \($0.category.rawValue)"
-        } ?? "no allocation history"
-        let focusPhrase = focus.map { "The main focus area is \($0.title.lowercased()): \($0.detail.lowercased())." } ?? ""
+            AppLocalization.formatted(
+                "%@ in %@",
+                arguments: [
+                    $0.percentage.formatted(.percent.precision(.fractionLength(0))),
+                    $0.category.localizedName
+                ]
+            )
+        } ?? AppLocalization.string("no allocation history")
+        let focusPhrase = focus.map {
+            AppLocalization.formatted(
+                "The main focus area is %@: %@.",
+                arguments: [$0.title.lowercased(), $0.detail.lowercased()]
+            )
+        } ?? ""
 
-        return "Portfolio health is \(grade.rawValue.lowercased()) at \(score)/100, with \(total) in tracked assets and \(debtPhrase). Allocation is currently led by \(concentration). \(focusPhrase)"
+        return AppLocalization.formatted(
+            "Portfolio health is %@ at %lld/100, with %@ in tracked assets and %@. Allocation is currently led by %@. %@",
+            arguments: [
+                grade.localizedName.lowercased(),
+                score,
+                total,
+                debtPhrase,
+                concentration,
+                focusPhrase
+            ]
+        )
     }
 
     private func makeObservations(
@@ -394,8 +433,15 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
             let amount = dominant.amount.formatted(.currency(code: baseCurrency.rawValue).precision(.fractionLength(0)))
             observations.append(PortfolioObservation(
                 id: "asset-concentration",
-                title: "Asset Concentration",
-                message: "\(dominant.category.rawValue) makes up \(dominant.percentage.formatted(.percent.precision(.fractionLength(0)))) of your portfolio (\(amount)).",
+                title: AppLocalization.string("Asset Concentration"),
+                message: AppLocalization.formatted(
+                    "%@ makes up %@ of your portfolio (%@).",
+                    arguments: [
+                        dominant.category.localizedName,
+                        dominant.percentage.formatted(.percent.precision(.fractionLength(0))),
+                        amount
+                    ]
+                ),
                 severity: .warning,
                 systemImage: "exclamationmark.circle.fill"
             ))
@@ -404,10 +450,13 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
         let cashShare = allocation.first(where: { $0.category == .bank })?.percentage ?? 0
         observations.append(PortfolioObservation(
             id: "liquidity",
-            title: "Liquidity",
+            title: AppLocalization.string("Liquidity"),
             message: cashShare >= 0.80
-                ? "The portfolio is highly liquid, with most assets available as cash or deposits."
-                : "Cash and deposits represent \(cashShare.formatted(.percent.precision(.fractionLength(0)))) of assets.",
+                ? AppLocalization.string("The portfolio is highly liquid, with most assets available as cash or deposits.")
+                : AppLocalization.formatted(
+                    "Cash and deposits represent %@ of assets.",
+                    arguments: [cashShare.formatted(.percent.precision(.fractionLength(0)))]
+                ),
             severity: cashShare >= 0.05 ? .neutral : .warning,
             systemImage: cashShare >= 0.05 ? "minus.circle.fill" : "drop.triangle.fill"
         ))
@@ -416,10 +465,15 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
             let ratio = liabilityTotal / assetTotal
             observations.append(PortfolioObservation(
                 id: "debt-ratio",
-                title: ratio <= 0 ? "Debt Free" : "Debt Ratio",
+                title: ratio <= 0
+                    ? AppLocalization.string("Debt Free")
+                    : AppLocalization.string("Debt Ratio"),
                 message: ratio <= 0
-                    ? "No liabilities are currently reducing net worth."
-                    : "Liabilities equal \(ratio.formatted(.percent.precision(.fractionLength(0)))) of tracked assets.",
+                    ? AppLocalization.string("No liabilities are currently reducing net worth.")
+                    : AppLocalization.formatted(
+                        "Liabilities equal %@ of tracked assets.",
+                        arguments: [ratio.formatted(.percent.precision(.fractionLength(0)))]
+                    ),
                 severity: ratio < 0.25 ? .positive : .warning,
                 systemImage: ratio <= 0 ? "checkmark.shield.fill" : "exclamationmark.triangle.fill"
             ))
@@ -432,8 +486,13 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
         if !staleAssets.isEmpty {
             observations.append(PortfolioObservation(
                 id: "freshness",
-                title: "Stale Values",
-                message: "\(staleAssets.count) asset \(staleAssets.count == 1 ? "value needs" : "values need") a refresh.",
+                title: AppLocalization.string("Stale Values"),
+                message: AppLocalization.formatted(
+                    staleAssets.count == 1
+                        ? "%lld asset value needs a refresh."
+                        : "%lld asset values need a refresh.",
+                    arguments: [staleAssets.count]
+                ),
                 severity: .warning,
                 systemImage: "clock.badge.exclamationmark.fill"
             ))
@@ -446,8 +505,18 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
             let change = last.displayAmount - first.displayAmount
             observations.append(PortfolioObservation(
                 id: "net-worth-trend",
-                title: "Net Worth Trend",
-                message: "Net worth \(change >= 0 ? "increased" : "decreased") by \(abs(change).formatted(.currency(code: baseCurrency.rawValue).precision(.fractionLength(0)))) over recorded history.",
+                title: AppLocalization.string("Net Worth Trend"),
+                message: AppLocalization.formatted(
+                    change >= 0
+                        ? "Net worth increased by %@ over recorded history."
+                        : "Net worth decreased by %@ over recorded history.",
+                    arguments: [
+                        abs(change).formatted(
+                            .currency(code: baseCurrency.rawValue)
+                                .precision(.fractionLength(0))
+                        )
+                    ]
+                ),
                 severity: change >= 0 ? .positive : .warning,
                 systemImage: change >= 0 ? "arrow.up.right.circle.fill" : "arrow.down.right.circle.fill"
             ))
@@ -456,8 +525,8 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
         if observations.isEmpty {
             observations.append(PortfolioObservation(
                 id: "empty",
-                title: "Add Portfolio Data",
-                message: "Add assets and liabilities to unlock portfolio intelligence.",
+                title: AppLocalization.string("Add Portfolio Data"),
+                message: AppLocalization.string("Add assets and liabilities to unlock portfolio intelligence."),
                 severity: .neutral,
                 systemImage: "sparkles"
             ))

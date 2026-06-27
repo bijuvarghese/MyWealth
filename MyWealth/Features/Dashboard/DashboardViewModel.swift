@@ -101,7 +101,9 @@ final class DashboardViewModel: AssetOperations {
                 : "Exchange rates are missing \(missingRateCodes.joined(separator: ", ")). Totals may be incomplete."
             persistRates(rates, inrRate: exchangeRate, at: lastUpdatedAt)
         } catch {
-            rateErrorMessage = "Unable to refresh exchange rates. Showing the last saved rates."
+            rateErrorMessage = AppLocalization.string(
+                "Unable to refresh exchange rates. Showing the last saved rates."
+            )
             print("Warning: Error fetching rate:", error.localizedDescription)
         }
     }
@@ -290,7 +292,7 @@ final class DashboardViewModel: AssetOperations {
         if isLoadingRate {
             return RateStatusModel(
                 systemImage: "arrow.triangle.2.circlepath",
-                message: "Refreshing exchange rates...",
+                message: AppLocalization.string("Refreshing exchange rates..."),
                 style: .loading
             )
         }
@@ -306,7 +308,7 @@ final class DashboardViewModel: AssetOperations {
         guard let lastUpdated else {
             return RateStatusModel(
                 systemImage: "clock",
-                message: "Exchange rates have not been refreshed yet.",
+                message: AppLocalization.string("Exchange rates have not been refreshed yet."),
                 style: .neutral
             )
         }
@@ -314,7 +316,10 @@ final class DashboardViewModel: AssetOperations {
         if !Calendar.current.isDateInToday(lastUpdated) {
             return RateStatusModel(
                 systemImage: "clock.badge.exclamationmark",
-                message: "Exchange rates are from \(lastUpdated.formatted(date: .abbreviated, time: .shortened)).",
+                message: AppLocalization.formatted(
+                    "Exchange rates are from %@.",
+                    arguments: [lastUpdated.formatted(date: .abbreviated, time: .shortened)]
+                ),
                 style: .warning
             )
         }
@@ -322,7 +327,10 @@ final class DashboardViewModel: AssetOperations {
         // Happy path — always show a freshness indicator so the banner is visible.
         return RateStatusModel(
             systemImage: "checkmark.circle",
-            message: "Updated \(lastUpdated.formatted(.relative(presentation: .numeric)))",
+            message: AppLocalization.formatted(
+                "Updated %@",
+                arguments: [lastUpdated.formatted(.relative(presentation: .numeric))]
+            ),
             style: .neutral
         )
     }
@@ -544,7 +552,12 @@ final class DashboardViewModel: AssetOperations {
             let timeLabel = days < 30 ? "\(days)d" : days < 365 ? "\(days / 30)mo" : "\(days / 365)yr"
             rows.append(PortfolioInsightRow(
                 systemImage: isUp ? "arrow.up.right.circle.fill" : "arrow.down.right.circle.fill",
-                message: "Net worth \(isUp ? "up" : "down") \(formatted) over the last \(timeLabel).",
+                message: AppLocalization.formatted(
+                    isUp
+                        ? "Net worth up %@ over the last %@."
+                        : "Net worth down %@ over the last %@.",
+                    arguments: [formatted, timeLabel]
+                ),
                 sentiment: isUp ? .positive : .warning
             ))
         }
@@ -554,13 +567,16 @@ final class DashboardViewModel: AssetOperations {
             let ratio = l / a
             let pct = safePercentInt(ratio)
             let (label, sentiment): (String, PortfolioInsightRow.Sentiment) = {
-                if ratio < 0.20 { return ("healthy", .positive) }
-                if ratio < 0.50 { return ("elevated", .neutral) }
-                return ("high", .warning)
+                if ratio < 0.20 { return (AppLocalization.string("healthy"), .positive) }
+                if ratio < 0.50 { return (AppLocalization.string("elevated"), .neutral) }
+                return (AppLocalization.string("high"), .warning)
             }()
             rows.append(PortfolioInsightRow(
                 systemImage: sentiment == .positive ? "checkmark.shield.fill" : "exclamationmark.triangle.fill",
-                message: "Debt-to-asset ratio is \(pct)% — \(label).",
+                message: AppLocalization.formatted(
+                    "Debt-to-asset ratio is %lld%% — %@.",
+                    arguments: [pct, label]
+                ),
                 sentiment: sentiment
             ))
         }
@@ -569,14 +585,26 @@ final class DashboardViewModel: AssetOperations {
         if let dominant = allocationRows.first, dominant.percentage > 0.60 {
             rows.append(PortfolioInsightRow(
                 systemImage: "exclamationmark.circle.fill",
-                message: "\(safePercentInt(dominant.percentage))% of assets are in \(dominant.category.rawValue). Consider diversifying.",
+                message: AppLocalization.formatted(
+                    "%lld%% of assets are in %@. Consider diversifying.",
+                    arguments: [
+                        safePercentInt(dominant.percentage),
+                        dominant.category.localizedName
+                    ]
+                ),
                 sentiment: .warning
             ))
         } else if let largest = allocationRows.first {
             // Non-concerning allocation summary
             rows.append(PortfolioInsightRow(
                 systemImage: largest.category.icon,
-                message: "\(safePercentInt(largest.percentage))% of assets are in \(largest.category.rawValue).",
+                message: AppLocalization.formatted(
+                    "%lld%% of assets are in %@.",
+                    arguments: [
+                        safePercentInt(largest.percentage),
+                        largest.category.localizedName
+                    ]
+                ),
                 sentiment: .neutral
             ))
         }
@@ -586,13 +614,18 @@ final class DashboardViewModel: AssetOperations {
         if categoryCount >= 4 {
             rows.append(PortfolioInsightRow(
                 systemImage: "chart.pie.fill",
-                message: "Portfolio spans \(categoryCount) categories — well diversified.",
+                message: AppLocalization.formatted(
+                    "Portfolio spans %lld categories — well diversified.",
+                    arguments: [categoryCount]
+                ),
                 sentiment: .positive
             ))
         } else if categoryCount == 1, assets.count > 1 {
             rows.append(PortfolioInsightRow(
                 systemImage: "chart.pie",
-                message: "All assets are in one category. Adding more categories reduces risk.",
+                message: AppLocalization.string(
+                    "All assets are in one category. Adding more categories reduces risk."
+                ),
                 sentiment: .warning
             ))
         }
@@ -604,11 +637,23 @@ final class DashboardViewModel: AssetOperations {
             return Date().timeIntervalSince(updated) > staleThreshold
         }
         if !staleAssets.isEmpty {
-            let names = staleAssets.prefix(2).map { $0.displayName.isEmpty ? "Unnamed" : $0.displayName }.joined(separator: ", ")
-            let suffix = staleAssets.count > 2 ? " and \(staleAssets.count - 2) more" : ""
+            let names = staleAssets.prefix(2).map {
+                $0.displayName.isEmpty ? AppLocalization.string("Unnamed") : $0.displayName
+            }.joined(separator: ", ")
+            let suffix = staleAssets.count > 2
+                ? AppLocalization.formatted(
+                    " and %lld more",
+                    arguments: [staleAssets.count - 2]
+                )
+                : ""
             rows.append(PortfolioInsightRow(
                 systemImage: "clock.badge.exclamationmark.fill",
-                message: "\(names)\(suffix) \(staleAssets.count == 1 ? "hasn't" : "haven't") been updated in 60+ days.",
+                message: AppLocalization.formatted(
+                    staleAssets.count == 1
+                        ? "%@%@ hasn't been updated in 60+ days."
+                        : "%@%@ haven't been updated in 60+ days.",
+                    arguments: [names, suffix]
+                ),
                 sentiment: .warning
             ))
         }
@@ -618,7 +663,9 @@ final class DashboardViewModel: AssetOperations {
            !liabilities.isEmpty, bankRow.percentage < 0.05 {
             rows.append(PortfolioInsightRow(
                 systemImage: "building.columns.fill",
-                message: "Cash & deposits are under 5% of assets. A small buffer helps cover liabilities.",
+                message: AppLocalization.string(
+                    "Cash & deposits are under 5% of assets. A small buffer helps cover liabilities."
+                ),
                 sentiment: .warning
             ))
         }
@@ -631,7 +678,10 @@ final class DashboardViewModel: AssetOperations {
                     let milestoneFormatted = milestone.formatted(.currency(code: baseCurrency.rawValue).precision(.fractionLength(0)))
                     rows.append(PortfolioInsightRow(
                         systemImage: "star.circle.fill",
-                        message: "Milestone reached! Net worth crossed \(milestoneFormatted).",
+                        message: AppLocalization.formatted(
+                            "Milestone reached! Net worth crossed %@.",
+                            arguments: [milestoneFormatted]
+                        ),
                         sentiment: .positive
                     ))
                     break
@@ -645,10 +695,15 @@ final class DashboardViewModel: AssetOperations {
             let topConverted = convertedTotal([topAsset], to: baseCurrency, exchangeRates: exchangeRates) ?? 0
             let share = topConverted / total
             if share > 0.40 {
-                let name = topAsset.displayName.isEmpty ? "one asset" : topAsset.displayName
+                let name = topAsset.displayName.isEmpty
+                    ? AppLocalization.string("one asset")
+                    : topAsset.displayName
                 rows.append(PortfolioInsightRow(
                     systemImage: "person.crop.circle.badge.exclamationmark",
-                    message: "\(safePercentInt(share))% of assets are in \(name) alone.",
+                    message: AppLocalization.formatted(
+                        "%lld%% of assets are in %@ alone.",
+                        arguments: [safePercentInt(share), name]
+                    ),
                     sentiment: share > 0.70 ? .warning : .neutral
                 ))
             }
@@ -664,7 +719,10 @@ final class DashboardViewModel: AssetOperations {
             if totalMetalPct > 0.10 {
                 rows.append(PortfolioInsightRow(
                     systemImage: "cube.fill",
-                    message: "\(safePercentInt(totalMetalPct))% of assets are in precious metals.",
+                    message: AppLocalization.formatted(
+                        "%lld%% of assets are in precious metals.",
+                        arguments: [safePercentInt(totalMetalPct)]
+                    ),
                     sentiment: .neutral
                 ))
             }
@@ -674,7 +732,9 @@ final class DashboardViewModel: AssetOperations {
         if rows.isEmpty {
             rows.append(PortfolioInsightRow(
                 systemImage: "sparkles",
-                message: "Add assets or update values to unlock portfolio insights.",
+                message: AppLocalization.string(
+                    "Add assets or update values to unlock portfolio insights."
+                ),
                 sentiment: .neutral
             ))
         }

@@ -229,7 +229,7 @@ struct AddorEditAssetView: View {
     private var categorySection: some View {
         Picker("Category", selection: $category) {
             ForEach(Asset.CategoryType.allCases) { type in
-                Label(type.rawValue, systemImage: type.icon)
+                Label(type.localizedName, systemImage: type.icon)
                     .tag(type)
             }
         }

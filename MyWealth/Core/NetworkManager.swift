@@ -16,13 +16,22 @@ enum NetworkError: Error, LocalizedError {
         case .invalidURL:
             return "The URL provided was invalid."
         case .requestFailed(let underlying):
-            return "The network request failed: \(underlying.localizedDescription)"
+            return AppLocalization.formatted(
+                "The network request failed: %@",
+                arguments: [underlying.localizedDescription]
+            )
         case .badStatusCode(let code):
-            return "Received an unexpected status code: \(code)"
+            return AppLocalization.formatted(
+                "Received an unexpected status code: %lld",
+                arguments: [code]
+            )
         case .decodingFailed(let underlying):
-            return "Failed to decode the response: \(underlying.localizedDescription)"
+            return AppLocalization.formatted(
+                "Failed to decode the response: %@",
+                arguments: [underlying.localizedDescription]
+            )
         case .noData:
-            return "No data was returned by the server."
+            return AppLocalization.string("No data was returned by the server.")
         }
     }
 }

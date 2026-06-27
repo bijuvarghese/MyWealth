@@ -456,10 +456,18 @@ struct SettingsView: View {
         do {
             let removed = try HistorySanitizer.sanitize(modelContext: modelContext)
             cleanupResultMessage = removed > 0
-                ? "Removed \(removed) duplicate \(removed == 1 ? "entry" : "entries")."
-                : "No duplicates found — your history is already clean."
+                ? AppLocalization.formatted(
+                    removed == 1
+                        ? "Removed %lld duplicate entry."
+                        : "Removed %lld duplicate entries.",
+                    arguments: [removed]
+                )
+                : AppLocalization.string("No duplicates found — your history is already clean.")
         } catch {
-            cleanupResultMessage = "Cleanup failed: \(error.localizedDescription)"
+            cleanupResultMessage = AppLocalization.formatted(
+                "Cleanup failed: %@",
+                arguments: [error.localizedDescription]
+            )
         }
     }
 
@@ -468,14 +476,14 @@ struct SettingsView: View {
     }
 
     private var displayCurrencyPrimaryValue: String {
-        interestedDisplayCurrencies.first?.rawValue ?? "None"
+        interestedDisplayCurrencies.first?.rawValue ?? AppLocalization.string("None")
     }
 
     private var displayCurrencyMoreValue: String? {
         let remainingCount = interestedDisplayCurrencies.dropFirst().count
 
         if remainingCount > 0 {
-            return "+\(remainingCount) more"
+            return AppLocalization.formatted("+%lld more", arguments: [remainingCount])
         }
 
         return nil
@@ -619,7 +627,7 @@ private struct ChatGPTExportProgressOverlay: View {
             VStack(spacing: 14) {
                 ProgressView()
                     .controlSize(.large)
-                Text(message)
+                Text(AppLocalization.string(message, fallback: message))
                     .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                     .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
             }
@@ -648,12 +656,12 @@ private struct SettingsRow: View {
                 .background(WealthMapDesignTokens.ColorToken.brandPrimary.opacity(0.12), in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.compactRadius, style: .continuous))
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(title)
+                Text(AppLocalization.string(title, fallback: title))
                     .font(WealthMapDesignTokens.Typography.body.weight(.medium))
                     .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
 
                 if let subtitle {
-                    Text(subtitle)
+                    Text(AppLocalization.string(subtitle, fallback: subtitle))
                         .font(WealthMapDesignTokens.Typography.caption)
                         .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 }

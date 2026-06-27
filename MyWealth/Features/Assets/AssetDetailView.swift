@@ -281,7 +281,7 @@ private struct AssetDetailHeaderView: View {
                 Text(title)
                     .font(WealthMapDesignTokens.Typography.amountProminent)
                     .lineLimit(2)
-                Text(asset.displayCategory.rawValue)
+                Text(asset.displayCategory.localizedName)
                     .font(WealthMapDesignTokens.Typography.subheadline)
                     .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
 
@@ -333,7 +333,7 @@ private struct AssetValueSummaryView: View {
 
     private func metricRow(title: String, value: some View) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Text(title)
+            Text(AppLocalization.string(title, fallback: title))
                 .font(WealthMapDesignTokens.Typography.subheadline)
                 .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
             Spacer(minLength: 8)
@@ -361,7 +361,10 @@ private struct AssetAllocationSummaryView: View {
             )
 
             allocationRow(
-                title: "\(categoryName) Share",
+                title: AppLocalization.formatted(
+                    "%@ Share",
+                    arguments: [categoryName]
+                ),
                 share: categoryShare,
                 totalAmount: categoryAmount
             )
@@ -371,7 +374,7 @@ private struct AssetAllocationSummaryView: View {
     private func allocationRow(title: String, share: Double?, totalAmount: Double?) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {
-                Text(title)
+                Text(AppLocalization.string(title, fallback: title))
                     .font(WealthMapDesignTokens.Typography.subheadlineMedium)
                 Spacer()
                 if let share {
