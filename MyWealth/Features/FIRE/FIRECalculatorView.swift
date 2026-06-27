@@ -204,12 +204,17 @@ struct FIRECalculatorView: View {
                             .textCase(.uppercase)
 
                         HStack(spacing: 10) {
-                            returnButton(label: "5%", subtitle: "Conservative", value: 0.05)
-                            returnButton(label: "7%", subtitle: "Moderate", value: 0.07)
-                            returnButton(label: "9%", subtitle: "Optimistic", value: 0.09)
+                            returnButton(subtitle: "Conservative", value: 0.05)
+                            returnButton(subtitle: "Moderate", value: 0.07)
+                            returnButton(subtitle: "Optimistic", value: 0.09)
                         }
 
-                        Text("Real return after inflation. 7% is the long-term stock market average.")
+                        Text(
+                            AppLocalization.formatted(
+                                "Real return after inflation. %@ is the long-term stock market average.",
+                                arguments: [AppLocalization.percent(0.07)]
+                            )
+                        )
                             .font(WealthMapDesignTokens.Typography.footnote)
                             .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     }
@@ -244,12 +249,12 @@ struct FIRECalculatorView: View {
         }
     }
 
-    private func returnButton(label: String, subtitle: String, value: Double) -> some View {
+    private func returnButton(subtitle: String, value: Double) -> some View {
         Button {
             annualReturn = value
         } label: {
             VStack(spacing: 4) {
-                Text(label)
+                Text(AppLocalization.percent(value))
                     .font(WealthMapDesignTokens.Typography.amountProminent.weight(.bold))
                 Text(AppLocalization.string(subtitle, fallback: subtitle))
                     .font(WealthMapDesignTokens.Typography.caption)
@@ -280,7 +285,12 @@ struct FIRECalculatorView: View {
                             .font(WealthMapDesignTokens.Typography.compactLabel)
                             .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                             .textCase(.uppercase)
-                        Text("25x annual spending · 4% rule")
+                        Text(
+                            AppLocalization.formatted(
+                                "25x annual spending · %@ rule",
+                                arguments: [AppLocalization.percent(0.04)]
+                            )
+                        )
                             .font(WealthMapDesignTokens.Typography.subheadline)
                             .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     }
@@ -367,7 +377,12 @@ struct FIRECalculatorView: View {
                 ProgressView(value: min(projection.savingsRate, 1))
                     .tint(WealthMapDesignTokens.ColorToken.success)
 
-                Text("Savings rate is the single strongest predictor of FIRE speed. At 50%+ you typically reach FI in under 17 years from scratch.")
+                Text(
+                    AppLocalization.formatted(
+                        "Savings rate is the single strongest predictor of FIRE speed. At %@ or higher you typically reach FI in under 17 years from scratch.",
+                        arguments: [AppLocalization.percent(0.50)]
+                    )
+                )
                     .font(WealthMapDesignTokens.Typography.subheadline)
                     .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -400,7 +415,12 @@ struct FIRECalculatorView: View {
                         .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         .textCase(.uppercase)
                     Spacer()
-                    Text("\(Int(annualReturn * 100))% return / yr")
+                    Text(
+                        AppLocalization.formatted(
+                            "%@ return / yr",
+                            arguments: [AppLocalization.percent(annualReturn)]
+                        )
+                    )
                         .font(WealthMapDesignTokens.Typography.subheadline)
                         .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 }
@@ -597,7 +617,10 @@ struct FIRECalculatorView: View {
                     )
                     Divider()
                     explainerSection(
-                        title: "The 4% Rule",
+                        title: AppLocalization.formatted(
+                            "The %@ Rule",
+                            arguments: [AppLocalization.percent(0.04)]
+                        ),
                         body: AppLocalization.formatted(
                             "A classic FIRE target is 25x your annual expenses. Spending %@/yr implies a target of %@.",
                             arguments: [

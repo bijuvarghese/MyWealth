@@ -1579,6 +1579,18 @@ struct MyWealthTests {
         #expect(result.contains("Dec 31, 2030"))
     }
 
+    @Test func percentageFormattingUsesRequestedLocale() {
+        let locale = Locale(identifier: "ar")
+        let expected = 0.25.formatted(
+            .percent
+                .precision(.fractionLength(0))
+                .locale(locale)
+        )
+
+        #expect(AppLocalization.percent(0.25, locale: locale) == expected)
+        #expect(AppLocalization.percent(.infinity, locale: locale) == AppLocalization.percent(0, locale: locale))
+    }
+
     @MainActor
     @Test func reminderLocalizationPreservesIdentifierAndRawValues() {
         let locale = Locale(identifier: "pt-BR")
@@ -1603,6 +1615,9 @@ struct MyWealthTests {
 
             for (key, value) in strings where !key.isEmpty {
                 let definition = try #require(value as? [String: Any])
+                #expect(definition["extractionState"] as? String != "stale")
+                #expect(!key.contains("%%"))
+                #expect(key.range(of: #"\d+%"#, options: .regularExpression) == nil)
                 let localizations = try #require(
                     definition["localizations"] as? [String: Any]
                 )
@@ -1616,6 +1631,7 @@ struct MyWealthTests {
                     let translated = try #require(unit["value"] as? String)
 
                     #expect(!translated.isEmpty)
+                    #expect(translated.range(of: #"\d+%"#, options: .regularExpression) == nil)
                     #expect(Self.formatArguments(in: translated) == Self.formatArguments(in: key))
                 }
             }

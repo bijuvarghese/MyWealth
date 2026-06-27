@@ -1,7 +1,7 @@
 import Foundation
 
 enum AppLocalization {
-    static let supportedLanguageIdentifiers = [
+    nonisolated static let supportedLanguageIdentifiers = [
         "en", "hi", "es", "pt-BR", "fr", "de", "zh-Hans", "ar"
     ]
 
@@ -37,7 +37,19 @@ enum AppLocalization {
             locale: locale,
             fallback: fallback
         )
-        return String(format: format, locale: locale, arguments: arguments)
+        return unsafe String(format: format, locale: locale, arguments: arguments)
+    }
+
+    nonisolated static func percent(
+        _ value: Double,
+        locale: Locale = .current
+    ) -> String {
+        let safeValue = value.isFinite ? value : 0
+        return safeValue.formatted(
+            .percent
+                .precision(.fractionLength(0))
+                .locale(locale)
+        )
     }
 }
 

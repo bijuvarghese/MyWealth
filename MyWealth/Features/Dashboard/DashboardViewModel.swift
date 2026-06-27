@@ -565,7 +565,7 @@ final class DashboardViewModel: AssetOperations {
         // 2. Debt-to-asset ratio with health label
         if let a = assetTotal, let l = liabilityTotal, a > 0, l > 0, a.isFinite, l.isFinite {
             let ratio = l / a
-            let pct = safePercentInt(ratio)
+            let percentage = AppLocalization.percent(ratio)
             let (label, sentiment): (String, PortfolioInsightRow.Sentiment) = {
                 if ratio < 0.20 { return (AppLocalization.string("healthy"), .positive) }
                 if ratio < 0.50 { return (AppLocalization.string("elevated"), .neutral) }
@@ -574,8 +574,8 @@ final class DashboardViewModel: AssetOperations {
             rows.append(PortfolioInsightRow(
                 systemImage: sentiment == .positive ? "checkmark.shield.fill" : "exclamationmark.triangle.fill",
                 message: AppLocalization.formatted(
-                    "Debt-to-asset ratio is %lld%% — %@.",
-                    arguments: [pct, label]
+                    "Debt-to-asset ratio is %@ — %@.",
+                    arguments: [percentage, label]
                 ),
                 sentiment: sentiment
             ))
@@ -586,9 +586,9 @@ final class DashboardViewModel: AssetOperations {
             rows.append(PortfolioInsightRow(
                 systemImage: "exclamationmark.circle.fill",
                 message: AppLocalization.formatted(
-                    "%lld%% of assets are in %@. Consider diversifying.",
+                    "%@ of assets are in %@. Consider diversifying.",
                     arguments: [
-                        safePercentInt(dominant.percentage),
+                        AppLocalization.percent(dominant.percentage),
                         dominant.category.localizedName
                     ]
                 ),
@@ -599,9 +599,9 @@ final class DashboardViewModel: AssetOperations {
             rows.append(PortfolioInsightRow(
                 systemImage: largest.category.icon,
                 message: AppLocalization.formatted(
-                    "%lld%% of assets are in %@.",
+                    "%@ of assets are in %@.",
                     arguments: [
-                        safePercentInt(largest.percentage),
+                        AppLocalization.percent(largest.percentage),
                         largest.category.localizedName
                     ]
                 ),
@@ -663,8 +663,9 @@ final class DashboardViewModel: AssetOperations {
            !liabilities.isEmpty, bankRow.percentage < 0.05 {
             rows.append(PortfolioInsightRow(
                 systemImage: "building.columns.fill",
-                message: AppLocalization.string(
-                    "Cash & deposits are under 5% of assets. A small buffer helps cover liabilities."
+                message: AppLocalization.formatted(
+                    "Cash & deposits are under %@ of assets. A small buffer helps cover liabilities.",
+                    arguments: [AppLocalization.percent(0.05)]
                 ),
                 sentiment: .warning
             ))
@@ -701,8 +702,8 @@ final class DashboardViewModel: AssetOperations {
                 rows.append(PortfolioInsightRow(
                     systemImage: "person.crop.circle.badge.exclamationmark",
                     message: AppLocalization.formatted(
-                        "%lld%% of assets are in %@ alone.",
-                        arguments: [safePercentInt(share), name]
+                        "%@ of assets are in %@ alone.",
+                        arguments: [AppLocalization.percent(share), name]
                     ),
                     sentiment: share > 0.70 ? .warning : .neutral
                 ))
@@ -720,8 +721,8 @@ final class DashboardViewModel: AssetOperations {
                 rows.append(PortfolioInsightRow(
                     systemImage: "cube.fill",
                     message: AppLocalization.formatted(
-                        "%lld%% of assets are in precious metals.",
-                        arguments: [safePercentInt(totalMetalPct)]
+                        "%@ of assets are in precious metals.",
+                        arguments: [AppLocalization.percent(totalMetalPct)]
                     ),
                     sentiment: .neutral
                 ))
@@ -740,16 +741,6 @@ final class DashboardViewModel: AssetOperations {
         }
 
         return Array(rows.prefix(limit))
-    }
-
-    // Safely converts a 0…1 ratio to an integer percentage, returning 0 if the
-    // input is NaN or infinite. Prevents an Int(Double) trap when upstream
-    // math (e.g. division by a missing/zero exchange rate) yields a non-finite
-    // value.
-    private func safePercentInt(_ ratio: Double) -> Int {
-        let scaled = ratio * 100
-        guard scaled.isFinite else { return 0 }
-        return Int(scaled.rounded())
     }
 
     func recordPortfolioHistory(
