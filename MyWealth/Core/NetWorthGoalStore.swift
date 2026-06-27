@@ -9,7 +9,9 @@ enum NetWorthGoalStore {
         var errorDescription: String? {
             switch self {
             case .invalidDraft:
-                return "Enter a positive target amount, supported currency, and valid target date."
+                return AppLocalization.string(
+                    "Enter a positive target amount, supported currency, and valid target date."
+                )
             }
         }
     }

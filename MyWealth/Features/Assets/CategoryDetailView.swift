@@ -43,7 +43,7 @@ struct CategoryDetailView: View {
                 ContentUnavailableView(
                     "No Assets",
                     systemImage: category.icon,
-                    description: Text("No assets found in \(category.rawValue).")
+                    description: Text("No assets found in \(category.localizedName).")
                 )
             } else {
                 List {
@@ -82,7 +82,7 @@ struct CategoryDetailView: View {
                 .scrollIndicators(.hidden)
             }
         }
-        .navigationTitle(category.rawValue)
+        .navigationTitle(category.localizedName)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             async let forex: () = viewModel.refreshExchangeRateIfNeeded()

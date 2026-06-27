@@ -20,7 +20,7 @@ struct LiabilityRowView: View {
                         .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
                 }
 
-                Text(liability.displayCategory.rawValue)
+                Text(liability.displayCategory.localizedName)
                     .font(WealthMapDesignTokens.Typography.caption)
                     .foregroundStyle(WealthMapDesignTokens.ColorToken.inactive)
             }

@@ -49,6 +49,22 @@ Financial data is stored locally by default. Users can opt in to iCloud backup a
 - Local snapshot history for asset value changes, portfolio totals, and net worth changes
 - Searchable currency selection with common currencies prioritized
 
+## Localization
+
+Wealth Map follows the active iOS app or system language automatically. The
+MVP supports English, Hindi, Spanish, Portuguese (Brazil), French, German,
+Simplified Chinese, and Arabic. Unsupported languages fall back to English.
+
+App, widget, reminder, validation, status, accessibility, and share copy is
+localized. Currency codes, saved enum values, backup fields, widget payloads,
+notification identifiers, analytics names, and user-entered financial labels
+remain unchanged. Currency names use the active locale when Foundation
+provides one, with the existing catalog as a fallback.
+
+Translations in `Localizable.xcstrings` should receive native-speaker review
+before a production release, especially financial guidance and compact widget
+copy.
+
 ## Architecture
 
 - SwiftUI for app UI and navigation

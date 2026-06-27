@@ -50,7 +50,7 @@ struct AddOrEditLiabilityView: View {
 
                 Picker("Type", selection: $category) {
                     ForEach(Liability.CategoryType.allCases) { type in
-                        Label(type.rawValue, systemImage: type.icon)
+                        Label(type.localizedName, systemImage: type.icon)
                             .tag(type)
                     }
                 }

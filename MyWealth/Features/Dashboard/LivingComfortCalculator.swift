@@ -31,6 +31,10 @@ enum LivingComfortLevel: String, Equatable {
     case stable = "Stable"
     case comfortable = "Comfortable"
     case independent = "Independent"
+
+    var localizedName: String {
+        AppLocalization.string(rawValue, fallback: rawValue)
+    }
 }
 
 struct LivingComfortRow: Identifiable, Equatable {

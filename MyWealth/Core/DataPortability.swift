@@ -198,11 +198,16 @@ enum DataImporter {
         var errorDescription: String? {
             switch self {
             case .unsupportedVersion(let v):
-                return "Backup version \(v) is not supported by this app version."
+                return AppLocalization.formatted(
+                    "Backup version %lld is not supported by this app version.",
+                    arguments: [v]
+                )
             case .invalidGoal:
-                return "The backup contains an invalid net worth goal."
+                return AppLocalization.string("The backup contains an invalid net worth goal.")
             case .goalConflict:
-                return "The backup contains a different net worth goal. Choose whether to keep or replace your current goal."
+                return AppLocalization.string(
+                    "The backup contains a different net worth goal. Choose whether to keep or replace your current goal."
+                )
             }
         }
     }
@@ -419,14 +424,49 @@ struct ImportSummary {
 
     var description: String {
         var parts: [String] = []
-        if assets > 0             { parts.append("\(assets) asset\(assets == 1 ? "" : "s")") }
-        if liabilities > 0        { parts.append("\(liabilities) liabilit\(liabilities == 1 ? "y" : "ies")") }
-        if assetSnapshots > 0     { parts.append("\(assetSnapshots) asset history entries") }
-        if netWorthSnapshots > 0  { parts.append("\(netWorthSnapshots) net worth snapshots") }
-        if portfolioSnapshots > 0 { parts.append("\(portfolioSnapshots) portfolio snapshots") }
-        if netWorthGoals > 0      { parts.append("\(netWorthGoals) net worth goal") }
-        guard !parts.isEmpty else { return "Nothing new to import — all records already exist." }
-        return "Imported: " + parts.joined(separator: ", ") + "."
+        if assets > 0 {
+            parts.append(AppLocalization.formatted(
+                assets == 1 ? "%lld asset" : "%lld assets",
+                arguments: [assets]
+            ))
+        }
+        if liabilities > 0 {
+            parts.append(AppLocalization.formatted(
+                liabilities == 1 ? "%lld liability" : "%lld liabilities",
+                arguments: [liabilities]
+            ))
+        }
+        if assetSnapshots > 0 {
+            parts.append(AppLocalization.formatted(
+                "%lld asset history entries",
+                arguments: [assetSnapshots]
+            ))
+        }
+        if netWorthSnapshots > 0 {
+            parts.append(AppLocalization.formatted(
+                "%lld net worth snapshots",
+                arguments: [netWorthSnapshots]
+            ))
+        }
+        if portfolioSnapshots > 0 {
+            parts.append(AppLocalization.formatted(
+                "%lld portfolio snapshots",
+                arguments: [portfolioSnapshots]
+            ))
+        }
+        if netWorthGoals > 0 {
+            parts.append(AppLocalization.formatted(
+                "%lld net worth goal",
+                arguments: [netWorthGoals]
+            ))
+        }
+        guard !parts.isEmpty else {
+            return AppLocalization.string("Nothing new to import — all records already exist.")
+        }
+        return AppLocalization.formatted(
+            "Imported: %@.",
+            arguments: [parts.joined(separator: ", ")]
+        )
     }
 }
 
@@ -440,18 +480,34 @@ enum PortfolioShareSummaryBuilder {
         goalProgressFraction: Double? = nil
     ) -> String {
         var lines = [
-            "Wealth Map update",
-            "Net worth: \(formatted(netWorth, currency: baseCurrency))"
+            AppLocalization.string("Wealth Map update"),
+            AppLocalization.formatted(
+                "Net worth: %@",
+                arguments: [formatted(netWorth, currency: baseCurrency)]
+            )
         ]
 
         if let goal {
             if let goalProgressFraction {
-                lines.append("Goal progress: \(goalProgressFraction.formatted(.percent.precision(.fractionLength(0...1))))")
+                lines.append(AppLocalization.formatted(
+                    "Goal progress: %@",
+                    arguments: [
+                        goalProgressFraction.formatted(
+                            .percent.precision(.fractionLength(0...1))
+                        )
+                    ]
+                ))
             }
-            lines.append("Goal target: \(formatted(goal.displayTargetAmount, currency: goal.displayCurrency)) by \(goal.displayTargetDate.formatted(date: .abbreviated, time: .omitted))")
+            lines.append(AppLocalization.formatted(
+                "Goal target: %@ by %@",
+                arguments: [
+                    formatted(goal.displayTargetAmount, currency: goal.displayCurrency),
+                    goal.displayTargetDate.formatted(date: .abbreviated, time: .omitted)
+                ]
+            ))
         }
 
-        lines.append("Tracked privately with Wealth Map.")
+        lines.append(AppLocalization.string("Tracked privately with Wealth Map."))
         return lines.joined(separator: "\n")
     }
 

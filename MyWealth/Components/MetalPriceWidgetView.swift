@@ -78,7 +78,7 @@ private struct MetalGroupSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(group.rawValue.uppercased())
+            Text(group.localizedName.uppercased())
                 .font(WealthMapDesignTokens.Typography.caption2.weight(.semibold))
                 .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                 .tracking(0.6)

@@ -211,6 +211,17 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 - **FR13.8**: Crashlytics breadcrumbs and optional non-fatal errors must use only the same non-sensitive typed parameter catalog.
 - **FR13.9**: Firebase user identifiers must not be set from email, Apple ID, name, account identifiers, or financial identifiers.
 
+### 14. Localization
+
+- **FR14.1**: The app must automatically follow the active iOS app or system language for English, Hindi, Spanish, Portuguese (Brazil), French, German, Simplified Chinese, and Arabic.
+- **FR14.2**: Unsupported app languages and missing translations must fall back to English without exposing localization keys.
+- **FR14.3**: Onboarding, navigation, portfolio workflows, settings, reminders, widgets, alerts, validation, empty/error states, and user-initiated share summaries must use localized user-facing copy.
+- **FR14.4**: Currency names should use locale-aware platform names when available while currency codes remain stable and visible.
+- **FR14.5**: Asset categories, liability categories, reminder labels, FIRE labels, goal states, rate statuses, and other display labels must localize without changing their persisted or exported raw values.
+- **FR14.6**: Number, currency, percentage, date, and time presentation must remain locale-aware while preserving the user-selected Wealth Map currency.
+- **FR14.7**: Arabic app and widget surfaces must support right-to-left layout without changing financial meaning, record order, or navigation behavior.
+- **FR14.8**: Localization must not change SwiftData schemas, settings keys, backup fields, widget payload fields, notification identifiers, Firebase contracts, or analytics identifiers.
+
 ## Non-Functional Requirements
 
 ### 1. Platform and Tooling
@@ -278,6 +289,7 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 - The Net Worth tab provides a focused converted net worth and trend view.
 - The Rates tab displays transfer-rate rows for configured display currencies relative to the selected base currency.
 - Home and lock screen widgets display net worth summaries from the most recent app-written snapshot.
+- App, widget, reminder, and share copy follows the active supported iOS language, with English fallback for unsupported languages.
 - iCloud sync and backup import/export are available from onboarding and Settings.
 - The app records portfolio history but does not yet prune old snapshot records.
 - Trend charts currently use recent snapshots; user-selectable time ranges are future scope.

@@ -10,10 +10,18 @@ extension Asset.CurrencyType {
     }
 
     var name: String {
+        localizedName()
+    }
+
+    func localizedName(locale: Locale = .current) -> String {
+        if let localizedName = locale.localizedString(forCurrencyCode: rawValue),
+           !localizedName.isEmpty {
+            return localizedName
+        }
         guard let name = Self.names[rawValue] else {
             return rawValue
         }
-        return name
+        return AppLocalization.string(name, locale: locale, fallback: name)
     }
 
     private static let names: [String: String] = [

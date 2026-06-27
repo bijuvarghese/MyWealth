@@ -23,10 +23,10 @@ enum WeightUnit: String, Codable, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .troyOz: "troy oz"
-        case .grams:  "grams"
-        case .kg:     "kg"
-        case .oz:     "oz"
+        case .troyOz: AppLocalization.string("troy oz")
+        case .grams:  AppLocalization.string("grams")
+        case .kg:     AppLocalization.string("kg")
+        case .oz:     AppLocalization.string("oz")
         }
     }
 
@@ -300,6 +300,10 @@ final class Asset {
 
         var id: String { rawValue }
 
+        var localizedName: String {
+            AppLocalization.string(rawValue, fallback: rawValue)
+        }
+
         var icon: String {
             switch self {
             case .stocks:    "chart.line.uptrend.xyaxis"
@@ -388,6 +392,10 @@ final class Liability {
         case other = "Other Debt"
 
         var id: String { rawValue }
+
+        var localizedName: String {
+            AppLocalization.string(rawValue, fallback: rawValue)
+        }
 
         var icon: String {
             switch self {

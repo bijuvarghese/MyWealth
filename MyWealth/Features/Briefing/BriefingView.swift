@@ -182,7 +182,7 @@ struct BriefingView: View {
                         Text("Portfolio Health")
                             .font(WealthMapDesignTokens.Typography.headline)
                             .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
-                        Text(report.grade.rawValue)
+                        Text(report.grade.localizedName)
                             .font(WealthMapDesignTokens.Typography.amountProminent.weight(.bold))
                             .foregroundStyle(gradeColor(report.grade))
                     }
@@ -255,7 +255,7 @@ struct BriefingView: View {
                     .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
 
                 HStack(spacing: 10) {
-                    Text(report.grade.rawValue)
+                    Text(report.grade.localizedName)
                         .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                         .foregroundStyle(gradeColor(report.grade))
                         .padding(.horizontal, 12)
@@ -334,7 +334,7 @@ struct BriefingView: View {
                         Text(report.generatedAt.formatted(.relative(presentation: .numeric)))
                             .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         Spacer()
-                        Text(report.grade.rawValue)
+                        Text(report.grade.localizedName)
                             .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                             .foregroundStyle(gradeColor(report.grade))
                             .padding(.horizontal, 10)
@@ -413,7 +413,7 @@ struct BriefingView: View {
                             RoundedRectangle(cornerRadius: 3)
                                 .fill(categoryColor(row.category))
                                 .frame(width: 14, height: 14)
-                            Text(row.category.rawValue)
+                            Text(row.category.localizedName)
                                 .font(WealthMapDesignTokens.Typography.headline)
                             Text("(\(assets.filter { $0.displayCategory == row.category }.count))")
                                 .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
@@ -634,7 +634,7 @@ private struct WhatIfSimulatorView: View {
 
     private func whatIfRow(title: String, value: Double, delta: Double) -> some View {
         HStack {
-            Text(title)
+            Text(AppLocalization.string(title, fallback: title))
                 .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
             Spacer()
             VStack(alignment: .trailing, spacing: 2) {
@@ -657,9 +657,9 @@ private enum WhatIfScenario: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .buyAsset: return "Buy"
-        case .sellAsset: return "Sell"
-        case .payDebt: return "Pay Debt"
+        case .buyAsset: return AppLocalization.string("Buy")
+        case .sellAsset: return AppLocalization.string("Sell")
+        case .payDebt: return AppLocalization.string("Pay Debt")
         }
     }
 
@@ -674,11 +674,17 @@ private enum WhatIfScenario: String, CaseIterable, Identifiable {
     var guidance: String {
         switch self {
         case .buyAsset:
-            return "Buying adds exposure. The health impact depends on whether the new asset improves diversification or adds concentration."
+            return AppLocalization.string(
+                "Buying adds exposure. The health impact depends on whether the new asset improves diversification or adds concentration."
+            )
         case .sellAsset:
-            return "Selling reduces assets in the simulation. If the sale lowers concentration, the portfolio may become more balanced."
+            return AppLocalization.string(
+                "Selling reduces assets in the simulation. If the sale lowers concentration, the portfolio may become more balanced."
+            )
         case .payDebt:
-            return "Paying off debt directly improves net worth and the debt-ratio component of portfolio health."
+            return AppLocalization.string(
+                "Paying off debt directly improves net worth and the debt-ratio component of portfolio health."
+            )
         }
     }
 }
