@@ -1,6 +1,6 @@
 # Wealth Map - Requirements
 
-Last updated: June 25, 2026
+Last updated: June 29, 2026
 
 This document defines the current product requirements for the Wealth Map iOS app and its exchange-rate proxy. It reflects the current app state: onboarding, local asset and liability tracking, multi-currency net worth, net worth goals, display-currency ordering, exchange-rate caching, portfolio history, widgets, iCloud sync, backup import/export, reminders, and the Firebase rate proxy.
 
@@ -154,6 +154,7 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 - **FR9.7**: Snapshot recording must run when dashboard/net worth data loads and when assets, liabilities, selected currencies, or exchange rates change.
 - **FR9.8**: Snapshot display helpers must filter net worth trend rows by base currency, sort chronologically, and limit displayed rows.
 - **FR9.9**: Recent asset history must sort snapshots newest first and limit displayed rows.
+- **FR9.10**: Changing whether ignored assets participate in portfolio calculations must start a new visible history scope and record a fresh baseline, while retaining older snapshots without presenting the scope change as portfolio growth or decline.
 
 ### 10. Data Persistence
 

@@ -446,6 +446,26 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func backupImportDeduplicatesRepeatedRecordsWithinOnePayload() async throws {
+        let source = try makeInMemoryModelContext()
+        let target = try makeInMemoryModelContext()
+        source.insert(Asset(name: "Cash", amount: 500, currency: .usd, category: .bank))
+        try source.save()
+        let url = try DataExporter.buildExportURL(context: source)
+        var json = try #require(
+            JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any]
+        )
+        let assets = try #require(json["assets"] as? [[String: Any]])
+        json["assets"] = assets + assets
+        let duplicatedData = try JSONSerialization.data(withJSONObject: json)
+
+        let summary = try DataImporter.importData(duplicatedData, into: target)
+
+        #expect(summary.assets == 1)
+        #expect(try contextCount(Asset.self, in: target) == 1)
+    }
+
+    @MainActor
     @Test func assetCurrencyTotalsConvertEveryAssetIntoEachCurrency() async throws {
         let viewModel = DashboardViewModel(autoRefreshRate: false)
         viewModel.exchangeRates = [
@@ -464,6 +484,51 @@ struct MyWealthTests {
 
         #expect(usdTotal.amount == 5)
         #expect(eurTotal.amount == 2.5)
+    }
+
+    @MainActor
+    @Test func conversionsRequireEveryPositiveHoldingRate() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        let assets = [
+            Asset(name: "Cash", amount: 1_000, currency: .usd, category: .bank),
+            Asset(name: "Euro Cash", amount: 500, currency: .eur, category: .bank)
+        ]
+        let liabilities = [
+            Liability(name: "Euro Loan", amount: 100, currency: .eur, category: .personalLoan)
+        ]
+
+        #expect(viewModel.convertedTotal(assets, to: .usd, exchangeRates: ["USD": 1]) == nil)
+        #expect(viewModel.convertedLiabilityTotal(liabilities, to: .usd, exchangeRates: ["USD": 1]) == nil)
+        #expect(
+            viewModel.netWorthTotal(
+                assets,
+                liabilities: liabilities,
+                to: .usd,
+                exchangeRates: ["USD": 1]
+            ) == nil
+        )
+        #expect(viewModel.categoryAllocationRows(assets, targetCurrency: .usd).isEmpty)
+    }
+
+    @MainActor
+    @Test func largestAssetInsightComparesConvertedValues() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        viewModel.exchangeRates = ["USD": 1, "INR": 80]
+        let assets = [
+            Asset(name: "Rupee Account", amount: 1_000_000, currency: .inr, category: .bank),
+            Asset(name: "US Brokerage", amount: 50_000, currency: .usd, category: .stocks)
+        ]
+
+        let rows = viewModel.portfolioInsightRows(
+            assets: assets,
+            liabilities: [],
+            netWorthSnapshots: [],
+            baseCurrency: .usd,
+            limit: 20
+        )
+
+        #expect(rows.contains { $0.message.contains("US Brokerage alone") })
+        #expect(!rows.contains { $0.message.contains("Rupee Account alone") })
     }
 
     @MainActor
@@ -586,6 +651,23 @@ struct MyWealthTests {
         #expect(report.focusArea == "Diversification")
         #expect(report.metrics.map(\.score) == [0, 14, 20, 10, 15])
         #expect(report.observations.contains { $0.id == "asset-concentration" })
+    }
+
+    @MainActor
+    @Test func portfolioIntelligenceIsUnavailableWhenConversionIsIncomplete() async throws {
+        let report = PortfolioIntelligenceCalculator().makeReport(
+            assets: [
+                Asset(name: "Euro Account", amount: 1_000, currency: .eur, category: .bank)
+            ],
+            liabilities: [],
+            netWorthSnapshots: [],
+            exchangeRates: ["USD": 1],
+            baseCurrency: .usd
+        )
+
+        #expect(!report.isConversionComplete)
+        #expect(report.metrics.isEmpty)
+        #expect(report.observations.map(\.id) == ["conversion-unavailable"])
     }
 
     @MainActor
@@ -749,6 +831,24 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func portfolioHistoryScopeStartPersistsAcrossSettingsInstances() async throws {
+        let defaults = try makeIsolatedDefaults()
+        let scopeStart = Date(timeIntervalSince1970: 1_800_000_000)
+        let settings = AppSettings(
+            userDefaults: defaults,
+            hasMadeReminderChoice: { true }
+        )
+
+        settings.beginNewPortfolioHistoryScope(at: scopeStart)
+
+        let restored = AppSettings(
+            userDefaults: defaults,
+            hasMadeReminderChoice: { true }
+        )
+        #expect(restored.portfolioHistoryScopeStartedAt == scopeStart)
+    }
+
+    @MainActor
     @Test func hidingAssetChangesMembershipButNotHistorySignature() async throws {
         let defaults = try makeIsolatedDefaults()
         let settings = AppSettings(
@@ -840,6 +940,28 @@ struct MyWealthTests {
 
         #expect(after.assetSnapshotSignature == historySignature)
         #expect(after.portfolioMembershipSignature != membershipSignature)
+    }
+
+    @MainActor
+    @Test func portfolioScopeResetsOnlyForPolicyChangesNotAssetAdds() {
+        let initial = PortfolioMembershipState(
+            assetIdentifiers: ["asset-1"],
+            calculationAssetIdentifiers: ["asset-1"],
+            includesIgnoredAssets: false
+        )
+        let excluded = PortfolioMembershipState(
+            assetIdentifiers: ["asset-1"],
+            calculationAssetIdentifiers: [],
+            includesIgnoredAssets: false
+        )
+        let added = PortfolioMembershipState(
+            assetIdentifiers: ["asset-1", "asset-2"],
+            calculationAssetIdentifiers: ["asset-1", "asset-2"],
+            includesIgnoredAssets: false
+        )
+
+        #expect(excluded.isPolicyChange(from: initial))
+        #expect(!added.isPolicyChange(from: initial))
     }
 
     @MainActor
@@ -990,6 +1112,70 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func metalPricesDoNotMislabelUSDWhenBaseRateIsMissing() async throws {
+        let viewModel = MetalPricesViewModel(
+            userDefaults: try makeIsolatedDefaults(),
+            metalPriceService: StubMetalPriceService(
+                response: RateResponse(
+                    base: "USD",
+                    date: nil,
+                    rates: ["XAU": 0.0005],
+                    success: true,
+                    timestamp: nil,
+                    cacheTimestamp: nil
+                )
+            )
+        )
+        viewModel.metalRates = ["XAU": 0.0005]
+
+        let missingRateRows = viewModel.metalPriceRows(
+            baseCurrency: .inr,
+            exchangeRates: ["USD": 1]
+        )
+        let convertedRows = viewModel.metalPriceRows(
+            baseCurrency: .inr,
+            exchangeRates: ["USD": 1, "INR": 80]
+        )
+
+        #expect(missingRateRows.first { $0.symbol == "XAU" }?.priceInBase == nil)
+        #expect(convertedRows.first { $0.symbol == "XAU" }?.priceInBase == 160_000)
+    }
+
+    @MainActor
+    @Test func dedicatedMetalRatesSurviveForexRefreshAndTakePrecedence() async throws {
+        let service = StubExchangeRateService(
+            response: RateResponse(
+                base: "USD",
+                date: nil,
+                rates: ["XAU": 0.0004, "EUR": 0.9],
+                success: true,
+                timestamp: nil,
+                cacheTimestamp: nil
+            )
+        )
+        let viewModel = DashboardViewModel(
+            autoRefreshRate: false,
+            userDefaults: try makeIsolatedDefaults(),
+            exchangeRateService: service
+        )
+        viewModel.enrichWithMetalRates(["XAU": 0.0005, "XPT": 0.001])
+
+        await viewModel.fetchExchangeRate(requiredCurrencies: [.xau, .xpt])
+
+        #expect(viewModel.exchangeRates["XAU"] == 0.0005)
+        #expect(viewModel.exchangeRates["XPT"] == 0.001)
+        #expect(viewModel.exchangeRates["EUR"] == 0.9)
+    }
+
+    @MainActor
+    @Test func unsupportedRhodiumIsNotOfferedAsLivePricedMetal() {
+        #expect(Asset.CategoryType.gold.supportsLiveMetalPricing)
+        #expect(Asset.CategoryType.palladium.supportsLiveMetalPricing)
+        #expect(!Asset.CategoryType.rhodium.supportsLiveMetalPricing)
+        #expect(!PreciousMetalSelectionView.metals.contains { $0.currency == .xrh })
+    }
+
+    @MainActor
     @Test func exchangeRateFetchDoesNotRequireINRUnlessNeeded() async throws {
         let defaults = try makeIsolatedDefaults()
         let service = StubExchangeRateService(
@@ -1103,6 +1289,46 @@ struct MyWealthTests {
 
         #expect(rows.map(\.amount) == [2, 3])
         #expect(rows.allSatisfy { $0.currencyCode == "USD" })
+    }
+
+    @MainActor
+    @Test func historyRowsExcludeSnapshotsFromPreviousPortfolioScope() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        let oldDate = Date(timeIntervalSince1970: 1_700_000_000)
+        let scopeStart = Date(timeIntervalSince1970: 1_750_000_000)
+        let newDate = Date(timeIntervalSince1970: 1_800_000_000)
+        let netWorthSnapshots = [
+            NetWorthSnapshot(amount: 100, currencyCode: "USD", recordedAt: oldDate),
+            NetWorthSnapshot(amount: 40, currencyCode: "USD", recordedAt: newDate)
+        ]
+        let portfolioSnapshots = [
+            PortfolioSnapshot(
+                assetTotal: 150,
+                liabilityTotal: 50,
+                currencyCode: "USD",
+                recordedAt: oldDate
+            ),
+            PortfolioSnapshot(
+                assetTotal: 90,
+                liabilityTotal: 50,
+                currencyCode: "USD",
+                recordedAt: newDate
+            )
+        ]
+
+        let netWorthRows = viewModel.netWorthTrendRows(
+            netWorthSnapshots,
+            baseCurrency: .usd,
+            since: scopeStart
+        )
+        let portfolioRows = viewModel.portfolioTrendRows(
+            portfolioSnapshots,
+            baseCurrency: .usd,
+            since: scopeStart
+        )
+
+        #expect(netWorthRows.map(\.amount) == [40])
+        #expect(portfolioRows.map(\.assetTotal) == [90])
     }
 
     @MainActor
@@ -1366,6 +1592,36 @@ struct MyWealthTests {
         let snapshots = try modelContext.fetch(FetchDescriptor<NetWorthSnapshot>())
         let snapshot = try #require(snapshots.first)
         #expect(snapshot.displayAmount == 750)
+    }
+
+    @MainActor
+    @Test func newPortfolioScopeRecordsFreshBaselineWithoutDeletingOldHistory() async throws {
+        let viewModel = DashboardViewModel(autoRefreshRate: false)
+        viewModel.exchangeRates = ["USD": 1]
+        let modelContext = try makeInMemoryModelContext()
+        let asset = Asset(name: "Cash", amount: 100, currency: .usd, category: .bank)
+        let oldSnapshot = NetWorthSnapshot(
+            amount: 100,
+            currencyCode: "USD",
+            recordedAt: Date(timeIntervalSince1970: 1_700_000_000)
+        )
+        modelContext.insert(asset)
+        modelContext.insert(oldSnapshot)
+        let scopeStart = Date(timeIntervalSince1970: 1_750_000_000)
+
+        viewModel.recordPortfolioHistory(
+            assets: [asset],
+            baseCurrency: .usd,
+            netWorthSnapshots: [oldSnapshot],
+            assetValueSnapshots: [],
+            scopeStartedAt: scopeStart,
+            modelContext: modelContext
+        )
+
+        let snapshots = try modelContext.fetch(FetchDescriptor<NetWorthSnapshot>())
+        #expect(snapshots.count == 2)
+        #expect(snapshots.contains { $0.displayRecordedAt < scopeStart })
+        #expect(snapshots.contains { $0.displayRecordedAt >= scopeStart })
     }
 
     @MainActor

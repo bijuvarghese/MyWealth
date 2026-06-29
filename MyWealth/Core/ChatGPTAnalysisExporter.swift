@@ -188,7 +188,11 @@ enum ChatGPTAnalysisExporter {
                 },
             assets: sanitizedAssets(calculationAssets),
             liabilities: sanitizedLiabilities(liabilities),
-            portfolioHistory: viewModel.portfolioTrendRows(portfolioSnapshots, baseCurrency: baseCurrency)
+            portfolioHistory: viewModel.portfolioTrendRows(
+                portfolioSnapshots,
+                baseCurrency: baseCurrency,
+                since: settings.portfolioHistoryScopeStartedAt
+            )
                 .map {
                     ChatGPTPortfolioHistoryPoint(
                         recordedAt: $0.recordedAt,
@@ -198,7 +202,11 @@ enum ChatGPTAnalysisExporter {
                         currency: $0.currencyCode
                     )
                 },
-            netWorthHistory: viewModel.netWorthTrendRows(netWorthSnapshots, baseCurrency: baseCurrency)
+            netWorthHistory: viewModel.netWorthTrendRows(
+                netWorthSnapshots,
+                baseCurrency: baseCurrency,
+                since: settings.portfolioHistoryScopeStartedAt
+            )
                 .map {
                     ChatGPTNetWorthHistoryPoint(
                         recordedAt: $0.recordedAt,

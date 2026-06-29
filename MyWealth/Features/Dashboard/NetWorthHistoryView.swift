@@ -17,7 +17,7 @@ struct NetWorthHistoryView: View {
     // MARK: - Filtered data
 
     private var filteredPortfolioRows: [PortfolioTrendRow] {
-        let cutoff = selectedRange.cutoffDate
+        let cutoff = max(selectedRange.cutoffDate, settings.portfolioHistoryScopeStartedAt)
         return portfolioSnapshots
             .filter {
                 $0.displayCurrencyCode == settings.baseCurrency.rawValue &&
@@ -37,7 +37,7 @@ struct NetWorthHistoryView: View {
     }
 
     private var filteredNetWorthRows: [NetWorthTrendRow] {
-        let cutoff = selectedRange.cutoffDate
+        let cutoff = max(selectedRange.cutoffDate, settings.portfolioHistoryScopeStartedAt)
         return netWorthSnapshots
             .filter {
                 $0.displayCurrencyCode == settings.baseCurrency.rawValue &&

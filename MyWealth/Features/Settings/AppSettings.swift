@@ -10,6 +10,7 @@ final class AppSettings {
         static let baseCurrency = "settings.baseCurrency"
         static let usesCompactCurrencyTotals = "settings.usesCompactCurrencyTotals"
         static let includeIgnoredAssetsInPortfolio = "settings.includeIgnoredAssetsInPortfolio"
+        static let portfolioHistoryScopeStartedAt = "settings.portfolioHistoryScopeStartedAt"
         static let hasCompletedOnboarding = "settings.hasCompletedOnboarding"
         static let iCloudSyncEnabled = "settings.iCloudSyncEnabled"
         static let hasSeenICloudOnboarding = "settings.hasSeenICloudOnboarding"
@@ -41,6 +42,15 @@ final class AppSettings {
     var includeIgnoredAssetsInPortfolio: Bool {
         didSet {
             userDefaults.set(includeIgnoredAssetsInPortfolio, forKey: DefaultsKeys.includeIgnoredAssetsInPortfolio)
+        }
+    }
+
+    private(set) var portfolioHistoryScopeStartedAt: Date {
+        didSet {
+            userDefaults.set(
+                portfolioHistoryScopeStartedAt.timeIntervalSince1970,
+                forKey: DefaultsKeys.portfolioHistoryScopeStartedAt
+            )
         }
     }
 
@@ -78,6 +88,11 @@ final class AppSettings {
             : AppSettings.normalizedDisplayCurrencies(savedCurrencies, including: restoredBaseCurrency)
         self.usesCompactCurrencyTotals = userDefaults.bool(forKey: DefaultsKeys.usesCompactCurrencyTotals)
         self.includeIgnoredAssetsInPortfolio = userDefaults.bool(forKey: DefaultsKeys.includeIgnoredAssetsInPortfolio)
+        if let interval = userDefaults.object(forKey: DefaultsKeys.portfolioHistoryScopeStartedAt) as? TimeInterval {
+            self.portfolioHistoryScopeStartedAt = Date(timeIntervalSince1970: interval)
+        } else {
+            self.portfolioHistoryScopeStartedAt = .distantPast
+        }
         self.iCloudSyncEnabled = userDefaults.bool(forKey: DefaultsKeys.iCloudSyncEnabled)
 
         let hasSavedCurrencySettings = savedBaseCode != nil || !savedCodes.isEmpty
@@ -157,6 +172,10 @@ final class AppSettings {
         includeIgnoredAssetsInPortfolio
             ? assets
             : assets.filter(\.participatesInPortfolioCalculations)
+    }
+
+    func beginNewPortfolioHistoryScope(at date: Date = Date()) {
+        portfolioHistoryScopeStartedAt = date
     }
 
     private func persistOnboardingStatus() {

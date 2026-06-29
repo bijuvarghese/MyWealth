@@ -61,6 +61,7 @@ struct PortfolioIntelligenceReport {
     let assetTotal: Double
     let liabilityTotal: Double
     let netWorth: Double
+    let isConversionComplete: Bool
 
     var gradeMovementLabel: String? {
         guard let previousGrade, previousGrade != grade else { return nil }
@@ -82,8 +83,45 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
         previousGrade: PortfolioHealthGrade? = nil,
         generatedAt: Date = Date()
     ) -> PortfolioIntelligenceReport {
-        let assetTotal = convertedTotal(assets, to: baseCurrency, exchangeRates: exchangeRates) ?? 0
-        let liabilityTotal = convertedLiabilityTotal(liabilities, to: baseCurrency, exchangeRates: exchangeRates) ?? 0
+        guard
+            let assetTotal = convertedTotal(assets, to: baseCurrency, exchangeRates: exchangeRates),
+            let liabilityTotal = convertedLiabilityTotal(
+                liabilities,
+                to: baseCurrency,
+                exchangeRates: exchangeRates
+            )
+        else {
+            return PortfolioIntelligenceReport(
+                generatedAt: generatedAt,
+                score: 0,
+                grade: .risk,
+                previousGrade: previousGrade,
+                metrics: [],
+                focusArea: AppLocalization.string("Portfolio"),
+                focusDetail: AppLocalization.string(
+                    "Progress is unavailable until the required exchange rates are available."
+                ),
+                summary: AppLocalization.string(
+                    "Progress is unavailable until the required exchange rates are available."
+                ),
+                observations: [
+                    PortfolioObservation(
+                        id: "conversion-unavailable",
+                        title: AppLocalization.string("Unavailable"),
+                        message: AppLocalization.string(
+                            "Progress is unavailable until the required exchange rates are available."
+                        ),
+                        severity: .warning,
+                        systemImage: "exclamationmark.triangle.fill"
+                    )
+                ],
+                allocation: [],
+                assetTotal: 0,
+                liabilityTotal: 0,
+                netWorth: 0,
+                isConversionComplete: false
+            )
+        }
         let allocation = categoryAllocationRows(
             assets: assets,
             baseCurrency: baseCurrency,
@@ -136,7 +174,8 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
             allocation: allocation,
             assetTotal: assetTotal,
             liabilityTotal: liabilityTotal,
-            netWorth: assetTotal - liabilityTotal
+            netWorth: assetTotal - liabilityTotal,
+            isConversionComplete: true
         )
     }
 
@@ -146,8 +185,15 @@ struct PortfolioIntelligenceCalculator: AssetOperations {
         exchangeRates: [String: Double]
     ) -> [CategoryAllocationRow] {
         let grouped = Dictionary(grouping: assets) { $0.displayCategory }
-        let totals = grouped.map { category, categoryAssets in
-            (category, convertedTotal(categoryAssets, to: baseCurrency, exchangeRates: exchangeRates) ?? 0)
+        let totals = grouped.compactMap { category, categoryAssets -> (Asset.CategoryType, Double)? in
+            guard let total = convertedTotal(
+                categoryAssets,
+                to: baseCurrency,
+                exchangeRates: exchangeRates
+            ) else {
+                return nil
+            }
+            return (category, total)
         }
         .filter { $0.1 > 0 }
         .sorted { $0.1 > $1.1 }

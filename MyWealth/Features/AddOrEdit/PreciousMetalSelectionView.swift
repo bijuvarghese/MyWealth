@@ -24,7 +24,6 @@ struct PreciousMetalSelectionView: View {
         MetalOption(currency: .xag, name: "Silver",    symbol: "XAG", unit: "troy oz", color: Color(.systemGray)),
         MetalOption(currency: .xpt, name: "Platinum",  symbol: "XPT", unit: "troy oz", color: Color(.systemTeal)),
         MetalOption(currency: .xpd, name: "Palladium", symbol: "XPD", unit: "troy oz", color: Color(.systemMint)),
-        MetalOption(currency: .xrh, name: "Rhodium",   symbol: "XRH", unit: "troy oz", color: Color(.systemPurple)),
     ]
 
     var body: some View {

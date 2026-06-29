@@ -335,6 +335,15 @@ final class Asset {
 
         var isPreciousMetal: Bool { metalCurrency != nil }
 
+        var supportsLiveMetalPricing: Bool {
+            switch self {
+            case .gold, .silver, .platinum, .palladium:
+                return true
+            default:
+                return false
+            }
+        }
+
         /// True for asset categories whose value doesn't update automatically
         /// (no live market price feed), so users may want to log value milestones
         /// manually over time (e.g. property re-appraisals, car trade-in estimates).
@@ -380,6 +389,16 @@ final class Liability {
 
     var displayCategory: CategoryType {
         category ?? .other
+    }
+
+    var stableHistoryIdentifier: String {
+        if let historyIdentifier, !historyIdentifier.isEmpty {
+            return historyIdentifier
+        }
+
+        let identifier = UUID().uuidString
+        historyIdentifier = identifier
+        return identifier
     }
 
     enum CategoryType: String, Codable, CaseIterable, Identifiable {

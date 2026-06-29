@@ -20,6 +20,8 @@ final class DashboardViewModel: AssetOperations {
 
     @ObservationIgnored private let userDefaults: UserDefaults
     @ObservationIgnored private let exchangeRateService: any ExchangeRateFetching
+    @ObservationIgnored private var supplementalMetalRates: [String: Double] = [:]
+    @ObservationIgnored private var refreshTask: Task<Void, Never>?
 
     var exchangeRate: Double = 0
     var exchangeRates: [String: Double] = ["USD": 1]
@@ -41,6 +43,9 @@ final class DashboardViewModel: AssetOperations {
         }
         if let savedRates = userDefaults.object(forKey: DefaultsKeys.rates) as? [String: Double] {
             self.exchangeRates = savedRates.merging(["USD": 1]) { current, _ in current }
+            self.supplementalMetalRates = savedRates.filter {
+                Self.liveMetalRateCodes.contains($0.key) && $0.value.isFinite && $0.value > 0
+            }
         }
         if let savedDateInterval = userDefaults.object(forKey: DefaultsKeys.lastUpdated) as? TimeInterval {
             self.lastUpdated = Date(timeIntervalSince1970: savedDateInterval)
@@ -69,10 +74,18 @@ final class DashboardViewModel: AssetOperations {
 
     @MainActor
     func refreshExchangeRateIfNeeded(requiredCurrencies: [Asset.CurrencyType] = []) async {
-        guard !isLoadingRate else {
+        if let refreshTask {
+            await refreshTask.value
             return
         }
-        await fetchExchangeRate(requiredCurrencies: requiredCurrencies)
+
+        let task = Task { @MainActor [weak self] in
+            guard let self else { return }
+            await self.fetchExchangeRate(requiredCurrencies: requiredCurrencies)
+        }
+        refreshTask = task
+        await task.value
+        refreshTask = nil
     }
 
     @MainActor
@@ -81,12 +94,15 @@ final class DashboardViewModel: AssetOperations {
         await refreshExchangeRateIfNeeded(requiredCurrencies: requiredCurrencies)
     }
     
+    @MainActor
     func fetchExchangeRate(requiredCurrencies: [Asset.CurrencyType] = []) async {
         isLoadingRate = true
         defer { isLoadingRate = false }
         do {
             let decoded = try await exchangeRateService.fetchLatestExchangeRates()
-            let rates = (decoded.rates ?? [:]).merging(["USD": 1]) { current, _ in current }
+            let rates = (decoded.rates ?? [:])
+                .merging(["USD": 1]) { current, _ in current }
+                .merging(supplementalMetalRates) { _, metalRate in metalRate }
             let missingRateCodes = missingRequiredRateCodes(
                 in: rates,
                 requiredCurrencies: requiredCurrencies
@@ -123,10 +139,14 @@ final class DashboardViewModel: AssetOperations {
         targetCurrency: Asset.CurrencyType
     ) -> [(Asset.CategoryType, Double)] {
         let dict = Dictionary(grouping: assets) { $0.displayCategory }
-        return dict.map { (key, group) in
-            let total = convertedTotal(group, to: targetCurrency, exchangeRates: exchangeRates) ?? 0
-            return (key, total)
-        }.sorted { $0.1 > $1.1 }
+        var totals: [(Asset.CategoryType, Double)] = []
+        for (key, group) in dict {
+            guard let total = convertedTotal(group, to: targetCurrency, exchangeRates: exchangeRates) else {
+                return []
+            }
+            totals.append((key, total))
+        }
+        return totals.sorted { $0.1 > $1.1 }
     }
 
     func categoryAllocationRows(_ assets: [Asset]) -> [CategoryAllocationRow] {
@@ -158,14 +178,18 @@ final class DashboardViewModel: AssetOperations {
         targetCurrency: Asset.CurrencyType
     ) -> [LiabilityAllocationRow] {
         let dict = Dictionary(grouping: liabilities) { $0.displayCategory }
-        let totals = dict.map { category, group -> (Liability.CategoryType, Double) in
-            let total = group.reduce(0.0) { sum, liability in
-                sum + convertLiabilityAmount(liability, to: targetCurrency)
+        var totals: [(Liability.CategoryType, Double)] = []
+        for (category, group) in dict {
+            guard let total = convertedLiabilityTotal(
+                group,
+                to: targetCurrency,
+                exchangeRates: exchangeRates
+            ) else {
+                return []
             }
-            return (category, total)
+            totals.append((category, total))
         }
-        .filter { $0.1 > 0 }
-        .sorted { $0.1 > $1.1 }
+        totals = totals.filter { $0.1 > 0 }.sorted { $0.1 > $1.1 }
 
         let grandTotal = totals.reduce(0) { $0 + $1.1 }
         guard grandTotal > 0 else { return [] }
@@ -177,26 +201,6 @@ final class DashboardViewModel: AssetOperations {
                 percentage: amount / grandTotal
             )
         }
-    }
-
-    private func convertLiabilityAmount(_ liability: Liability, to targetCurrency: Asset.CurrencyType) -> Double {
-        let sourceCurrency = liability.displayCurrency
-        if sourceCurrency == targetCurrency { return liability.displayAmount }
-        let sourceRate: Double
-        if sourceCurrency == .usd {
-            sourceRate = 1
-        } else {
-            guard let r = exchangeRates[sourceCurrency.rawValue], r > 0 else { return 0 }
-            sourceRate = r
-        }
-        let targetRate: Double
-        if targetCurrency == .usd {
-            targetRate = 1
-        } else {
-            guard let r = exchangeRates[targetCurrency.rawValue], r > 0 else { return 0 }
-            targetRate = r
-        }
-        return (liability.displayAmount / sourceRate) * targetRate
     }
 
     func totalsByCurrency(_ assets: [Asset]) -> [CurrencyTotal] {
@@ -283,10 +287,16 @@ final class DashboardViewModel: AssetOperations {
     ///
     /// Call this after both the forex and metal price fetches have settled.
     func enrichWithMetalRates(_ metalRates: [String: Double]) {
-        for (symbol, rate) in metalRates where exchangeRates[symbol] == nil {
+        let validRates = metalRates.filter {
+            Self.liveMetalRateCodes.contains($0.key) && $0.value.isFinite && $0.value > 0
+        }
+        supplementalMetalRates.merge(validRates) { _, latest in latest }
+        for (symbol, rate) in validRates {
             exchangeRates[symbol] = rate
         }
     }
+
+    private static let liveMetalRateCodes: Set<String> = ["XAU", "XAG", "XPT", "XPD"]
 
     var rateStatus: RateStatusModel? {
         if isLoadingRate {
@@ -391,10 +401,14 @@ final class DashboardViewModel: AssetOperations {
     func portfolioTrendRows(
         _ snapshots: [PortfolioSnapshot],
         baseCurrency: Asset.CurrencyType,
+        since scopeStartedAt: Date = .distantPast,
         limit: Int = 30
     ) -> [PortfolioTrendRow] {
         snapshots
-            .filter { $0.displayCurrencyCode == baseCurrency.rawValue }
+            .filter {
+                $0.displayCurrencyCode == baseCurrency.rawValue &&
+                    $0.displayRecordedAt >= scopeStartedAt
+            }
             .sorted { $0.displayRecordedAt < $1.displayRecordedAt }
             .suffix(limit)
             .enumerated()
@@ -412,10 +426,14 @@ final class DashboardViewModel: AssetOperations {
     func netWorthTrendRows(
         _ snapshots: [NetWorthSnapshot],
         baseCurrency: Asset.CurrencyType,
+        since scopeStartedAt: Date = .distantPast,
         limit: Int = 30
     ) -> [NetWorthTrendRow] {
         snapshots
-            .filter { $0.displayCurrencyCode == baseCurrency.rawValue }
+            .filter {
+                $0.displayCurrencyCode == baseCurrency.rawValue &&
+                    $0.displayRecordedAt >= scopeStartedAt
+            }
             .sorted { $0.displayRecordedAt < $1.displayRecordedAt }
             .suffix(limit)
             .enumerated()
@@ -691,9 +709,20 @@ final class DashboardViewModel: AssetOperations {
         }
 
         // 8. Largest single asset
-        if let topAsset = assets.max(by: { ($0.displayAmount) < ($1.displayAmount) }),
+        let convertedAssets = assets.compactMap { asset -> (asset: Asset, amount: Double)? in
+            guard let amount = convertedTotal(
+                [asset],
+                to: baseCurrency,
+                exchangeRates: exchangeRates
+            ) else {
+                return nil
+            }
+            return (asset, amount)
+        }
+        if let largest = convertedAssets.max(by: { $0.amount < $1.amount }),
            let total = assetTotal, total > 0 {
-            let topConverted = convertedTotal([topAsset], to: baseCurrency, exchangeRates: exchangeRates) ?? 0
+            let topAsset = largest.asset
+            let topConverted = largest.amount
             let share = topConverted / total
             if share > 0.40 {
                 let name = topAsset.displayName.isEmpty
@@ -749,6 +778,7 @@ final class DashboardViewModel: AssetOperations {
         baseCurrency: Asset.CurrencyType,
         netWorthSnapshots: [NetWorthSnapshot],
         assetValueSnapshots: [AssetValueSnapshot],
+        scopeStartedAt: Date = .distantPast,
         modelContext: ModelContext
     ) {
         guard !assets.isEmpty || !liabilities.isEmpty else {
@@ -779,7 +809,10 @@ final class DashboardViewModel: AssetOperations {
         }
 
         let latestSnapshot = freshNetWorthSnapshots
-            .filter { $0.displayCurrencyCode == baseCurrency.rawValue }
+            .filter {
+                $0.displayCurrencyCode == baseCurrency.rawValue &&
+                    $0.displayRecordedAt >= scopeStartedAt
+            }
             .max { $0.displayRecordedAt < $1.displayRecordedAt }
 
         if shouldRecordNetWorthSnapshot(netWorth, after: latestSnapshot) {
@@ -796,6 +829,7 @@ final class DashboardViewModel: AssetOperations {
             assets: assets,
             liabilities: liabilities,
             baseCurrency: baseCurrency,
+            scopeStartedAt: scopeStartedAt,
             modelContext: modelContext
         )
     }
@@ -804,6 +838,7 @@ final class DashboardViewModel: AssetOperations {
         assets: [Asset],
         liabilities: [Liability],
         baseCurrency: Asset.CurrencyType,
+        scopeStartedAt: Date,
         modelContext: ModelContext
     ) {
         guard
@@ -819,7 +854,10 @@ final class DashboardViewModel: AssetOperations {
         }
 
         let latest = freshPortfolioSnapshots
-            .filter { $0.displayCurrencyCode == baseCurrency.rawValue }
+            .filter {
+                $0.displayCurrencyCode == baseCurrency.rawValue &&
+                    $0.displayRecordedAt >= scopeStartedAt
+            }
             .max { $0.displayRecordedAt < $1.displayRecordedAt }
 
         let hasChanged = latest.map {

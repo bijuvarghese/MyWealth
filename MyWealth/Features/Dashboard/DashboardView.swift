@@ -171,7 +171,9 @@ struct DashboardView: View {
                     let insightRows = viewModel.portfolioInsightRows(
                         assets: portfolioAssets,
                         liabilities: liabilities,
-                        netWorthSnapshots: netWorthSnapshots,
+                        netWorthSnapshots: netWorthSnapshots.filter {
+                            $0.displayRecordedAt >= settings.portfolioHistoryScopeStartedAt
+                        },
                         baseCurrency: settings.baseCurrency
                     )
                     if !insightRows.isEmpty {
@@ -275,11 +277,13 @@ struct DashboardView: View {
                             DashboardTrendView(
                                 portfolioRows: viewModel.portfolioTrendRows(
                                     portfolioSnapshots,
-                                    baseCurrency: settings.baseCurrency
+                                    baseCurrency: settings.baseCurrency,
+                                    since: settings.portfolioHistoryScopeStartedAt
                                 ),
                                 netWorthRows: viewModel.netWorthTrendRows(
                                     netWorthSnapshots,
-                                    baseCurrency: settings.baseCurrency
+                                    baseCurrency: settings.baseCurrency,
+                                    since: settings.portfolioHistoryScopeStartedAt
                                 ),
                                 currencyCode: settings.baseCurrency.rawValue,
                                 onViewFullHistory: {
@@ -468,7 +472,9 @@ struct DashboardView: View {
                 outlook: calculator.outlook(
                     goal: goal,
                     progress: progress,
-                    snapshots: netWorthSnapshots,
+                    snapshots: netWorthSnapshots.filter {
+                        $0.displayRecordedAt >= settings.portfolioHistoryScopeStartedAt
+                    },
                     exchangeRates: viewModel.exchangeRates
                 ),
                 achievementPlan: calculator.achievementPlan(goal: goal, progress: progress),
@@ -621,11 +627,13 @@ struct NetWorthView: View {
                                 DashboardTrendView(
                                     portfolioRows: viewModel.portfolioTrendRows(
                                         portfolioSnapshots,
-                                        baseCurrency: settings.baseCurrency
+                                        baseCurrency: settings.baseCurrency,
+                                        since: settings.portfolioHistoryScopeStartedAt
                                     ),
                                     netWorthRows: viewModel.netWorthTrendRows(
                                         netWorthSnapshots,
-                                        baseCurrency: settings.baseCurrency
+                                        baseCurrency: settings.baseCurrency,
+                                        since: settings.portfolioHistoryScopeStartedAt
                                     ),
                                     currencyCode: settings.baseCurrency.rawValue,
                                     onViewFullHistory: {
@@ -714,7 +722,9 @@ struct NetWorthView: View {
                 outlook: calculator.outlook(
                     goal: goal,
                     progress: progress,
-                    snapshots: netWorthSnapshots,
+                    snapshots: netWorthSnapshots.filter {
+                        $0.displayRecordedAt >= settings.portfolioHistoryScopeStartedAt
+                    },
                     exchangeRates: viewModel.exchangeRates
                 ),
                 achievementPlan: calculator.achievementPlan(goal: goal, progress: progress),
