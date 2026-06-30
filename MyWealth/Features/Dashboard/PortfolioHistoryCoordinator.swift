@@ -9,6 +9,27 @@ import SwiftUI
 import SwiftData
 import WidgetKit
 
+struct PortfolioMembershipState: Equatable {
+    let assetIdentifiers: [String]
+    let calculationAssetIdentifiers: [String]
+    let includesIgnoredAssets: Bool
+
+    var signature: String {
+        [
+            includesIgnoredAssets ? "include-ignored" : "exclude-ignored",
+            calculationAssetIdentifiers.joined(separator: ":")
+        ].joined(separator: "|")
+    }
+
+    func isPolicyChange(from previous: PortfolioMembershipState) -> Bool {
+        previous.assetIdentifiers == assetIdentifiers &&
+            (
+                previous.calculationAssetIdentifiers != calculationAssetIdentifiers ||
+                    previous.includesIgnoredAssets != includesIgnoredAssets
+            )
+    }
+}
+
 struct PortfolioHistoryCoordinator {
     let allAssets: [Asset]
     let assets: [Asset]
@@ -30,11 +51,20 @@ struct PortfolioHistoryCoordinator {
         .joined(separator: "|")
     }
 
+    var portfolioMembershipState: PortfolioMembershipState {
+        PortfolioMembershipState(
+            assetIdentifiers: allAssets
+                .map { String(describing: $0.persistentModelID) }
+                .sorted(),
+            calculationAssetIdentifiers: assets
+                .map { String(describing: $0.persistentModelID) }
+                .sorted(),
+            includesIgnoredAssets: settings.includeIgnoredAssetsInPortfolio
+        )
+    }
+
     var portfolioMembershipSignature: String {
-        [
-            settings.includeIgnoredAssetsInPortfolio ? "include-ignored" : "exclude-ignored",
-            assets.map { String(describing: $0.persistentModelID) }.joined(separator: ":")
-        ].joined(separator: "|")
+        portfolioMembershipState.signature
     }
 
     var liabilitySnapshotSignature: String {
@@ -69,6 +99,7 @@ struct PortfolioHistoryCoordinator {
             baseCurrency: settings.baseCurrency,
             netWorthSnapshots: netWorthSnapshots,
             assetValueSnapshots: assetValueSnapshots,
+            scopeStartedAt: settings.portfolioHistoryScopeStartedAt,
             modelContext: modelContext
         )
     }
@@ -150,11 +181,16 @@ struct PortfolioHistoryCoordinationModifier: ViewModifier {
                     coordinator.writeWidgetSnapshot()
                 }
             }
-            .onChange(of: coordinator.portfolioMembershipSignature) {
+            .onChange(of: coordinator.portfolioMembershipState) { oldState, newState in
+                guard newState.isPolicyChange(from: oldState) else {
+                    return
+                }
+                coordinator.settings.beginNewPortfolioHistoryScope()
                 Task {
                     await coordinator.viewModel.refreshExchangeRateIfNeeded(
                         requiredCurrencies: coordinator.requiredExchangeRateCurrencies
                     )
+                    coordinator.recordPortfolioHistory()
                     coordinator.writeWidgetSnapshot()
                 }
             }

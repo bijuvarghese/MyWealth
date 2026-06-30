@@ -138,40 +138,14 @@ struct DashboardView: View {
                         .buttonStyle(.plain)
                         .appListRow()
 
-                        Button {
-                            shareSummaryText = dashboardShareSummary()
-                        } label: {
-                            AppListCard {
-                                HStack(spacing: 14) {
-                                    Image(systemName: "square.and.arrow.up")
-                                        .font(WealthMapDesignTokens.Typography.title2)
-                                        .foregroundStyle(WealthMapDesignTokens.ColorToken.brandPrimary)
-                                        .frame(width: 42, height: 42)
-                                        .background(WealthMapDesignTokens.ColorToken.brandPrimary.opacity(0.12), in: Circle())
-
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("Share Progress")
-                                            .font(WealthMapDesignTokens.Typography.headline)
-                                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textPrimary)
-                                        Text(shareProgressSubtitle)
-                                            .font(WealthMapDesignTokens.Typography.subheadline)
-                                            .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
-                                            .fixedSize(horizontal: false, vertical: true)
-                                    }
-
-                                    Spacer()
-                                }
-                            }
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(dashboardShareSummary() == nil)
-                        .appListRow()
                     }
 
                     let insightRows = viewModel.portfolioInsightRows(
                         assets: portfolioAssets,
                         liabilities: liabilities,
-                        netWorthSnapshots: netWorthSnapshots,
+                        netWorthSnapshots: netWorthSnapshots.filter {
+                            $0.displayRecordedAt >= settings.portfolioHistoryScopeStartedAt
+                        },
                         baseCurrency: settings.baseCurrency
                     )
                     if !insightRows.isEmpty {
@@ -275,11 +249,13 @@ struct DashboardView: View {
                             DashboardTrendView(
                                 portfolioRows: viewModel.portfolioTrendRows(
                                     portfolioSnapshots,
-                                    baseCurrency: settings.baseCurrency
+                                    baseCurrency: settings.baseCurrency,
+                                    since: settings.portfolioHistoryScopeStartedAt
                                 ),
                                 netWorthRows: viewModel.netWorthTrendRows(
                                     netWorthSnapshots,
-                                    baseCurrency: settings.baseCurrency
+                                    baseCurrency: settings.baseCurrency,
+                                    since: settings.portfolioHistoryScopeStartedAt
                                 ),
                                 currencyCode: settings.baseCurrency.rawValue,
                                 onViewFullHistory: {
@@ -325,13 +301,18 @@ struct DashboardView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
+                        Button {
+                            shareSummaryText = dashboardShareSummary()
+                        } label: {
+                            Label("Share Progress", systemImage: "square.and.arrow.up")
+                        }
+                        .disabled(dashboardShareSummary() == nil)
+
                         Toggle(isOn: $settings.includeIgnoredAssetsInPortfolio) {
                             Label("Include Ignored Assets", systemImage: "eye.slash")
                         }
                     } label: {
-                        Image(systemName: settings.includeIgnoredAssetsInPortfolio
-                            ? "line.3.horizontal.decrease.circle.fill"
-                            : "line.3.horizontal.decrease.circle")
+                        Label("Asset Actions", systemImage: "ellipsis.circle")
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -412,12 +393,6 @@ struct DashboardView: View {
         )
     }
 
-    private var shareProgressSubtitle: String {
-        dashboardShareSummary() == nil
-            ? "Available after totals can be calculated"
-            : "Share a text milestone you control"
-    }
-
     private func dashboardShareSummary() -> String? {
         guard let netWorth = viewModel.netWorthTotal(
             portfolioAssets,
@@ -468,7 +443,9 @@ struct DashboardView: View {
                 outlook: calculator.outlook(
                     goal: goal,
                     progress: progress,
-                    snapshots: netWorthSnapshots,
+                    snapshots: netWorthSnapshots.filter {
+                        $0.displayRecordedAt >= settings.portfolioHistoryScopeStartedAt
+                    },
                     exchangeRates: viewModel.exchangeRates
                 ),
                 achievementPlan: calculator.achievementPlan(goal: goal, progress: progress),
@@ -621,11 +598,13 @@ struct NetWorthView: View {
                                 DashboardTrendView(
                                     portfolioRows: viewModel.portfolioTrendRows(
                                         portfolioSnapshots,
-                                        baseCurrency: settings.baseCurrency
+                                        baseCurrency: settings.baseCurrency,
+                                        since: settings.portfolioHistoryScopeStartedAt
                                     ),
                                     netWorthRows: viewModel.netWorthTrendRows(
                                         netWorthSnapshots,
-                                        baseCurrency: settings.baseCurrency
+                                        baseCurrency: settings.baseCurrency,
+                                        since: settings.portfolioHistoryScopeStartedAt
                                     ),
                                     currencyCode: settings.baseCurrency.rawValue,
                                     onViewFullHistory: {
@@ -714,7 +693,9 @@ struct NetWorthView: View {
                 outlook: calculator.outlook(
                     goal: goal,
                     progress: progress,
-                    snapshots: netWorthSnapshots,
+                    snapshots: netWorthSnapshots.filter {
+                        $0.displayRecordedAt >= settings.portfolioHistoryScopeStartedAt
+                    },
                     exchangeRates: viewModel.exchangeRates
                 ),
                 achievementPlan: calculator.achievementPlan(goal: goal, progress: progress),

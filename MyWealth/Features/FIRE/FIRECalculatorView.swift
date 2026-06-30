@@ -32,13 +32,24 @@ struct FIRECalculatorView: View {
         settings.portfolioCalculationAssets(from: assets)
     }
 
-    private var currentPortfolio: Double {
+    private var requiredExchangeRateCurrencies: [Asset.CurrencyType] {
+        [settings.baseCurrency] +
+            settings.totalCurrencies +
+            portfolioAssets.compactMap(\.currency) +
+            liabilities.compactMap(\.currency)
+    }
+
+    private var currentPortfolioAmount: Double? {
         viewModel.netWorthTotal(
             portfolioAssets,
             liabilities: liabilities,
             to: settings.baseCurrency,
             exchangeRates: viewModel.exchangeRates
-        ) ?? 0
+        )
+    }
+
+    private var currentPortfolio: Double {
+        currentPortfolioAmount ?? 0
     }
 
     private var projection: FIREProjection {
@@ -58,19 +69,28 @@ struct FIRECalculatorView: View {
                 .ignoresSafeArea(.all)
 
             ScrollView {
-                VStack(spacing: 18) {
-                    numbersCard
-                    fireTargetCard
-                    firePaceCard
-                    trajectoryCard
-                    fireLevelsCard
-                    savingsExplorerCard
-                    oneMoreYearCard
-                    fireExplainerCard
+                if currentPortfolioAmount == nil {
+                    ContentUnavailableView(
+                        "Current value unavailable",
+                        systemImage: "exclamationmark.triangle",
+                        description: Text("Progress is unavailable until the required exchange rates are available.")
+                    )
+                    .padding(.top, 80)
+                } else {
+                    VStack(spacing: 18) {
+                        numbersCard
+                        fireTargetCard
+                        firePaceCard
+                        trajectoryCard
+                        fireLevelsCard
+                        savingsExplorerCard
+                        oneMoreYearCard
+                        fireExplainerCard
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 12)
+                    .padding(.bottom, 32)
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 12)
-                .padding(.bottom, 32)
             }
             .scrollIndicators(.hidden)
         }
@@ -85,7 +105,11 @@ struct FIRECalculatorView: View {
             }
         }
         .task(id: "fireRates") {
-            await metalViewModel.refreshIfNeeded()
+            async let forex: Void = viewModel.refreshExchangeRateIfNeeded(
+                requiredCurrencies: requiredExchangeRateCurrencies
+            )
+            async let metals: Void = metalViewModel.refreshIfNeeded()
+            _ = await (forex, metals)
             viewModel.enrichWithMetalRates(metalViewModel.metalRates)
         }
         .onChange(of: scenePhase) { _, newPhase in

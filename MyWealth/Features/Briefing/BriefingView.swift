@@ -25,6 +25,13 @@ struct BriefingView: View {
         settings.portfolioCalculationAssets(from: assets)
     }
 
+    private var requiredExchangeRateCurrencies: [Asset.CurrencyType] {
+        [settings.baseCurrency] +
+            settings.totalCurrencies +
+            portfolioAssets.compactMap(\.currency) +
+            liabilities.compactMap(\.currency)
+    }
+
     private var currentReport: PortfolioIntelligenceReport {
         if let report = reportHistory.first {
             return report
@@ -112,7 +119,7 @@ struct BriefingView: View {
                     } label: {
                         Label("Refresh Analysis", systemImage: "arrow.clockwise")
                     }
-                    .disabled(isAnalyzing)
+                    .disabled(isAnalyzing || !currentReport.isConversionComplete)
                 }
             }
             .sheet(isPresented: $showSettings) {
@@ -120,7 +127,11 @@ struct BriefingView: View {
             }
         }
         .task(id: "briefingRates") {
-            await metalViewModel.refreshIfNeeded()
+            async let forex: Void = viewModel.refreshExchangeRateIfNeeded(
+                requiredCurrencies: requiredExchangeRateCurrencies
+            )
+            async let metals: Void = metalViewModel.refreshIfNeeded()
+            _ = await (forex, metals)
             viewModel.enrichWithMetalRates(metalViewModel.metalRates)
             if reportHistory.isEmpty {
                 reportHistory = [makeReport(previousGrade: nil)]
@@ -140,7 +151,9 @@ struct BriefingView: View {
         calculator.makeReport(
             assets: portfolioAssets,
             liabilities: liabilities,
-            netWorthSnapshots: netWorthSnapshots,
+            netWorthSnapshots: netWorthSnapshots.filter {
+                $0.displayRecordedAt >= settings.portfolioHistoryScopeStartedAt
+            },
             exchangeRates: viewModel.exchangeRates,
             baseCurrency: settings.baseCurrency,
             previousGrade: previousGrade
@@ -182,7 +195,11 @@ struct BriefingView: View {
                         Text("Portfolio Health")
                             .font(WealthMapDesignTokens.Typography.headline)
                             .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
-                        Text(report.grade.localizedName)
+                        Text(
+                            report.isConversionComplete
+                                ? report.grade.localizedName
+                                : AppLocalization.string("Unavailable")
+                        )
                             .font(WealthMapDesignTokens.Typography.amountProminent.weight(.bold))
                             .foregroundStyle(gradeColor(report.grade))
                     }
@@ -219,11 +236,13 @@ struct BriefingView: View {
         ZStack {
             Circle()
                 .stroke(Color(.systemGray5), lineWidth: 9)
-            Circle()
-                .trim(from: 0, to: Double(report.score) / 100)
-                .stroke(gradeColor(report.grade), style: StrokeStyle(lineWidth: 9, lineCap: .round))
-                .rotationEffect(.degrees(-90))
-            Text("\(report.score)")
+            if report.isConversionComplete {
+                Circle()
+                    .trim(from: 0, to: Double(report.score) / 100)
+                    .stroke(gradeColor(report.grade), style: StrokeStyle(lineWidth: 9, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+            }
+            Text(report.isConversionComplete ? "\(report.score)" : "—")
                 .font(.title.weight(.bold))
                 .monospacedDigit()
         }
@@ -255,7 +274,11 @@ struct BriefingView: View {
                     .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
 
                 HStack(spacing: 10) {
-                    Text(report.grade.localizedName)
+                    Text(
+                        report.isConversionComplete
+                            ? report.grade.localizedName
+                            : AppLocalization.string("Unavailable")
+                    )
                         .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                         .foregroundStyle(gradeColor(report.grade))
                         .padding(.horizontal, 12)
@@ -320,7 +343,7 @@ struct BriefingView: View {
                         .background(WealthMapDesignTokens.ColorToken.warning.opacity(0.08), in: RoundedRectangle(cornerRadius: WealthMapDesignTokens.Shape.cardRadius, style: .continuous))
                 }
                 .buttonStyle(.plain)
-                .disabled(isAnalyzing)
+                .disabled(isAnalyzing || !currentReport.isConversionComplete)
 
                 Divider()
 
@@ -334,7 +357,11 @@ struct BriefingView: View {
                         Text(report.generatedAt.formatted(.relative(presentation: .numeric)))
                             .foregroundStyle(WealthMapDesignTokens.ColorToken.textSecondary)
                         Spacer()
-                        Text(report.grade.localizedName)
+                        Text(
+                            report.isConversionComplete
+                                ? report.grade.localizedName
+                                : AppLocalization.string("Unavailable")
+                        )
                             .font(WealthMapDesignTokens.Typography.subheadlineSemibold)
                             .foregroundStyle(gradeColor(report.grade))
                             .padding(.horizontal, 10)
@@ -457,6 +484,7 @@ struct BriefingView: View {
             }
         }
         .buttonStyle(.plain)
+        .disabled(!currentReport.isConversionComplete)
     }
 
     private var generatedFooter: some View {

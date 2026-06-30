@@ -46,6 +46,14 @@ struct AddorEditAssetView: View {
         return PreciousMetalSelectionView.metals.first { $0.currency == metalCurrency }
     }
 
+    private var selectableCategories: [Asset.CategoryType] {
+        Asset.CategoryType.allCases.filter { candidate in
+            !candidate.isPreciousMetal ||
+                candidate.supportsLiveMetalPricing ||
+                asset?.displayCategory == candidate
+        }
+    }
+
     /// Weight in troy oz derived from the user's input (nil when input is invalid).
     private var weightInTroyOz: Double? {
         guard let w = Double(metalWeight), w > 0 else { return nil }
@@ -228,7 +236,7 @@ struct AddorEditAssetView: View {
 
     private var categorySection: some View {
         Picker("Category", selection: $category) {
-            ForEach(Asset.CategoryType.allCases) { type in
+            ForEach(selectableCategories) { type in
                 Label(type.localizedName, systemImage: type.icon)
                     .tag(type)
             }

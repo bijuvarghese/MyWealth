@@ -116,7 +116,7 @@ enum DataExporter {
                     currency: $0.currency?.rawValue ?? "",
                     category: $0.category?.rawValue ?? "",
                     lastUpdated: $0.lastUpdated ?? Date(),
-                    historyIdentifier: $0.historyIdentifier ?? UUID().uuidString,
+                    historyIdentifier: $0.stableHistoryIdentifier,
                     weightUnit: $0.weightUnit?.rawValue,
                     isIncludedInPortfolio: $0.participatesInPortfolioCalculations
                 )
@@ -128,7 +128,7 @@ enum DataExporter {
                     currency: $0.currency?.rawValue ?? "",
                     category: $0.category?.rawValue ?? "",
                     lastUpdated: $0.lastUpdated ?? Date(),
-                    historyIdentifier: $0.historyIdentifier ?? UUID().uuidString
+                    historyIdentifier: $0.stableHistoryIdentifier
                 )
             },
             assetValueSnapshots: assetSnapshots.map {
@@ -289,10 +289,10 @@ enum DataImporter {
         existingGoal: NetWorthGoal?,
         goalConflictResolution: GoalConflictResolution
     ) throws -> ImportSummary {
-        let existingAssetIDs = Set(
+        var existingAssetIDs = Set(
             (try context.fetch(FetchDescriptor<Asset>())).compactMap(\.historyIdentifier)
         )
-        let existingLiabilityIDs = Set(
+        var existingLiabilityIDs = Set(
             (try context.fetch(FetchDescriptor<Liability>())).compactMap(\.historyIdentifier)
         )
 
@@ -310,6 +310,7 @@ enum DataImporter {
             )
             asset.historyIdentifier = a.historyIdentifier
             context.insert(asset)
+            existingAssetIDs.insert(a.historyIdentifier)
             summary.assets += 1
         }
 
@@ -323,10 +324,11 @@ enum DataImporter {
             )
             liability.historyIdentifier = l.historyIdentifier
             context.insert(liability)
+            existingLiabilityIDs.insert(l.historyIdentifier)
             summary.liabilities += 1
         }
 
-        let existingSnapKeys = Set(
+        var existingSnapKeys = Set(
             (try context.fetch(FetchDescriptor<AssetValueSnapshot>())).map {
                 "\($0.assetIdentifier ?? "")|\($0.recordedAt?.timeIntervalSince1970 ?? 0)"
             }
@@ -342,10 +344,11 @@ enum DataImporter {
                 categoryName: s.categoryName,
                 recordedAt: s.recordedAt
             ))
+            existingSnapKeys.insert(key)
             summary.assetSnapshots += 1
         }
 
-        let existingNWKeys = Set(
+        var existingNWKeys = Set(
             (try context.fetch(FetchDescriptor<NetWorthSnapshot>())).map {
                 "\($0.currencyCode ?? "")|\($0.recordedAt?.timeIntervalSince1970 ?? 0)"
             }
@@ -358,10 +361,11 @@ enum DataImporter {
                 currencyCode: s.currencyCode,
                 recordedAt: s.recordedAt
             ))
+            existingNWKeys.insert(key)
             summary.netWorthSnapshots += 1
         }
 
-        let existingPFKeys = Set(
+        var existingPFKeys = Set(
             (try context.fetch(FetchDescriptor<PortfolioSnapshot>())).map {
                 "\($0.currencyCode ?? "")|\($0.recordedAt?.timeIntervalSince1970 ?? 0)"
             }
@@ -375,6 +379,7 @@ enum DataImporter {
                 currencyCode: s.currencyCode,
                 recordedAt: s.recordedAt
             ))
+            existingPFKeys.insert(key)
             summary.portfolioSnapshots += 1
         }
 

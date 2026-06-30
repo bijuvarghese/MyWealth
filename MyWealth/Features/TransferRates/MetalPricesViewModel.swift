@@ -117,13 +117,13 @@ final class MetalPricesViewModel {
         exchangeRates: [String: Double]
     ) -> [MetalPriceRow] {
         // How many units of the base currency equal 1 USD?
-        let baseUnitsPerUSD: Double
+        let baseUnitsPerUSD: Double?
         if baseCurrency == .usd {
             baseUnitsPerUSD = 1.0
-        } else if let rate = exchangeRates[baseCurrency.rawValue], rate > 0 {
+        } else if let rate = exchangeRates[baseCurrency.rawValue], rate.isFinite, rate > 0 {
             baseUnitsPerUSD = rate
         } else {
-            baseUnitsPerUSD = 1.0
+            baseUnitsPerUSD = nil
         }
 
         return Self.knownMetals.compactMap { info in
@@ -133,7 +133,7 @@ final class MetalPricesViewModel {
             // The API returns "units of metal per 1 USD".
             // → price per 1 unit of metal in USD  = 1 / metalRate
             // → price per 1 unit of metal in base = (1 / metalRate) × baseUnitsPerUSD
-            let priceInBase = (1.0 / metalRate) * baseUnitsPerUSD
+            let priceInBase = baseUnitsPerUSD.map { (1.0 / metalRate) * $0 }
 
             return MetalPriceRow(
                 symbol: info.symbol,

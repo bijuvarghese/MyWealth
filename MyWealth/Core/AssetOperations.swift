@@ -27,18 +27,16 @@ extension AssetOperations {
 
         var totalInUSD = 0.0
         for asset in assets {
+            guard let amount = asset.amount, amount > 0, amount.isFinite else {
+                continue
+            }
             guard
                 let sourceCurrency = asset.currency,
-                let amount = asset.amount,
-                amount > 0, amount.isFinite,
+                sourceCurrency != .none,
                 let sourceRate = rate(for: sourceCurrency, exchangeRates: exchangeRates),
                 sourceRate > 0, sourceRate.isFinite
             else {
-                // Skip this asset rather than aborting the whole total.
-                // A missing or non-finite rate (e.g. a metal not yet in the
-                // forex API, or a NaN from a network glitch) should not wipe
-                // out the rest of the portfolio calculation.
-                continue
+                return nil
             }
 
             totalInUSD += amount / sourceRate
@@ -58,14 +56,16 @@ extension AssetOperations {
 
         var totalInUSD = 0.0
         for liability in liabilities {
+            guard let amount = liability.amount, amount > 0, amount.isFinite else {
+                continue
+            }
             guard
                 let sourceCurrency = liability.currency,
-                let amount = liability.amount,
-                amount > 0, amount.isFinite,
+                sourceCurrency != .none,
                 let sourceRate = rate(for: sourceCurrency, exchangeRates: exchangeRates),
                 sourceRate > 0, sourceRate.isFinite
             else {
-                continue
+                return nil
             }
 
             totalInUSD += amount / sourceRate

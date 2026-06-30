@@ -29,7 +29,7 @@ behavior.
 | Dashboard and net worth | FR6.1-FR6.16 | `MyWealth/Features/Dashboard/`, shared components |
 | Exchange rates | FR7.1-FR7.16 | iOS networking services, `functions/`, Firebase configuration |
 | Reminders | FR8.1-FR8.12 | `MyWealth/Core/Notifications/`, reminder feature views |
-| Portfolio history | FR9.1-FR9.9 | snapshot models, dashboard coordinators and sanitizers |
+| Portfolio history | FR9.1-FR9.10 | snapshot models, dashboard coordinators and sanitizers |
 | Persistence and portability | FR10.1-FR10.13 | SwiftData container, settings stores, `DataPortability.swift`, iCloud helpers |
 | Widgets | FR11.1-FR11.6 | `MyWealth/Core/Widget/`, `MyWealthWidget/` |
 | Net worth goals | FR12.1-FR12.16 | `MyWealth/Core/NetWorthGoal.swift`, `MyWealth/Core/NetWorthGoalStore.swift`, `MyWealth/Features/Goals/`, Dashboard and Net Worth surfaces |
