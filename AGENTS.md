@@ -38,6 +38,17 @@ xcodebuild test -project MyWealth.xcodeproj -scheme MyWealth \
 For Firebase changes, run the scripts defined by `functions/package.json`.
 Always run `git diff --check` before delivery.
 
+## Tagging and Publishing
+
+- Follow the existing release naming convention: use the plain app version as
+  the Git tag and GitHub release title, for example `5.0.2`.
+- Do not prefix release tags with `v` unless the repository history changes to
+  that convention.
+- Publish releases from the commit that contains the matching app and widget
+  version bump.
+- When correcting a mistakenly named release, remove the incorrect release/tag
+  and republish using the plain-version convention.
+
 <!-- SPECKIT START -->
 For feature work, use the project-local `$speckit-*` skills. Read the current
 feature plan at `specs/005-weekly-monthly-highlights/plan.md` and
