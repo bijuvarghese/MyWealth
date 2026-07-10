@@ -2,7 +2,7 @@
 
 **Feature Branch**: `003-localization-mvp`
 **Created**: June 26, 2026
-**Status**: Draft
+**Status**: Complete
 **Input**: User description: "MVP multi-language support. When Wealth Map is opened in a supported locale, the app should show the local language. MVP languages: English fallback, Hindi, Spanish, Portuguese Brazil, French, German, Simplified Chinese, and Arabic."
 **Baseline**: `requirements.md` and `.specify/memory/requirements-context.md`
 
@@ -19,11 +19,12 @@
 | FR6.1-FR6.16 | Extend | Dashboard, Assets, Net Worth, insights, history, rate status, share-sheet prefill text, and large-value labels must localize while calculations, converted totals, share action gating, and display-currency order remain unchanged. Regression evidence: populated and empty dashboard checks with localized copy. |
 | FR7.1-FR7.16 | Preserve | Exchange-rate fetching, cache semantics, conversion logic, server proxy behavior, and failure handling are not changed. Regression evidence: existing exchange-rate and conversion tests continue to pass. |
 | FR8.1-FR8.12 | Extend | Reminder settings and notification title/body copy must localize while saved reminder preferences, scheduling identifiers, badge behavior, smart reminder logic, and backward compatibility remain unchanged. Regression evidence: notification scheduling tests confirm stable identifiers and localized body selection. |
-| FR9.1-FR9.9 | Preserve | Snapshot recording, filtering, sorting, and stored snapshot values are unchanged. Display-only category labels may localize, but stored snapshot category names remain compatible. Regression evidence: existing snapshot tests continue to pass. |
+| FR9.1-FR9.10 | Preserve | Snapshot recording, filtering, sorting, history-scope behavior, and stored snapshot values are unchanged. Display-only category labels may localize, but stored snapshot category names remain compatible. Regression evidence: existing snapshot tests continue to pass. |
 | FR10.1-FR10.13 | Preserve | SwiftData, UserDefaults, iCloud settings sync, backup export/import formats, and restored data behavior remain unchanged. Regression evidence: backup/import compatibility tests confirm existing payloads remain importable. |
 | FR11.1-FR11.6 | Extend | Widget visible labels must localize under supported widget locales while widget snapshot schema, App Group suite, timeline reload behavior, and selected-currency order remain unchanged. Regression evidence: placeholder and populated widget checks in English and one non-English locale. |
 | FR12.1-FR12.16 | Extend | Goal form, summaries, validation messages, outlook states, and progress labels must localize while goal data, calculations, backup participation, privacy exclusions, and accessibility requirements remain unchanged. Regression evidence: localized goal create/edit/delete checks and existing goal tests. |
 | FR13.1-FR13.9 | Preserve | Analytics event names, allowed parameters, Crashlytics behavior, and privacy restrictions are unchanged. Regression evidence: analytics catalog review confirms no locale, free text, user-entered financial data, or direct personal identifiers are added. |
+| FR14.1-FR14.8 | Add | App and widget copy follows the active supported iOS language with English fallback, locale-aware display formatting, stable persisted values, and Arabic right-to-left support. Regression evidence: locale coverage, fallback, raw-value compatibility, and RTL checks. |
 | NFR1.1-NFR1.4 | Preserve | Platform, Swift, and Xcode baselines remain unchanged. Regression evidence: existing project build/test gate. |
 | NFR2.1-NFR2.7 | Extend | Localized UI must remain native, readable, searchable, clear for destructive actions, and usable with long translated labels and large totals. Regression evidence: Dynamic Type, long-label, and destructive-action checks in supported locales. |
 | NFR3.1-NFR3.4 | Preserve | Localization must not add blocking work to tab updates, calculations, persistence, or dashboard rendering. Regression evidence: code review confirms no network or heavy parsing during normal view rendering. |

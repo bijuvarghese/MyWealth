@@ -24398,6 +24398,318 @@
         }
       }
     },
+    "Add assets or liabilities to start seeing weekly and monthly progress." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أضف أصولًا أو التزامات لبدء رؤية التقدم الأسبوعي والشهري." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Füge Vermögenswerte oder Verbindlichkeiten hinzu, um wöchentliche und monatliche Fortschritte zu sehen." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Añade activos o pasivos para empezar a ver el progreso semanal y mensual." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ajoutez des actifs ou des dettes pour voir vos progrès hebdomadaires et mensuels." } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "साप्ताहिक और मासिक प्रगति देखने के लिए एसेट या देनदारियाँ जोड़ें।" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Adicione ativos ou passivos para começar a ver o progresso semanal e mensal." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "添加资产或负债，开始查看每周和每月进展。" } }
+      }
+    },
+    "Asset Change" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تغير الأصول" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Vermögensänderung" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cambio en activos" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Variation des actifs" } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "एसेट में बदलाव" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Variação dos ativos" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "资产变化" } }
+      }
+    },
+    "Based on your recorded Wealth Map data." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "استنادًا إلى بياناتك المسجلة في Wealth Map." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Basierend auf deinen in Wealth Map erfassten Daten." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Basado en tus datos registrados en Wealth Map." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "D’après vos données enregistrées dans Wealth Map." } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "Wealth Map में दर्ज आपके डेटा के आधार पर।" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Com base nos seus dados registrados no Wealth Map." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "基于您在 Wealth Map 中记录的数据。" } }
+      }
+    },
+    "Compared with %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مقارنةً بـ %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verglichen mit %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Comparado con %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Comparé au %@" } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "%@ की तुलना में" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Comparado com %@" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "与 %@ 相比" } }
+      }
+    },
+    "Complete exchange rates are needed to calculate this highlight." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يلزم توفر أسعار صرف كاملة لحساب هذا الملخص." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Für diese Zusammenfassung werden vollständige Wechselkurse benötigt." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Se necesitan tipos de cambio completos para calcular este resumen." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Des taux de change complets sont nécessaires pour calculer ce résumé." } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "इस हाइलाइट की गणना के लिए सभी विनिमय दरें आवश्यक हैं।" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "São necessárias taxas de câmbio completas para calcular este destaque." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "需要完整的汇率才能计算此亮点。" } }
+      }
+    },
+    "Current Portfolio" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "المحفظة الحالية" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Aktuelles Portfolio" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cartera actual" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Portefeuille actuel" } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "मौजूदा पोर्टफोलियो" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Portfólio atual" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "当前投资组合" } }
+      }
+    },
+    "Debt-to-asset ratio is %@." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نسبة الدين إلى الأصول هي %@." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Das Verhältnis von Schulden zu Vermögen beträgt %@." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "La relación entre deuda y activos es %@." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Le ratio dettes sur actifs est de %@." } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "देनदारी-से-एसेट अनुपात %@ है।" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "A relação entre dívidas e ativos é %@." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "负债资产比为 %@。" } }
+      }
+    },
+    "Highlights Unavailable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الملخص غير متاح" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Highlights nicht verfügbar" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Resumen no disponible" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Résumé indisponible" } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "हाइलाइट उपलब्ध नहीं" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Destaque indisponível" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "亮点不可用" } }
+      }
+    },
+    "Insights" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رؤى" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Einblicke" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Perspectivas" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Éclairages" } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "जानकारियाँ" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Insights" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "洞察" } }
+      }
+    },
+    "Keep updating your portfolio to unlock %@ comparisons." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "واصل تحديث محفظتك لعرض مقارنات %@." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Aktualisiere dein Portfolio weiter, um %@svergleiche freizuschalten." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Sigue actualizando tu cartera para habilitar comparaciones de %@." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Continuez à mettre à jour votre portefeuille pour obtenir des comparaisons par %@." } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "%@ की तुलना देखने के लिए पोर्टफोलियो अपडेट करते रहें।" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Continue atualizando seu portfólio para liberar comparações por %@." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "继续更新投资组合以解锁%@比较。" } }
+      }
+    },
+    "Liabilities decreased by %@ this %@." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "انخفضت الالتزامات بمقدار %@ خلال %@." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Die Verbindlichkeiten sind um %@ in diesem %@ gesunken." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Los pasivos disminuyeron %@ este %@." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Les dettes ont diminué de %@ sur cette période (%@)." } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "इस %2$@ में देनदारियाँ %1$@ घटीं।" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Os passivos diminuíram %@ neste %@." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本%2$@负债减少了 %1$@。" } }
+      }
+    },
+    "Liabilities increased by %@ this %@." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "زادت الالتزامات بمقدار %@ خلال %@." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Die Verbindlichkeiten sind um %@ in diesem %@ gestiegen." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Los pasivos aumentaron %@ este %@." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Les dettes ont augmenté de %@ sur cette période (%@)." } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "इस %2$@ में देनदारियाँ %1$@ बढ़ीं।" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Os passivos aumentaram %@ neste %@." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本%2$@负债增加了 %1$@。" } }
+      }
+    },
+    "Liability Change" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تغير الالتزامات" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verbindlichkeitsänderung" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cambio en pasivos" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Variation des dettes" } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "देनदारी में बदलाव" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Variação dos passivos" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "负债变化" } }
+      }
+    },
+    "month" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الشهر" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Monat" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "mes" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "mois" } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "महीना" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "mês" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "月" } }
+      }
+    },
+    "Monthly Highlights" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أبرز أحداث الشهر" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Monatshighlights" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Resumen mensual" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Temps forts du mois" } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "मासिक हाइलाइट्स" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Destaques mensais" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "每月亮点" } }
+      }
+    },
+    "Net Worth Change" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تغير صافي الثروة" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nettovermögensänderung" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cambio en patrimonio neto" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Variation de la valeur nette" } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "नेटवर्थ में बदलाव" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Variação do patrimônio líquido" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "净值变化" } }
+      }
+    },
+    "Net worth decreased by %@ this %@." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "انخفض صافي الثروة بمقدار %@ خلال %@." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Das Nettovermögen ist um %@ in diesem %@ gesunken." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "El patrimonio neto disminuyó %@ este %@." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "La valeur nette a diminué de %@ sur cette période (%@)." } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "इस %2$@ में नेटवर्थ %1$@ घटी।" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "O patrimônio líquido diminuiu %@ neste %@." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本%2$@净值减少了 %1$@。" } }
+      }
+    },
+    "Net worth held steady this %@." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ظل صافي الثروة مستقرًا خلال %@." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Das Nettovermögen blieb in diesem %@ stabil." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "El patrimonio neto se mantuvo estable este %@." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "La valeur nette est restée stable sur cette période (%@)." } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "इस %@ में नेटवर्थ स्थिर रही।" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "O patrimônio líquido ficou estável neste %@." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本%@净值保持稳定。" } }
+      }
+    },
+    "Net worth increased by %@ this %@." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "زاد صافي الثروة بمقدار %@ خلال %@." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Das Nettovermögen ist um %@ in diesem %@ gestiegen." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "El patrimonio neto aumentó %@ este %@." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "La valeur nette a augmenté de %@ sur cette période (%@)." } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "इस %2$@ में नेटवर्थ %1$@ बढ़ी।" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "O patrimônio líquido aumentou %@ neste %@." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本%2$@净值增加了 %1$@。" } }
+      }
+    },
+    "No Portfolio Yet" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا توجد محفظة بعد" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch kein Portfolio" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Aún no hay cartera" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aucun portefeuille pour le moment" } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "अभी कोई पोर्टफोलियो नहीं" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Ainda não há portfólio" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "尚无投资组合" } }
+      }
+    },
+    "Period Progress" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تقدم الفترة" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Fortschritt im Zeitraum" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Progreso del período" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Progression sur la période" } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "अवधि की प्रगति" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Progresso do período" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "期间进展" } }
+      }
+    },
+    "Saved Rates" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الأسعار المحفوظة" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Gespeicherte Kurse" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Tipos guardados" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Taux enregistrés" } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "सहेजी गई दरें" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Taxas salvas" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已保存汇率" } }
+      }
+    },
+    "Using saved exchange rates that may be stale." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يتم استخدام أسعار صرف محفوظة قد تكون قديمة." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Es werden gespeicherte Wechselkurse verwendet, die veraltet sein können." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Se usan tipos de cambio guardados que podrían estar desactualizados." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Utilisation de taux de change enregistrés qui peuvent être obsolètes." } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "सहेजी गई विनिमय दरें उपयोग हो रही हैं, जो पुरानी हो सकती हैं।" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Usando taxas de câmbio salvas que podem estar desatualizadas." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "正在使用可能已过期的已保存汇率。" } }
+      }
+    },
+    "week" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الأسبوع" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Woche" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "semana" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "semaine" } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "सप्ताह" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "semana" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "周" } }
+      }
+    },
+    "Weekly Highlights" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أبرز أحداث الأسبوع" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wochenhighlights" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Resumen semanal" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Temps forts de la semaine" } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "साप्ताहिक हाइलाइट्स" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Destaques semanais" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "每周亮点" } }
+      }
+    },
+    "Your largest allocation is %@ at %@." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أكبر توزيع لديك هو %@ بنسبة %@." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Deine größte Position ist %@ mit %@." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Tu mayor asignación es %@ con %@." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Votre allocation principale est %@ à %@." } },
+        "hi" : { "stringUnit" : { "state" : "translated", "value" : "आपका सबसे बड़ा आवंटन %@ है, जो %@ है।" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Sua maior alocação é %@ com %@." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "您的最大配置是 %@，占 %@。" } }
+      }
+    },
     "Zinc" : {
       "extractionState" : "manual",
       "localizations" : {

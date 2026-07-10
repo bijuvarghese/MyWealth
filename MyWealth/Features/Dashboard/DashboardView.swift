@@ -32,6 +32,7 @@ struct DashboardView: View {
     @State private var showNetWorthGoalForm = false
     @State private var shareSummaryText: String? = nil
     @State private var didLogDashboardView = false
+    @State private var selectedHighlightPeriod: WealthHighlightPeriod?
 
     private var activeGoal: NetWorthGoal? {
         NetWorthGoalStore.canonicalGoal(from: netWorthGoals)
@@ -308,6 +309,24 @@ struct DashboardView: View {
                         }
                         .disabled(dashboardShareSummary() == nil)
 
+                        Button {
+                            selectedHighlightPeriod = WealthHighlightPeriod(
+                                kind: .weekly,
+                                referenceDate: Date()
+                            )
+                        } label: {
+                            Label("Weekly Highlights", systemImage: "calendar.badge.clock")
+                        }
+
+                        Button {
+                            selectedHighlightPeriod = WealthHighlightPeriod(
+                                kind: .monthly,
+                                referenceDate: Date()
+                            )
+                        } label: {
+                            Label("Monthly Highlights", systemImage: "calendar.badge.checkmark")
+                        }
+
                         Toggle(isOn: $settings.includeIgnoredAssetsInPortfolio) {
                             Label("Include Ignored Assets", systemImage: "eye.slash")
                         }
@@ -355,6 +374,10 @@ struct DashboardView: View {
                     useCompactFormatting: settings.usesCompactCurrencyTotals,
                     sourceScreen: .dashboard
                 )
+            }
+            .sheet(item: $selectedHighlightPeriod) { period in
+                WealthHighlightsView(period: period, settings: settings)
+                    .presentationDetents([.large])
             }
             .navigationDestination(item: $selectedCategory) { category in
                 CategoryDetailView(category: category, settings: settings)

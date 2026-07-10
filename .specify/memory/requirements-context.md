@@ -33,13 +33,15 @@ behavior.
 | Persistence and portability | FR10.1-FR10.13 | SwiftData container, settings stores, `DataPortability.swift`, iCloud helpers |
 | Widgets | FR11.1-FR11.6 | `MyWealth/Core/Widget/`, `MyWealthWidget/` |
 | Net worth goals | FR12.1-FR12.16 | `MyWealth/Core/NetWorthGoal.swift`, `MyWealth/Core/NetWorthGoalStore.swift`, `MyWealth/Features/Goals/`, Dashboard and Net Worth surfaces |
+| Privacy-preserving telemetry | FR13.1-FR13.9 | `MyWealth/Core/AnalyticsService.swift`, `MyWealth/Core/FirebaseAppDelegate.swift`, analytics call sites |
 | Localization | FR14.1-FR14.8 | `MyWealth/Resources/Localizable.xcstrings`, `MyWealth/Core/Localization/`, localized feature display boundaries, `MyWealthWidget/Resources/Localizable.xcstrings` |
+| Weekly and monthly highlights | FR15.1-FR15.9 | `MyWealth/Core/Highlights/`, `MyWealth/Features/Highlights/`, `MyWealth/MyWealthApp.swift`, Dashboard entry points |
 | Platform and tooling | NFR1.1-NFR1.4 | Xcode project and all Swift targets |
 | Usability | NFR2.1-NFR2.7 | all user-facing SwiftUI flows |
 | Performance | NFR3.1-NFR3.4 | networking, calculations, persistence, dashboard rendering |
 | Reliability | NFR4.1-NFR4.8 | error paths, concurrency, persistence, widgets |
-| Security and privacy | NFR5.1-NFR5.5 | client data flows, Firebase functions, logs and configuration |
-| Architecture | NFR6.1-NFR6.8 | view models, services, stores, schedulers and portability helpers |
+| Security and privacy | NFR5.1-NFR5.7 | client data flows, Firebase functions, telemetry, logs and configuration |
+| Architecture | NFR6.1-NFR6.9 | view models, services, stores, schedulers, portability helpers and analytics boundaries |
 
 ## Scope Interpretation
 

@@ -33,6 +33,7 @@ Financial data is stored locally by default. Users can opt in to iCloud backup a
 - Multi-currency net worth totals using cached exchange rates
 - User-arranged display-currency ordering for totals and widgets
 - Dashboard summaries for assets, liabilities, net worth, allocation, insights, transfer-rate preview, trend, and recent history
+- Weekly and monthly progress highlights with wealth growth, asset, liability, debt, and allocation insights; eligible recaps remain due until dismissed
 - User-initiated Dashboard sharing for a text-only net worth progress summary
 - Dedicated Net Worth view with converted totals, exchange-rate status, trend chart, and recent history
 - One active net worth goal with multi-currency progress, target date, and history-based outlook
