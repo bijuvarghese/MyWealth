@@ -1,12 +1,12 @@
 # Wealth Map - Requirements
 
-Last updated: June 29, 2026
+Last updated: July 5, 2026
 
-This document defines the current product requirements for the Wealth Map iOS app and its exchange-rate proxy. It reflects the current app state: onboarding, local asset and liability tracking, multi-currency net worth, net worth goals, display-currency ordering, exchange-rate caching, portfolio history, widgets, iCloud sync, backup import/export, reminders, and the Firebase rate proxy.
+This document defines the current product requirements for the Wealth Map iOS app and its exchange-rate proxy. It reflects the current app state: onboarding, local asset and liability tracking, multi-currency net worth, net worth goals, display-currency ordering, exchange-rate caching, portfolio history, weekly and monthly highlights, widgets, iCloud sync, backup import/export, reminders, and the Firebase rate proxy.
 
 ## Product Overview
 
-Wealth Map is a SwiftUI iOS app for tracking personal net worth across currencies. Users can configure preferred currencies, arrange display-currency priority, add and maintain assets and liabilities, view converted portfolio totals, monitor transfer rates, review portfolio insights and history, share a text progress summary, see widget summaries, and rely on cached exchange-rate data fetched through a Firebase proxy.
+Wealth Map is a SwiftUI iOS app for tracking personal net worth across currencies. Users can configure preferred currencies, arrange display-currency priority, add and maintain assets and liabilities, view converted portfolio totals, monitor transfer rates, review portfolio insights, history, and weekly or monthly progress highlights, share a text progress summary, see widget summaries, and rely on cached exchange-rate data fetched through a Firebase proxy.
 
 User financial data is stored locally by default. Users may opt into iCloud-backed backup and sync through their personal iCloud account. The app does not provide account aggregation, bank connections, or remote app-managed user accounts.
 
@@ -14,7 +14,9 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 
 - First-time users complete onboarding before reaching the main app.
 - Returning users open into a tab-based app experience.
-- The main tabs are Dashboard, Assets, Net Worth, Rates, and Settings.
+- The main tabs are Dashboard, Assets, Net Worth, Rates, and Briefing.
+- Settings is presented from toolbar actions on Dashboard and Briefing.
+- Dashboard provides manual weekly and monthly highlights, while eligible highlights are also presented automatically after onboarding until the user dismisses them.
 - Assets, liabilities, asset value snapshots, and net worth snapshots are stored with SwiftData.
 - Onboarding state, currency settings, exchange-rate cache data, iCloud sync state, and reminder preferences are stored with UserDefaults.
 - Optional CloudKit/iCloud sync can back up and synchronize the SwiftData store.
@@ -31,10 +33,10 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 - **FR1.4**: The selected base currency must always be included in the display currency set.
 - **FR1.5**: Onboarding completion, base currency, display currency selections, and reminder choice state must persist locally.
 - **FR1.6**: Returning users who have completed onboarding must open directly to the main tab interface.
-- **FR1.7**: Users must be able to update currency preferences from the Settings tab.
+- **FR1.7**: Users must be able to update currency preferences from the Settings interface.
 - **FR1.8**: Currency settings must prevent users from removing the final remaining display currency.
 - **FR1.9**: Onboarding must include a step for configuring or explicitly skipping reminder preferences.
-- **FR1.10**: Users must be able to update reminder preferences from the Settings tab after onboarding.
+- **FR1.10**: Users must be able to update reminder preferences from the Settings interface after onboarding.
 - **FR1.11**: Settings must allow users to toggle compact formatting for large currency totals.
 - **FR1.12**: Settings must display app version information.
 - **FR1.13**: Onboarding must include an iCloud sync step that users can enable or skip.
@@ -82,13 +84,13 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 ### 5. Navigation and Tabs
 
 - **FR5.1**: After onboarding, the app root must be a tab-based interface.
-- **FR5.2**: The tab interface must include Dashboard, Assets, Net Worth, Rates, and Settings tabs.
+- **FR5.2**: The tab interface must include Dashboard, Assets, Net Worth, Rates, and Briefing tabs.
 - **FR5.3**: The Dashboard tab must summarize assets, liabilities, net worth, allocation, insights, selected converted totals, transfer rates, trend, and recent history.
 - **FR5.4**: The Assets tab must display full asset and liability lists and provide add, edit, and delete workflows.
 - **FR5.5**: The Net Worth tab must display converted net worth totals, exchange-rate status, net worth trend, and recent asset history.
 - **FR5.6**: The Rates tab must display exchange-rate information between the base currency and selected display currencies, with refresh support and rate status messaging.
-- **FR5.7**: The Settings tab must allow users to update currency preferences, reminder preferences, compact total formatting, and view app version information.
-- **FR5.8**: The Settings tab must expose data cleanup, backup export, backup import, and iCloud sync controls.
+- **FR5.7**: A Settings interface accessible from Dashboard and Briefing must allow users to update currency preferences, reminder preferences, compact total formatting, and view app version information.
+- **FR5.8**: The Settings interface must expose data cleanup, backup export, backup import, and iCloud sync controls.
 
 ### 6. Dashboard, Assets, and Net Worth Views
 
@@ -223,6 +225,18 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 - **FR14.7**: Arabic app and widget surfaces must support right-to-left layout without changing financial meaning, record order, or navigation behavior.
 - **FR14.8**: Localization must not change SwiftData schemas, settings keys, backup fields, widget payload fields, notification identifiers, Firebase contracts, or analytics identifiers.
 
+### 15. Weekly and Monthly Highlights
+
+- **FR15.1**: The app must provide distinct weekly and monthly highlight pages that identify the selected period and show current assets, liabilities, and net worth in the active base currency when complete conversion data is available.
+- **FR15.2**: On or after the first local calendar day of a month, the app must automatically present the prior completed month's highlight after onboarding and keep it due until the user explicitly dismisses it; only dismissal suppresses further automatic presentation for that monthly period.
+- **FR15.3**: On or after Saturday, the app must automatically present the most recent Saturday-triggered weekly highlight after onboarding and keep it due until the user explicitly dismisses it; only dismissal suppresses further automatic presentation for that weekly period.
+- **FR15.4**: When the first day of a month is Saturday, the completed-month monthly highlight must be presented first and the overlapping undismissed weekly highlight must follow after the monthly highlight is dismissed, even if dismissal happens on a later day.
+- **FR15.5**: Dashboard must provide manual access to the current calendar weekly and monthly highlights, and manually opening or dismissing a highlight must not change automatic dismissal state.
+- **FR15.6**: When a valid scoped portfolio baseline exists, highlights must show net worth change, valid percentage change, asset change, liability change, and a bounded set of deterministic progress, debt, and allocation insights without representing them as advice.
+- **FR15.7**: Missing required rates must make affected highlight values unavailable rather than partial; stale complete rates may be shown with stale context, and insufficient history must show current values with an explanatory comparison state.
+- **FR15.8**: Pending highlight period metadata and dismissal identifiers must persist locally so an undismissed page returns on later launches, remain outside portfolio backups and iCloud settings sync, and never add highlight financial content to widgets, notifications, telemetry, logs, exports, AI requests, or server payloads.
+- **FR15.9**: Highlight pages and copy must support iPhone and iPad, all supported app languages, locale-aware values and dates, right-to-left layout, Dynamic Type, VoiceOver, reduced motion, long labels, large values, negative values, and empty or unavailable states without relying on color alone.
+
 ## Non-Functional Requirements
 
 ### 1. Platform and Tooling
@@ -286,6 +300,7 @@ User financial data is stored locally by default. Users may opt into iCloud-back
 
 - The app currently supports manual asset and liability tracking only; it does not connect to banks, brokerages, or crypto wallets.
 - The Dashboard tab is the primary summary surface and includes asset/liability summary, insights, allocation, converted totals, transfer-rate preview, trend, and recent history.
+- Weekly and monthly highlights are local, history-based recap surfaces available from Dashboard and automatically offered on their eligible dates until explicitly dismissed.
 - The Assets tab is the primary record-management surface for both assets and liabilities.
 - The Net Worth tab provides a focused converted net worth and trend view.
 - The Rates tab displays transfer-rate rows for configured display currencies relative to the selected base currency.

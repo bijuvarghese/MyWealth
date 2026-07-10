@@ -86,11 +86,15 @@ private struct LaunchSplashContainer<Content: View>: View {
 
 private struct AppRootView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(ContainerHolder.self) private var containerHolder
     @State private var settings = AppSettings()
     @State private var activityTracker = AppActivityTracker.shared
+    @State private var automaticHighlightPeriod: WealthHighlightPeriod?
+    @State private var automaticHighlightAwaitingDismissal: WealthHighlightPeriod?
 
     private let iCloudSync = ICloudSettingsSync.shared
+    private let highlightPresentationStore = HighlightPresentationStore()
 
     var body: some View {
         Group {
@@ -119,6 +123,23 @@ private struct AppRootView: View {
                     }
                 }
             }
+
+            presentHighlightIfEligible()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard newPhase == .active else { return }
+            presentHighlightIfEligible()
+        }
+        .onChange(of: settings.onboardingStatus().isComplete) { _, isComplete in
+            guard isComplete else { return }
+            presentHighlightIfEligible()
+        }
+        .sheet(
+            item: $automaticHighlightPeriod,
+            onDismiss: handleAutomaticHighlightDismissal
+        ) { period in
+            WealthHighlightsView(period: period, settings: settings)
+                .presentationDetents([.large])
         }
         // When the toggle changes, hot-swap the container immediately.
         .onChange(of: settings.iCloudSyncEnabled) { _, newValue in
@@ -174,6 +195,31 @@ private struct AppRootView: View {
         }
         .onChange(of: settings.usesCompactCurrencyTotals) {
             if settings.iCloudSyncEnabled { iCloudSync.push(settings: settings) }
+        }
+    }
+
+    private func presentHighlightIfEligible(at date: Date = Date()) {
+        guard automaticHighlightPeriod == nil else {
+            return
+        }
+        let period = highlightPresentationStore.automaticPeriod(
+            on: date,
+            onboardingComplete: settings.onboardingStatus().isComplete
+        )
+        automaticHighlightAwaitingDismissal = period
+        automaticHighlightPeriod = period
+    }
+
+    private func handleAutomaticHighlightDismissal() {
+        guard let period = automaticHighlightAwaitingDismissal else {
+            return
+        }
+        highlightPresentationStore.markDismissed(period)
+        automaticHighlightAwaitingDismissal = nil
+
+        Task { @MainActor in
+            await Task.yield()
+            presentHighlightIfEligible()
         }
     }
 

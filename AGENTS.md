@@ -7,7 +7,7 @@ Firebase proxy functions. Read `README.md`, `requirements.md`, and
 
 ## Requirements Discipline
 
-- Treat `FR1.1`-`FR11.6` and `NFR1.1`-`NFR6.8` in `requirements.md` as the
+- Treat `FR1.1`-`FR15.9` and `NFR1.1`-`NFR6.9` in `requirements.md` as the
   shipped baseline.
 - Treat Current Scope Notes as present limitations and Planned Enhancements as
   candidates, not shipped commitments.
@@ -40,7 +40,7 @@ Always run `git diff --check` before delivery.
 
 <!-- SPECKIT START -->
 For feature work, use the project-local `$speckit-*` skills. Read the current
-feature plan at `specs/003-localization-mvp/plan.md` and
+feature plan at `specs/005-weekly-monthly-highlights/plan.md` and
 `.specify/memory/requirements-context.md` for additional
 technology, structure, scope, and traceability context.
 <!-- SPECKIT END -->

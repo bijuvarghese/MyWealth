@@ -7,7 +7,7 @@
 
 ## Phase 1: Scope and Safety
 
-- [X] T001 [FR1.1-FR13.9,NFR1.1-NFR6.9,SFR-001-SFR-012] Confirm localization scope, traceability, and regression evidence in `specs/003-localization-mvp/spec.md` and `specs/003-localization-mvp/plan.md`
+- [X] T001 [FR1.1-FR14.8,NFR1.1-NFR6.9,SFR-001-SFR-012] Confirm localization scope, traceability, and regression evidence in `specs/003-localization-mvp/spec.md` and `specs/003-localization-mvp/plan.md`
 - [X] T002 [P] [NFR5.1-NFR5.7,SFR-010,SFR-011] Confirm privacy, stable identifiers, persistence compatibility, and rollback boundaries in `specs/003-localization-mvp/contracts/localization-coverage.md`
 - [X] T003 [P] [NFR2.1-NFR2.7,SFR-001,SFR-008,SFR-009] Confirm locale, RTL, fallback, Dynamic Type, and manual smoke coverage in `specs/003-localization-mvp/quickstart.md`
 
@@ -73,9 +73,9 @@
 ## Final Phase: Regression and Documentation
 
 - [X] T022 [P] [SFR-001-SFR-012] Document supported locales and automatic locale behavior in `README.md`
-- [X] T023 [FR1.1-FR13.9,NFR1.1-NFR6.9,SFR-001-SFR-012] Run localization-focused and existing regression tests from `specs/003-localization-mvp/quickstart.md`
+- [X] T023 [FR1.1-FR14.8,NFR1.1-NFR6.9,SFR-001-SFR-012] Run localization-focused and existing regression tests from `specs/003-localization-mvp/quickstart.md`
 - [X] T024 [SFR-011] Run `git diff --check` and audit localization resources for secrets or personal financial data
-- [X] T025 [FR1.1-FR13.9,NFR1.1-NFR6.9,SFR-001-SFR-012] Run the full iPhone 17 `xcodebuild test` gate and confirm requirement evidence in `specs/003-localization-mvp/plan.md`
+- [X] T025 [FR1.1-FR14.8,NFR1.1-NFR6.9,SFR-001-SFR-012] Run the full iPhone 17 `xcodebuild test` gate and confirm requirement evidence in `specs/003-localization-mvp/plan.md`
 
 ## Dependencies and Execution
 

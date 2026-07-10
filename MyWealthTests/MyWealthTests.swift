@@ -489,6 +489,7 @@ struct MyWealthTests {
     @MainActor
     @Test func conversionsRequireEveryPositiveHoldingRate() async throws {
         let viewModel = DashboardViewModel(autoRefreshRate: false)
+        viewModel.exchangeRates = ["USD": 1]
         let assets = [
             Asset(name: "Cash", amount: 1_000, currency: .usd, category: .bank),
             Asset(name: "Euro Cash", amount: 500, currency: .eur, category: .bank)
@@ -1625,6 +1626,421 @@ struct MyWealthTests {
     }
 
     @MainActor
+    @Test func highlightPresentationStorePresentsMonthlyAndWeeklyOnce() throws {
+        let defaults = try makeIsolatedDefaults()
+        let calendar = Self.highlightsTestCalendar
+        let store = HighlightPresentationStore(userDefaults: defaults, calendar: calendar)
+        let firstOfMonth = try #require(
+            calendar.date(from: DateComponents(year: 2026, month: 7, day: 1, hour: 9))
+        )
+        let saturday = try #require(
+            calendar.date(from: DateComponents(year: 2026, month: 7, day: 4, hour: 9))
+        )
+
+        let monthly = store.automaticPeriod(on: firstOfMonth, onboardingComplete: true)
+        let repeatedMonthly = store.automaticPeriod(on: firstOfMonth, onboardingComplete: true)
+        if let monthly {
+            store.markDismissed(monthly)
+        }
+        let catchUpWeekly = store.automaticPeriod(on: firstOfMonth, onboardingComplete: true)
+        if let catchUpWeekly {
+            store.markDismissed(catchUpWeekly)
+        }
+        let suppressedMonthlyAndCatchUp = store.automaticPeriod(
+            on: firstOfMonth,
+            onboardingComplete: true
+        )
+        let weekly = store.automaticPeriod(on: saturday, onboardingComplete: true)
+        let repeatedWeekly = store.automaticPeriod(on: saturday, onboardingComplete: true)
+        if let weekly {
+            store.markDismissed(weekly)
+        }
+        let dismissedWeekly = store.automaticPeriod(on: saturday, onboardingComplete: true)
+
+        #expect(monthly?.kind == .monthly)
+        #expect(repeatedMonthly?.kind == .monthly)
+        #expect(catchUpWeekly?.kind == .weekly)
+        #expect(suppressedMonthlyAndCatchUp == nil)
+        #expect(weekly?.kind == .weekly)
+        #expect(repeatedWeekly?.kind == .weekly)
+        #expect(dismissedWeekly == nil)
+    }
+
+    @MainActor
+    @Test func highlightPresentationStoreGatesOnboardingAndHandlesOverlap() throws {
+        let defaults = try makeIsolatedDefaults()
+        let calendar = Self.highlightsTestCalendar
+        let store = HighlightPresentationStore(userDefaults: defaults, calendar: calendar)
+        let overlappingSaturday = try #require(
+            calendar.date(from: DateComponents(year: 2026, month: 8, day: 1, hour: 9))
+        )
+
+        #expect(
+            store.automaticPeriod(
+                on: overlappingSaturday,
+                onboardingComplete: false
+            ) == nil
+        )
+        #expect(store.lastDismissedIdentifier(for: .weekly) == nil)
+        #expect(store.lastDismissedIdentifier(for: .monthly) == nil)
+
+        let monthly = store.automaticPeriod(
+            on: overlappingSaturday,
+            onboardingComplete: true
+        )
+
+        #expect(monthly?.kind == .monthly)
+        #expect(store.lastDismissedIdentifier(for: .monthly) == nil)
+        #expect(store.lastDismissedIdentifier(for: .weekly) == nil)
+        store.markDismissed(try #require(monthly))
+
+        let weekly = store.automaticPeriod(
+            on: overlappingSaturday,
+            onboardingComplete: true
+        )
+        #expect(weekly?.kind == .weekly)
+        store.markDismissed(try #require(weekly))
+
+        #expect(
+            store.automaticPeriod(
+                on: overlappingSaturday,
+                onboardingComplete: true
+            ) == nil
+        )
+    }
+
+    @MainActor
+    @Test func highlightPresentationCatchesUpMonthlyAndWeeklyUntilDismissed() throws {
+        let defaults = try makeIsolatedDefaults()
+        let calendar = Self.highlightsTestCalendar
+        let store = HighlightPresentationStore(userDefaults: defaults, calendar: calendar)
+        let julyTenth = try #require(
+            calendar.date(from: DateComponents(year: 2026, month: 7, day: 10, hour: 9))
+        )
+        let julySixth = try #require(
+            calendar.date(from: DateComponents(year: 2026, month: 7, day: 6, hour: 9))
+        )
+        let previousMonth = try #require(
+            WealthHighlightPeriod(
+                kind: .monthly,
+                referenceDate: calendar.date(
+                    from: DateComponents(year: 2026, month: 6, day: 15)
+                )!,
+                calendar: calendar
+            )
+        )
+
+        let monthly = try #require(
+            store.automaticPeriod(on: julyTenth, onboardingComplete: true)
+        )
+        #expect(monthly.kind == .monthly)
+        #expect(monthly.identifier == previousMonth.identifier)
+        store.markDismissed(monthly)
+
+        let weekly = try #require(
+            store.automaticPeriod(on: julySixth, onboardingComplete: true)
+        )
+        let expectedWeekly = try #require(
+            WealthHighlightPeriod(
+                kind: .weekly,
+                referenceDate: calendar.date(
+                    from: DateComponents(year: 2026, month: 7, day: 4, hour: 9)
+                )!,
+                calendar: calendar
+            )
+        )
+        #expect(weekly.kind == .weekly)
+        #expect(weekly.identifier == expectedWeekly.identifier)
+        store.markDismissed(weekly)
+        #expect(store.automaticPeriod(on: julySixth, onboardingComplete: true) == nil)
+    }
+
+    @MainActor
+    @Test func highlightPresentationOverlapRestoresWeeklyAfterLateMonthlyDismissal() throws {
+        let defaults = try makeIsolatedDefaults()
+        let calendar = Self.highlightsTestCalendar
+        let store = HighlightPresentationStore(userDefaults: defaults, calendar: calendar)
+        let overlappingSaturday = try #require(
+            calendar.date(from: DateComponents(year: 2026, month: 8, day: 1, hour: 9))
+        )
+        let followingSunday = try #require(
+            calendar.date(from: DateComponents(year: 2026, month: 8, day: 2, hour: 9))
+        )
+        let expectedWeekly = try #require(
+            WealthHighlightPeriod(
+                kind: .weekly,
+                referenceDate: overlappingSaturday,
+                calendar: calendar
+            )
+        )
+
+        let monthly = try #require(
+            store.automaticPeriod(on: overlappingSaturday, onboardingComplete: true)
+        )
+        #expect(monthly.kind == .monthly)
+        #expect(store.automaticPeriod(on: followingSunday, onboardingComplete: true) == monthly)
+
+        store.markDismissed(monthly)
+        let weekly = try #require(
+            store.automaticPeriod(on: followingSunday, onboardingComplete: true)
+        )
+        #expect(weekly.kind == .weekly)
+        #expect(weekly.identifier == expectedWeekly.identifier)
+    }
+
+    @MainActor
+    @Test func highlightPresentationStateRestoresAndManualPeriodsDoNotConsumeIt() throws {
+        let defaults = try makeIsolatedDefaults()
+        let calendar = Self.highlightsTestCalendar
+        let saturday = try #require(
+            calendar.date(from: DateComponents(year: 2026, month: 7, day: 4, hour: 9))
+        )
+        let sunday = try #require(
+            calendar.date(from: DateComponents(year: 2026, month: 7, day: 5, hour: 9))
+        )
+        let initialStore = HighlightPresentationStore(
+            userDefaults: defaults,
+            calendar: calendar
+        )
+        let manualPeriod = try #require(
+            WealthHighlightPeriod(
+                kind: .weekly,
+                referenceDate: saturday,
+                calendar: calendar
+            )
+        )
+
+        #expect(manualPeriod.kind == .weekly)
+        #expect(initialStore.lastDismissedIdentifier(for: .weekly) == nil)
+        let monthlyCatchUp = try #require(
+            initialStore.automaticPeriod(
+                on: saturday,
+                onboardingComplete: true
+            )
+        )
+        #expect(monthlyCatchUp.kind == .monthly)
+        initialStore.markDismissed(monthlyCatchUp)
+
+        let automaticPeriod = try #require(
+            initialStore.automaticPeriod(
+                on: saturday,
+                onboardingComplete: true
+            )
+        )
+        #expect(automaticPeriod.kind == .weekly)
+
+        let restoredStore = HighlightPresentationStore(
+            userDefaults: defaults,
+            calendar: calendar
+        )
+        #expect(
+            restoredStore.automaticPeriod(
+                on: sunday,
+                onboardingComplete: true
+            )?.kind == .weekly
+        )
+
+        restoredStore.markDismissed(automaticPeriod)
+        #expect(
+            restoredStore.automaticPeriod(
+                on: sunday,
+                onboardingComplete: true
+            ) == nil
+        )
+    }
+
+    @MainActor
+    @Test func wealthHighlightSummaryCalculatesProgressAndLiabilityReduction() throws {
+        let calendar = Self.highlightsTestCalendar
+        let date = try #require(
+            calendar.date(from: DateComponents(year: 2026, month: 7, day: 4, hour: 9))
+        )
+        let period = try #require(
+            WealthHighlightPeriod(kind: .weekly, referenceDate: date, calendar: calendar)
+        )
+        let calculator = WealthHighlightCalculator()
+        let summary = calculator.summary(
+            period: period,
+            currencyCode: "USD",
+            currentAssetTotal: 1_200,
+            currentLiabilityTotal: 150,
+            snapshots: [
+                PortfolioSnapshot(
+                    assetTotal: 1_000,
+                    liabilityTotal: 200,
+                    currencyCode: "USD",
+                    recordedAt: period.interval.start.addingTimeInterval(-60)
+                )
+            ],
+            historyScopeStartedAt: .distantPast,
+            hasPortfolioData: true,
+            ratesAreStale: false,
+            allocations: [
+                WealthHighlightAllocation(
+                    name: "Bank Deposits",
+                    fraction: 0.65,
+                    systemImage: "building.columns.fill"
+                )
+            ]
+        )
+
+        #expect(summary.availability == .full)
+        #expect(summary.currentNetWorth == 1_050)
+        #expect(summary.baseline?.netWorth == 800)
+        #expect(summary.assetChange == 200)
+        #expect(summary.liabilityChange == -50)
+        #expect(summary.netWorthChange == 250)
+        #expect(summary.netWorthChangeFraction == 0.3125)
+        #expect(summary.insights.contains { $0.kind == .progress })
+        #expect(summary.insights.contains { $0.kind == .liability })
+        #expect(summary.insights.contains { $0.kind == .allocation })
+        #expect(summary.insights.count <= 4)
+    }
+
+    @MainActor
+    @Test func wealthHighlightBaselineUsesScopeAndEarliestInPeriodFallback() throws {
+        let calendar = Self.highlightsTestCalendar
+        let date = try #require(
+            calendar.date(from: DateComponents(year: 2026, month: 7, day: 4, hour: 9))
+        )
+        let period = try #require(
+            WealthHighlightPeriod(kind: .weekly, referenceDate: date, calendar: calendar)
+        )
+        let scopeStart = period.interval.start.addingTimeInterval(30)
+        let calculator = WealthHighlightCalculator()
+        let summary = calculator.summary(
+            period: period,
+            currencyCode: "USD",
+            currentAssetTotal: 500,
+            currentLiabilityTotal: 100,
+            snapshots: [
+                PortfolioSnapshot(
+                    assetTotal: 50,
+                    liabilityTotal: 10,
+                    currencyCode: "USD",
+                    recordedAt: period.interval.start.addingTimeInterval(-60)
+                ),
+                PortfolioSnapshot(
+                    assetTotal: 200,
+                    liabilityTotal: 60,
+                    currencyCode: "EUR",
+                    recordedAt: scopeStart.addingTimeInterval(10)
+                ),
+                PortfolioSnapshot(
+                    assetTotal: 300,
+                    liabilityTotal: 80,
+                    currencyCode: "USD",
+                    recordedAt: scopeStart.addingTimeInterval(20)
+                ),
+                PortfolioSnapshot(
+                    assetTotal: 350,
+                    liabilityTotal: 90,
+                    currencyCode: "USD",
+                    recordedAt: scopeStart.addingTimeInterval(40)
+                )
+            ],
+            historyScopeStartedAt: scopeStart,
+            hasPortfolioData: true,
+            ratesAreStale: false
+        )
+
+        #expect(summary.baseline?.assetTotal == 300)
+        #expect(summary.baseline?.liabilityTotal == 80)
+        #expect(summary.netWorthChange == 180)
+    }
+
+    @MainActor
+    @Test func wealthHighlightSummaryHandlesMissingZeroAndNegativeValues() throws {
+        let calendar = Self.highlightsTestCalendar
+        let date = try #require(
+            calendar.date(from: DateComponents(year: 2026, month: 7, day: 4, hour: 9))
+        )
+        let period = try #require(
+            WealthHighlightPeriod(kind: .weekly, referenceDate: date, calendar: calendar)
+        )
+        let baselineDate = period.interval.start.addingTimeInterval(-60)
+        let calculator = WealthHighlightCalculator()
+
+        let missing = calculator.summary(
+            period: period,
+            currencyCode: "USD",
+            currentAssetTotal: nil,
+            currentLiabilityTotal: 50,
+            snapshots: [],
+            historyScopeStartedAt: .distantPast,
+            hasPortfolioData: true,
+            ratesAreStale: true
+        )
+        let zero = calculator.summary(
+            period: period,
+            currencyCode: "USD",
+            currentAssetTotal: 300,
+            currentLiabilityTotal: 100,
+            snapshots: [
+                PortfolioSnapshot(
+                    assetTotal: 100,
+                    liabilityTotal: 100,
+                    currencyCode: "USD",
+                    recordedAt: baselineDate
+                )
+            ],
+            historyScopeStartedAt: .distantPast,
+            hasPortfolioData: true,
+            ratesAreStale: false
+        )
+        let negative = calculator.summary(
+            period: period,
+            currencyCode: "USD",
+            currentAssetTotal: 200,
+            currentLiabilityTotal: 150,
+            snapshots: [
+                PortfolioSnapshot(
+                    assetTotal: 100,
+                    liabilityTotal: 200,
+                    currencyCode: "USD",
+                    recordedAt: baselineDate
+                )
+            ],
+            historyScopeStartedAt: .distantPast,
+            hasPortfolioData: true,
+            ratesAreStale: false
+        )
+        let empty = calculator.summary(
+            period: period,
+            currencyCode: "USD",
+            currentAssetTotal: 0,
+            currentLiabilityTotal: 0,
+            snapshots: [],
+            historyScopeStartedAt: .distantPast,
+            hasPortfolioData: false,
+            ratesAreStale: false
+        )
+        let currentOnly = calculator.summary(
+            period: period,
+            currencyCode: "USD",
+            currentAssetTotal: 100,
+            currentLiabilityTotal: 0,
+            snapshots: [],
+            historyScopeStartedAt: .distantPast,
+            hasPortfolioData: true,
+            ratesAreStale: false
+        )
+
+        #expect(missing.availability == .unavailable)
+        #expect(missing.currentAssetTotal == nil)
+        #expect(missing.currentLiabilityTotal == nil)
+        #expect(missing.currentNetWorth == nil)
+        #expect(missing.ratesAreStale)
+        #expect(zero.netWorthChange == 200)
+        #expect(zero.netWorthChangeFraction == nil)
+        #expect(negative.netWorthChange == 150)
+        #expect(negative.netWorthChangeFraction == 1.5)
+        #expect(empty.availability == .empty)
+        #expect(currentOnly.availability == .currentOnly)
+        #expect(!currentOnly.insights.contains { $0.kind == .context })
+    }
+
+    @MainActor
     @Test func chatGPTAnalysisExportAnonymizesHoldingsAndIncludesAnalysisContext() async throws {
         let defaults = try makeIsolatedDefaults()
         let settings = AppSettings(
@@ -1945,6 +2361,14 @@ struct MyWealthTests {
             repository.appendingPathComponent("MyWealth/Resources/Localizable.xcstrings"),
             repository.appendingPathComponent("MyWealthWidget/Resources/Localizable.xcstrings")
         ]
+    }
+
+    private static var highlightsTestCalendar: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = Locale(identifier: "en_US_POSIX")
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.firstWeekday = 2
+        return calendar
     }
 
     private static func formatArguments(in value: String) -> [String] {
