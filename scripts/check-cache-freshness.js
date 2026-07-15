@@ -55,7 +55,7 @@ Options:
 
 Slack:
   If SLACK_WEBHOOK_URL is set, the script posts the full run summary to Slack
-  after every run, whether the result is OK, WARNING, or CRITICAL.`;
+  only when the result is CRITICAL (for example, an API failure or stale cache).`;
 }
 
 function parseArgs(argv) {
@@ -305,7 +305,7 @@ async function runCheck(argv = process.argv.slice(2), env = process.env) {
     overallStatus = Math.max(overallStatus, result.status);
   }
 
-  if (env.SLACK_WEBHOOK_URL) {
+  if (env.SLACK_WEBHOOK_URL && overallStatus === 2) {
     try {
       await postToSlack(env.SLACK_WEBHOOK_URL, results, overallStatus);
     } catch (error) {

@@ -192,7 +192,7 @@ For automation or manual health checks, run:
 
 The script checks both the exchange-rate and metal-price Firebase endpoints by default, reads each `cacheTimestamp` from the JSON response, and exits non-zero if either cache is older than 8 hours. Use `--exchange-only` or `--metal-only` for a single-endpoint check, `--threshold-hours N` to change the freshness window, or `--url URL` together with a single-endpoint option to override the endpoint.
 
-If the automation sets `SLACK_WEBHOOK_URL`, the script also posts the full run summary to Slack after every run.
+If the automation sets `SLACK_WEBHOOK_URL`, the script posts the full run summary to Slack only when the result is critical, such as when an API request fails or a cache is stale. Healthy runs and non-critical warnings do not post to Slack.
 
 ## Cloud Run Trigger
 
